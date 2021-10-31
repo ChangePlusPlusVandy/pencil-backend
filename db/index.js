@@ -2,7 +2,7 @@
 import config from '../config/db.config.js'
 import mysql from 'mysql'
 
-const connection = mysql.createPool({
+const connection = mysql.createConnection({
     host: config.HOST,
     port: config.PORT,
     user: config.USER,
@@ -10,10 +10,10 @@ const connection = mysql.createPool({
     database: config.DB
   });
 
-// connection.connect((err) => {
-//   if (err) throw err;
-//   console.log('Connected to db');
-// });
+connection.connect((err) => {
+  if (err) throw err;
+  console.log('Connected to db');
+});
 
 let pencildb = {};
 
