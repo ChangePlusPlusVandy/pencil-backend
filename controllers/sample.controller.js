@@ -1,8 +1,17 @@
-import db from '../db/index.js'
+
+import { 
+    connectDB as connectSQLDB,
+    close as closeSQLDB
+} from '../db/index.js';
+import {
+    connectDB as connectTeachersDB,
+    SQTeacher
+} from '../models/teacher-table.js';
 
 const get = async (req, res, next) => {
     try {
-        let result = await db.all()
+        await connectTeachersDB();
+        const result = await SQTeacher.findAll();
 
         res.json(result);
 
