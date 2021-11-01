@@ -1,8 +1,3 @@
-
-import { 
-    connectDB as connectSQLDB,
-    close as closeSQLDB
-} from '../db/index.js';
 import {
     connectDB as connectTeachersDB,
     SQTeacher

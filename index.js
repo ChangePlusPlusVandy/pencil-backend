@@ -2,7 +2,6 @@ import express from 'express'
 import cors from 'cors'
 
 import sampleRoutes from './routes/sample.routes.js'
-import config from './config/db.config.js'
 import bodyParser from 'body-parser'
 
 const app = express()
