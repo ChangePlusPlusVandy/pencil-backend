@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 
 import sampleRoutes from './routes/sample.routes.js'
+import formRoutes from './routes/form.routes.js'
 import bodyParser from 'body-parser'
 
 const app = express()
@@ -13,6 +14,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/sample', sampleRoutes)
+
+app.use('/api/form', formRoutes)
 
 const port = process.env.PORT || 8080
 

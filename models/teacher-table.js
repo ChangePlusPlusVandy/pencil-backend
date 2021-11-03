@@ -10,8 +10,9 @@ export async function connectDB() {
     if (sequelize) return;
     sequelize = await connectSQLDB();
     SQTeacher.init({
-        teacherkey: { type: Sequelize.DataTypes.STRING, 
-            primaryKey: true, unique: true }, 
+        teacherkey: {type: Sequelize.DataTypes.STRING,
+            primaryKey: true, unique: true },
+        
         firstName: Sequelize.DataTypes.STRING, 
         lastName: Sequelize.DataTypes.STRING, 
         email: Sequelize.DataTypes.STRING, 
