@@ -5,11 +5,12 @@ import {
 
 
 /**
- * Form page containing form with school items for teacher.
+ * Gets a teacher's profile.
  * 
- * @returns {Object} - Page containing form.
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
  * */
-const getTeacher = async (req, res, next) => {
+const getTeacher = async (req, res) => {
     try {
         res.json(req.profile);
     }
@@ -20,9 +21,13 @@ const getTeacher = async (req, res, next) => {
 }
 
 /**
- * Form page containing form with school items for teacher.
+ * Populates profile field with teacher information.
  * 
- * @returns {Object} - Page containing form.
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
+ * @param {function} next - Next middleware.
+ * @param {id} id - Teacher id.
+ * @returns {function} - Call to next controller.
  * */
 const teacherByID = async (req, res, next, id) => {
     try {
@@ -48,7 +53,7 @@ const teacherByID = async (req, res, next, id) => {
 
 
 
-const addTeacher = async (req, res, next) => {
+const addTeacher = async (req, res) => {
     try {
         console.log(req.body);
         await connectTeachersDB();
