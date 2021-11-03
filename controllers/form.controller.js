@@ -51,8 +51,12 @@ const teacherByID = async (req, res, next, id) => {
     }
 }
 
-
-
+/**
+ * Adds a teacher to the database.
+ * 
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
+ * */
 const addTeacher = async (req, res) => {
     try {
         console.log(req.body);

@@ -3,9 +3,13 @@ import Sequelize from 'sequelize';
 import { 
     connectDB as connectSQLDB
 } from '../db/index.js';
+
 var sequelize;
+
 export class SQTeacher extends Sequelize.Model {}
 
+
+// Connects to database and creates the table.
 export async function connectDB() {
     if (sequelize) return;
     sequelize = await connectSQLDB();
