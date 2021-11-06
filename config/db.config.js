@@ -2,7 +2,7 @@ const config = {
     HOST: 'localhost',
     PORT: '3306',
     USER: "root",
-    PASSWORD: "pencildb",
+    PASSWORD: "Tjdwodnjs@0810",
     DB: "pencildb"
 }
 

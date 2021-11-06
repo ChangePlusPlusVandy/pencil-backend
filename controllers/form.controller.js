@@ -2,6 +2,10 @@ import {
     connectDB as connectTeachersDB,
     SQTeacher
 } from '../models/teacher-table.js';
+import {
+    connectDB as connectSupplyFormDB,
+    SQSupplyForm
+} from '../models/temp-supply-form-table.js';
 
 
 /**
@@ -86,9 +90,47 @@ const addTeacher = async (req, res) => {
     }
 }
 
+// Testing
+const addSupply = async (req, res) => {
+    try {
+        await connectSupplyFormDB();
+        const sup = await SQSupplyForm.create({
+            item_id : 241,
+            item_name : "test",
+            max_limit : 130,
+            order : 98
+        });
+
+        if (!sup) return res.status(400).json({ error : "Sup empty." });
+        return res.json(sup);
+        
+    } catch (err) {
+        if(err) return res.status(400).json({ error : "addSupply - can't connect." });
+    }
+}
+
+/**
+ * Fetches the Supply Form from supply form table.
+ * @param {Object} req - Request Object
+ * @param {Object} res - Response Object
+ */
+const fetchForm = async(req, res) => {
+    try {
+        await connectSupplyFormDB();
+        const supplies = await SQSupplyForm.findAll();
+
+        if(!supplies) return res.status(400).json({ error : "fetchForm - supplies not found.."});
+
+        return res.status(200).json(supplies);
+    } catch {
+        return res.status(400).json({ error : "fetchForm - can't connect" });
+    }
+}
+
 export default {
     getTeacher,
     teacherByID,
-    addTeacher
-
+    addTeacher,
+    addSupply,
+    fetchForm
 }
