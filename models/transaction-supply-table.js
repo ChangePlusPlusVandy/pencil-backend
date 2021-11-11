@@ -25,7 +25,7 @@ export async function connectDB() {
 		},
 		{
 			sequelize,
-			modelName: "SQTeacher",
+			modelName: "SQTransactionSupply",
 		}
 	);
 	await SQTransactionSupply.sync();
