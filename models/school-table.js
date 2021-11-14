@@ -4,13 +4,13 @@ import { connectDB as connectSQLDB } from "../db/index.js";
 
 var sequelize;
 
-export class SQSchoolInfo extends Sequelize.Model {}
+export class SQSchool extends Sequelize.Model {}
 
 // Connects to database and creates the table.
 export async function connectDB() {
 	if (sequelize) return;
 	sequelize = await connectSQLDB();
-	SQSchoolInfo.init(
+	SQSchool.init(
 		{
 			schoolId: {
 				type: Sequelize.DataTypes.INTEGER,
@@ -22,8 +22,8 @@ export async function connectDB() {
 		},
 		{
 			sequelize,
-			modelName: "SQSchoolInfo",
+			modelName: "SQSchool",
 		}
 	);
-	await SQSchoolInfo.sync();
+	await SQSchool.sync();
 }
