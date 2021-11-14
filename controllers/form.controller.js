@@ -102,10 +102,10 @@ const addSupply = async (req, res) => {
     try {
         await connectSupplyFormDB();
         const sup = await SQShoppingForm.create({
-            item_id : 241,
-            item_name : "test",
-            max_limit : 130,
-            order : 98
+            itemId : 42,
+            itemName : "pencil",
+            maxLimit : 99,
+            itemOrder : 97
         });
 
         if (!sup) return res.status(400).json({ error : "Sup empty." });
