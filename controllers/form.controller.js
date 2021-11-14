@@ -6,7 +6,14 @@ import {
     connectDB as connectSupplyFormDB,
     SQSupplyForm
 } from '../models/temp-shopping-form-table.js';
-
+import {
+    connectDB as connectTransactionSupplyDB,
+    SQTransactionSupply
+} from '../models/transaction-supply-table.js';
+import {
+    connectDB as connectTransactionInfoDB,
+    SQTransactionInfo
+} from '../models/transaction-info-table.js';
 
 /**
  * Gets a teacher's profile.
@@ -114,7 +121,7 @@ const addSupply = async (req, res) => {
  * @param {Object} req - Request Object
  * @param {Object} res - Response Object
  */
-const fetchForm = async(req, res) => {
+const fetchShopForm = async(req, res) => {
     try {
         await connectSupplyFormDB();
         const supplies = await SQSupplyForm.findAll();
@@ -127,10 +134,50 @@ const fetchForm = async(req, res) => {
     }
 }
 
+const submitTransaction = async(req, res) => {
+    try {
+        await connectTransactionSupplyDB();
+        await connectTransactionInfoDB();
+        var datetime = new Date();
+        var time = {
+            year : datetime.getFullYear(),
+            month : datetime.getMonth() + 1,
+            day : datetime.getDate(),
+            hour : datetime.getHours(),
+            minute : datetime.getMinutes(),
+            second : datetime.getSeconds()
+        }
+        const infoObj = {
+            transactionID : 'rand',
+            teacher_id : req.teacher_id,
+            school_id : req.school_id,
+            time : time
+        }
+
+        const info = await SQTransactionInfo.create(infoObj);
+        if (!info) return res.status(400).json({ error : "Transaction Info not added." });
+
+        const supplyObj = {
+            transactionID : 'rand',
+            supply_taken : req.itemsObj
+        }
+
+        const supply = await SQTransactionSupply.create(supplyObj);
+        if (!supply) return res.status(400).json({ error : "Transaction Supply not added." });
+
+        return res.status(200)
+    } catch {
+        return res.status(400).json({ error : "Submit Transaction - cant submit" });
+    }
+}
+
+
+
 export default {
     getTeacher,
     teacherByID,
     addTeacher,
     addSupply,
-    fetchForm
+    fetchShopForm,
+    submitTransaction
 }
