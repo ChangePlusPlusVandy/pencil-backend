@@ -78,7 +78,7 @@ const addTeacher = async (req, res) => {
             lastName: req.body.lastName,
             email: req.body.email,
             phone: req.body.phone,
-            school: req.body.school,
+            schoolId: req.body.schoolId,
         });
 
         if (!teacher){
