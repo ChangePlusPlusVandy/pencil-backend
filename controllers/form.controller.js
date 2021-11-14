@@ -2,7 +2,18 @@ import {
     connectDB as connectTeachersDB,
     SQTeacher
 } from '../models/teacher-table.js';
-
+import {
+    connectDB as connectSupplyFormDB,
+    SQShoppingForm
+} from '../models/temp-shopping-form-table.js';
+import {
+    connectDB as connectTransactionSupplyDB,
+    SQTransactionSupply
+} from '../models/transaction-supply-table.js';
+import {
+    connectDB as connectTransactionInfoDB,
+    SQTransactionInfo
+} from '../models/transaction-info-table.js';
 
 /**
  * Gets a teacher's profile.
@@ -86,9 +97,87 @@ const addTeacher = async (req, res) => {
     }
 }
 
+// Testing
+const addSupply = async (req, res) => {
+    try {
+        await connectSupplyFormDB();
+        const sup = await SQShoppingForm.create({
+            item_id : 241,
+            item_name : "test",
+            max_limit : 130,
+            order : 98
+        });
+
+        if (!sup) return res.status(400).json({ error : "Sup empty." });
+        return res.json(sup);
+        
+    } catch (err) {
+        if(err) return res.status(400).json({ error : "addSupply - can't connect." });
+    }
+}
+
+/**
+ * Fetches the Supply Form from supply form table.
+ * @param {Object} req - Request Object
+ * @param {Object} res - Response Object
+ */
+const fetchShopForm = async(req, res) => {
+    try {
+        await connectSupplyFormDB();
+        const supplies = await SQShoppingForm.findAll();
+
+        if(!supplies) return res.status(400).json({ error : "fetchForm - supplies not found.."});
+
+        return res.status(200).json(supplies);
+    } catch {
+        return res.status(400).json({ error : "fetchForm - can't connect" });
+    }
+}
+
+const submitTransaction = async(req, res) => {
+    try {
+        await connectTransactionSupplyDB();
+        await connectTransactionInfoDB();
+        var datetime = new Date();
+        var time = {
+            year : datetime.getFullYear(),
+            month : datetime.getMonth() + 1,
+            day : datetime.getDate(),
+            hour : datetime.getHours(),
+            minute : datetime.getMinutes(),
+            second : datetime.getSeconds()
+        }
+        const infoObj = {
+            transactionID : 'rand',
+            teacher_id : req.teacher_id,
+            school_id : req.school_id,
+            time : time
+        }
+
+        const info = await SQTransactionInfo.create(infoObj);
+        if (!info) return res.status(400).json({ error : "Transaction Info not added." });
+
+        const supplyObj = {
+            transactionID : 'rand',
+            supply_taken : req.itemsObj
+        }
+
+        const supply = await SQTransactionSupply.create(supplyObj);
+        if (!supply) return res.status(400).json({ error : "Transaction Supply not added." });
+
+        return res.status(200)
+    } catch {
+        return res.status(400).json({ error : "Submit Transaction - cant submit" });
+    }
+}
+
+
+
 export default {
     getTeacher,
     teacherByID,
-    addTeacher
-
+    addTeacher,
+    addSupply,
+    fetchShopForm,
+    submitTransaction
 }

@@ -11,4 +11,13 @@ router.route('/create')
 
 router.param('teacherID', formController.teacherByID) // get teacher by id
 
+router.route('/addSupply')
+    .get(formController.addSupply) // add Supply - TESTING ONLY! To be deleted.
+
+router.route('/getShopForm')
+    .get(formController.fetchShopForm) // fetch Supply Form
+
+router.route('/transaction/submit')
+    .post(formController.submitTransaction)
+
 export default router
