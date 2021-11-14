@@ -3,15 +3,10 @@ import {
 	SQTeacher,
 } from "../models/teacher-table.js";
 import {
-<<<<<<< HEAD
-	connectDB as connectSupplyFormDB,
-	SQShoppingForm,
-} from "../models/shopping-form-table.js";
-=======
+
     connectDB as connectSupplyFormDB,
     SQShoppingForm
 } from '../models/shopping-form-table.js';
->>>>>>> arthur-backend
 import {
 	connectDB as connectTransactionDB,
 	SQTransaction,
