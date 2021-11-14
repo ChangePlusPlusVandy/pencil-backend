@@ -18,9 +18,7 @@ export async function connectDB() {
 				unique: true,
 			},
 
-			item1: Sequelize.DataTypes.INTEGER,
-			item2: Sequelize.DataTypes.INTEGER,
-			item3: Sequelize.DataTypes.INTEGER,
+			items: Sequelize.DataTypes.JSON,
 		},
 		{
 			sequelize,
