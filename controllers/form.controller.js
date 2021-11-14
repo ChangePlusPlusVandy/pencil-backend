@@ -3,7 +3,6 @@ import {
 	SQTeacher,
 } from "../models/teacher-table.js";
 import {
-
     connectDB as connectSupplyFormDB,
     SQShoppingForm
 } from '../models/shopping-form-table.js';
