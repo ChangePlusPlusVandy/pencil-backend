@@ -4,26 +4,26 @@ import { connectDB as connectSQLDB } from "../db/index.js";
 
 var sequelize;
 
-export class SQTransactionSupply extends Sequelize.Model {}
+export class SQSchool extends Sequelize.Model {}
 
 // Connects to database and creates the table.
 export async function connectDB() {
 	if (sequelize) return;
 	sequelize = await connectSQLDB();
-	SQTransactionSupply.init(
+	SQSchool.init(
 		{
-			transactionId: {
+			schoolId: {
 				type: Sequelize.DataTypes.INTEGER,
 				primaryKey: true,
 				unique: true,
 			},
 
-			items: Sequelize.DataTypes.JSON,
+			schoolName: Sequelize.DataTypes.STRING,
 		},
 		{
 			sequelize,
-			modelName: "SQTransactionSupply",
+			modelName: "SQSchool",
 		}
 	);
-	await SQTransactionSupply.sync();
+	await SQSchool.sync();
 }
