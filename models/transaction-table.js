@@ -4,13 +4,13 @@ import { connectDB as connectSQLDB } from "../db/index.js";
 
 var sequelize;
 
-export class SQTransactionSupply extends Sequelize.Model {}
+export class SQTransaction extends Sequelize.Model {}
 
 // Connects to database and creates the table.
 export async function connectDB() {
 	if (sequelize) return;
 	sequelize = await connectSQLDB();
-	SQTransactionSupply.init(
+	SQTransaction.init(
 		{
 			transactionId: {
 				type: Sequelize.DataTypes.INTEGER,
@@ -18,12 +18,15 @@ export async function connectDB() {
 				unique: true,
 			},
 
+			teacherId: Sequelize.DataTypes.INTEGER,
+			schoolId: Sequelize.DataTypes.INTEGER,
 			items: Sequelize.DataTypes.JSON,
+			time: Sequelize.DataTypes.DATE,
 		},
 		{
 			sequelize,
-			modelName: "SQTransactionSupply",
+			modelName: "SQTransaction",
 		}
 	);
-	await SQTransactionSupply.sync();
+	await SQTransaction.sync();
 }
