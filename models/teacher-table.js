@@ -22,7 +22,7 @@ export async function connectDB() {
 			lastName: Sequelize.DataTypes.STRING,
 			email: Sequelize.DataTypes.STRING,
 			phone: Sequelize.DataTypes.STRING,
-			school: Sequelize.DataTypes.TEXT,
+			schoolId: Sequelize.DataTypes.INTEGER,
 		},
 		{
 			sequelize,

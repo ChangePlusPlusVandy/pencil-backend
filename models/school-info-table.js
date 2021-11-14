@@ -22,7 +22,7 @@ export async function connectDB() {
 		},
 		{
 			sequelize,
-			modelName: "SQTransactionSupply",
+			modelName: "SQSchoolInfo",
 		}
 	);
 	await SQSchoolInfo.sync();
