@@ -4,7 +4,7 @@ import {
 } from '../models/teacher-table.js';
 import {
     connectDB as connectSupplyFormDB,
-    SQSupplyForm
+    SQShoppingForm
 } from '../models/temp-shopping-form-table.js';
 import {
     connectDB as connectTransactionSupplyDB,
@@ -101,7 +101,7 @@ const addTeacher = async (req, res) => {
 const addSupply = async (req, res) => {
     try {
         await connectSupplyFormDB();
-        const sup = await SQSupplyForm.create({
+        const sup = await SQShoppingForm.create({
             item_id : 241,
             item_name : "test",
             max_limit : 130,
@@ -124,7 +124,7 @@ const addSupply = async (req, res) => {
 const fetchShopForm = async(req, res) => {
     try {
         await connectSupplyFormDB();
-        const supplies = await SQSupplyForm.findAll();
+        const supplies = await SQShoppingForm.findAll();
 
         if(!supplies) return res.status(400).json({ error : "fetchForm - supplies not found.."});
 
