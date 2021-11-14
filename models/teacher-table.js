@@ -1,5 +1,4 @@
 import Sequelize from 'sequelize';
-
 import { 
     connectDB as connectSQLDB
 } from '../db/index.js';
@@ -28,4 +27,3 @@ export async function connectDB() {
     });
     await SQTeacher.sync();
 }
-
