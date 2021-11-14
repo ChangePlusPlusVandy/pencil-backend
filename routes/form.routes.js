@@ -1,14 +1,18 @@
-import express from 'express'
-import formController from '../controllers/form.controller.js'
+import express from "express";
+import formController from "../controllers/form.controller.js";
 
-const router = express.Router()
+const router = express.Router();
 
-router.route('/:teacherID')
-    .get(formController.getTeacher) // get teacher information for form
+router.route("/addSupply").post(formController.addSupply); // add Supply to shopping form
 
-router.route('/create')
-    .post(formController.addTeacher) // add teacher to database
+router.route("/getShopForm").get(formController.fetchShopForm); // fetch Supply Form
 
-router.param('teacherID', formController.teacherByID) // get teacher by id
+router.route("/:teacherID").get(formController.getTeacher); // get teacher information for form
 
-export default router
+router.param("teacherID", formController.teacherByID); // get teacher by id
+
+router.route("/create").post(formController.addTeacher); // add teacher to database
+
+router.route("/transaction/submit").post(formController.submitTransaction);
+
+export default router;
