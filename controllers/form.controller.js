@@ -5,7 +5,7 @@ import {
 import {
     connectDB as connectSupplyFormDB,
     SQShoppingForm
-} from '../models/temp-shopping-form-table.js';
+} from '../models/shopping-form-table.js';
 import {
     connectDB as connectTransactionSupplyDB,
     SQTransactionSupply
