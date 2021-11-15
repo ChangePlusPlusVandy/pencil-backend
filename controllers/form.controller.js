@@ -1,39 +1,32 @@
 import {
-    connectDB as connectTeachersDB,
-    SQTeacher
-} from '../models/teacher-table.js';
+	connectDB as connectTeachersDB,
+	SQTeacher,
+} from "../models/teacher-table.js";
 import {
-    connectDB as connectSupplyFormDB,
-    SQShoppingForm
-} from '../models/temp-shopping-form-table.js';
+	connectDB as connectSupplyFormDB,
+	SQShoppingForm,
+} from "../models/shopping-form-table.js";
 import {
-    connectDB as connectTransactionSupplyDB,
-    SQTransactionSupply
-} from '../models/transaction-supply-table.js';
-import {
-    connectDB as connectTransactionInfoDB,
-    SQTransactionInfo
-} from '../models/transaction-info-table.js';
+	connectDB as connectTransactionDB,
+	SQTransaction,
+} from "../models/transaction-table.js";
 
 /**
  * Gets a teacher's profile.
- * 
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * */
 const getTeacher = async (req, res) => {
-    try {
-        res.json(req.profile);
-    }
-    catch(err) {
-        console.log(err)
-        res.sendStatus(500)
-    }
-}
+	try {
+		res.json(req.profile);
+	} catch (err) {
+		console.log(err);
+		res.sendStatus(500);
+	}
+};
 
 /**
  * Populates profile field with teacher information.
- * 
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * @param {function} next - Next middleware.
@@ -41,143 +34,149 @@ const getTeacher = async (req, res) => {
  * @returns {function} - Call to next controller.
  * */
 const teacherByID = async (req, res, next, id) => {
-    try {
-        await connectTeachersDB();
-        const teacher = await SQTeacher.findOne({where: {teacherkey: id}});
+	try {
+		await connectTeachersDB();
+		const teacher = await SQTeacher.findOne({ where: { teacherkey: id } });
 
-        if (!teacher){
-        return res.status('400').json({
-            error: "Teacher not found"
-        })
-        
-        }
-        
-        req.profile = teacher
+		if (!teacher) {
+			return res.status("400").json({
+				error: "Teacher not found",
+			});
+		}
 
-        return next()
-    } catch (err) {
-        return res.status('400').json({
-        error: "Could not retrieve teacher"
-        })
-    }
-}
+		req.profile = teacher;
+
+		return next();
+	} catch (err) {
+		return res.status("400").json({
+			error: "Could not retrieve teacher",
+		});
+	}
+};
 
 /**
  * Adds a teacher to the database.
- * 
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * */
 const addTeacher = async (req, res) => {
-    try {
-        console.log(req.body);
-        await connectTeachersDB();
-        const teacher = await SQTeacher.create({
-            teacherkey: req.body.teacherkey,
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            phone: req.body.phone,
-            school: req.body.school,
-        });
+	try {
+		console.log(req.body);
+		await connectTeachersDB();
+		const teacher = await SQTeacher.create({
+			teacherkey: req.body.teacherkey,
+			firstName: req.body.firstName,
+			lastName: req.body.lastName,
+			email: req.body.email,
+			phone: req.body.phone,
+			schoolId: req.body.schoolId,
+		});
 
-        if (!teacher){
-        return res.status('400').json({
-            error: "Teacher not found"
-        })
-        
-        }
-        res.json(teacher);
-        
-    } catch (err) {
-        console.log(err)
-        return res.status('400').json({
-        error: "Could not create teacher",
-        })
-    }
-}
+		if (!teacher) {
+			return res.status("400").json({
+				error: "Teach not found",
+			});
+		}
+		res.json(teacher);
+	} catch (err) {
+		console.log(err);
+		return res.status("400").json({
+			error: "Could not create teacher",
+		});
+	}
+};
 
-// Testing
+/**
+ * Adds a supply to the form database.
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
+ * */
 const addSupply = async (req, res) => {
-    try {
-        await connectSupplyFormDB();
-        const sup = await SQShoppingForm.create({
-            item_id : 241,
-            item_name : "test",
-            max_limit : 130,
-            order : 98
-        });
+	try {
+		await connectSupplyFormDB();
+		const sup = await SQShoppingForm.create({
+			itemId: req.body.itemId,
+			itemName: req.body.itemName,
+			maxLimit: req.body.maxLimit,
+			itemOrder: req.body.itemOrder,
+		});
 
-        if (!sup) return res.status(400).json({ error : "Sup empty." });
-        return res.json(sup);
-        
-    } catch (err) {
-        if(err) return res.status(400).json({ error : "addSupply - can't connect." });
-    }
-}
+        if (!sup) {
+            console.log("addSupply : Sup empty.")
+            return res.status(400).json({ error: "Internal Server Error" });
+        } 
+
+		res.status(200).json(sup);
+	} catch (err) {
+		console.log("addSupply : can't connect");
+		return res
+			    .status(400)
+			    .json({ error: "Internal Server Error" });
+	}
+};
 
 /**
  * Fetches the Supply Form from supply form table.
  * @param {Object} req - Request Object
  * @param {Object} res - Response Object
  */
-const fetchShopForm = async(req, res) => {
-    try {
-        await connectSupplyFormDB();
-        const supplies = await SQShoppingForm.findAll();
+const fetchShopForm = async (req, res) => {
+	try {
+		await connectSupplyFormDB();
+		const supplies = await SQShoppingForm.findAll();
 
-        if(!supplies) return res.status(400).json({ error : "fetchForm - supplies not found.."});
-
-        return res.status(200).json(supplies);
-    } catch {
-        return res.status(400).json({ error : "fetchForm - can't connect" });
-    }
-}
-
-const submitTransaction = async(req, res) => {
-    try {
-        await connectTransactionSupplyDB();
-        await connectTransactionInfoDB();
-        var datetime = new Date();
-        var time = {
-            year : datetime.getFullYear(),
-            month : datetime.getMonth() + 1,
-            day : datetime.getDate(),
-            hour : datetime.getHours(),
-            minute : datetime.getMinutes(),
-            second : datetime.getSeconds()
-        }
-        const infoObj = {
-            transactionID : 'rand',
-            teacher_id : req.teacher_id,
-            school_id : req.school_id,
-            time : time
+		if (!supplies) {
+            console.log("fetchForm - supplies not found..");
+            return res
+				.status(400)
+				.json({ error: "Internal Server Error" });
         }
 
-        const info = await SQTransactionInfo.create(infoObj);
-        if (!info) return res.status(400).json({ error : "Transaction Info not added." });
+		return res.status(200).json(supplies);
+	} catch {
+        console.log("fetchForm - can't connect");
+		return res.status(400).json({ error: "Internal Server Error" });
+	}
+};
 
-        const supplyObj = {
-            transactionID : 'rand',
-            supply_taken : req.itemsObj
+/**
+ * Submits a User Transaction and adds data to the Transaction Table.
+ * @param {Object} req - Request Object
+ * @param {Object} res - Response Object
+ */
+const submitTransaction = async (req, res) => {
+	try {
+		await connectTransactionDB();
+		const infoObj = {
+			transactionId: "rand",
+			teacherId: req.body.teacher_id,
+			schoolId: req.body.school_id,
+            items : req.body.items,
+		};
+
+		const transaction = await SQTransaction.create(infoObj);
+
+		if (!transaction) {
+            console.log("Transaction Info not added.")
+            return res
+				.status(400)
+				.json({ error: "Internal Server Error" });
+
         }
 
-        const supply = await SQTransactionSupply.create(supplyObj);
-        if (!supply) return res.status(400).json({ error : "Transaction Supply not added." });
-
-        return res.status(200)
-    } catch {
-        return res.status(400).json({ error : "Submit Transaction - cant submit" });
-    }
-}
-
-
+		return res.status(200).json(infoObj);
+	} catch {
+		return res
+			.status(400)
+			.json({ error: "Submit Transaction - cant submit" });
+	}
+};
 
 export default {
-    getTeacher,
-    teacherByID,
-    addTeacher,
-    addSupply,
-    fetchShopForm,
-    submitTransaction
-}
+	getTeacher,
+	teacherByID,
+	addTeacher,
+	addSupply,
+	fetchShopForm,
+	submitTransaction,
+};

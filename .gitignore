@@ -1,5 +1,9 @@
 /node_modules/
 package-lock.json
+<<<<<<< HEAD
+db.config.js
+=======
 
 
 config
+>>>>>>> f3ddefcb5958749c4c3712d3246e331b65cd47ec
