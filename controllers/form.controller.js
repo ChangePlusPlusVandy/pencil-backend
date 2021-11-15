@@ -21,7 +21,7 @@ const getTeacher = async (req, res) => {
 		res.json(req.profile);
 	} catch (err) {
 		console.log(err);
-		res.sendStatus(500);
+		return res.status(500).json({ error: "Internal Server Error" });
 	}
 };
 
@@ -39,7 +39,7 @@ const teacherByID = async (req, res, next, id) => {
 		const teacher = await SQTeacher.findOne({ where: { teacherkey: id } });
 
 		if (!teacher) {
-			return res.status("400").json({
+			return res.status(400).json({
 				error: "Teacher not found",
 			});
 		}
@@ -48,7 +48,7 @@ const teacherByID = async (req, res, next, id) => {
 
 		return next();
 	} catch (err) {
-		return res.status("400").json({
+		return res.status(400).json({
 			error: "Could not retrieve teacher",
 		});
 	}
@@ -73,14 +73,14 @@ const addTeacher = async (req, res) => {
 		});
 
 		if (!teacher) {
-			return res.status("400").json({
-				error: "Teach not found",
+			return res.status(400).json({
+				error: "Teacher not found",
 			});
 		}
 		res.json(teacher);
 	} catch (err) {
 		console.log(err);
-		return res.status("400").json({
+		return res.status(400).json({
 			error: "Could not create teacher",
 		});
 	}
@@ -103,15 +103,13 @@ const addSupply = async (req, res) => {
 
         if (!sup) {
             console.log("addSupply : Sup empty.")
-            return res.status(400).json({ error: "Internal Server Error" });
+            return res.status(500).json({ error: "Internal Server Error" });
         } 
 
 		res.status(200).json(sup);
 	} catch (err) {
 		console.log("addSupply : can't connect");
-		return res
-			    .status(400)
-			    .json({ error: "Internal Server Error" });
+		return res.status(500).json({ error: "Internal Server Error" });
 	}
 };
 
@@ -135,7 +133,7 @@ const fetchShopForm = async (req, res) => {
 		return res.status(200).json(supplies);
 	} catch {
         console.log("fetchForm - can't connect");
-		return res.status(400).json({ error: "Internal Server Error" });
+		return res.status(500).json({ error: "Internal Server Error" });
 	}
 };
 
@@ -158,9 +156,7 @@ const submitTransaction = async (req, res) => {
 
 		if (!transaction) {
             console.log("Transaction Info not added.")
-            return res
-				.status(400)
-				.json({ error: "Internal Server Error" });
+            return res.status(500).json({ error: "Internal Server Error" });
 
         }
 
