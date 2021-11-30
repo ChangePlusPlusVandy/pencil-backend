@@ -1,7 +1,7 @@
 import {
   connectDB as connectTeachersDB,
   SQTeacher,
-} from '../models/teacher-table';
+} from '../models/teacher-table.js';
 
 const get = async (req, res) => {
   try {

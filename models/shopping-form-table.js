@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 
-import { connectDB as connectSQLDB } from '../db/index';
+import { connectDB as connectSQLDB } from '../db/index.js';
 
 let sequelize;
 

@@ -68,7 +68,8 @@
       "no-console": "off",
       "no-unused-vars": "warn",
       "no-var": "error",
-      "prefer-const": "error"
+      "prefer-const": "error",
+      "import/extensions": "off"
     }
   }
 }

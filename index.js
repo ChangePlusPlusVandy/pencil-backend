@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 
-import sampleRoutes from './routes/sample.routes';
-import formRoutes from './routes/form.routes';
+import sampleRoutes from './routes/sample.routes.js';
+import formRoutes from './routes/form.routes.js';
 
 const app = express();
 

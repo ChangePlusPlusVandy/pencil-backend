@@ -1,15 +1,15 @@
 import {
   connectDB as connectTeachersDB,
   SQTeacher,
-} from '../models/teacher-table';
+} from '../models/teacher-table.js';
 import {
   connectDB as connectSupplyFormDB,
   SQShoppingForm,
-} from '../models/shopping-form-table';
+} from '../models/shopping-form-table.js';
 import {
   connectDB as connectTransactionDB,
   SQTransaction,
-} from '../models/transaction-table';
+} from '../models/transaction-table.js';
 
 /**
  * Gets a teacher's profile.
