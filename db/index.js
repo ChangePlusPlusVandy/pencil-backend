@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 // eslint-disable-next-line import/no-unresolved
-import config from '../config/db.config';
+import config from '../config/db.config.js';
 
 let sqldb;
 
