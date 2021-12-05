@@ -21,7 +21,6 @@ export async function connectDB() {
       teacherId: Sequelize.DataTypes.INTEGER,
       schoolId: Sequelize.DataTypes.INTEGER,
       items: Sequelize.DataTypes.JSON,
-      time: Sequelize.DataTypes.DATE,
     },
     {
       sequelize,
