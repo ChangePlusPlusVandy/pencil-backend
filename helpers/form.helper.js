@@ -1,7 +1,8 @@
 import {
-  connectDB,
+  connectDB as connectTempTransactionDB,
   SQTempTransaction
 } from '../models/temp-transaction-table.js';
+
 
 /**
  * Retrieves a row from the tempTransactionDB, given a transaction ID.
@@ -11,7 +12,7 @@ import {
  */
 const transactionByID = async (id) => {
   try {
-    await connectDB();
+    await connectTempTransactionDB();
     const transaction = await SQTempTransaction.findOne({
       where: {
         transactionId: id,
