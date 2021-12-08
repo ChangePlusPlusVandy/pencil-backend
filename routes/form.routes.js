@@ -15,4 +15,6 @@ router.route('/create').post(formController.addTeacher); // add teacher to datab
 
 router.route('/transaction/submit').post(formController.submitTransaction);
 
+router.route('/updateSupply').put(formController.updateSupply);
+
 export default router;
