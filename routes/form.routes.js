@@ -21,4 +21,6 @@ router.route('/updateSupply').put(formController.updateSupply);
 
 router.param('teacherID', formController.teacherByID); // get teacher by id
 
+router.route('/transaction/approve').post(formController.approveTransaction);
+
 export default router;
