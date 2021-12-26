@@ -17,6 +17,7 @@ import {
  * @param {Object} res - Response object.
  * */
 const getTeacher = async (req, res) => {
+  console.log(req);
   try {
     return res.json(req.profile);
   } catch (err) {
@@ -33,20 +34,33 @@ const getTeacher = async (req, res) => {
  * @param {id} id - Teacher id.
  * @returns {function} - Call to next controller.
  * */
+// eslint-disable-next-line consistent-return
 const teacherByID = async (req, res, next, id) => {
   try {
     await connectTeachersDB();
-    const teacher = await SQTeacher.findOne({ where: { teacherkey: id } });
+    console.log(id);
+    const teacher = await SQTeacher.findOne({ where: { teacherkey: id } })
+      .then((data) => {
+        if (!data) {
+          res.status(400).json({
+            error: 'Teacher not found',
+          });
+        }
+        req.profile = data;
+        return next();
+      })
+      .catch((err) =>
+        res.status(400).json({
+          error: 'Teacher not found',
+        })
+      );
 
+    console.log(teacher);
     if (!teacher) {
       return res.status(400).json({
         error: 'Teacher not found',
       });
     }
-
-    req.profile = teacher;
-
-    return next();
   } catch (err) {
     return res.status(400).json({
       error: 'Could not retrieve teacher',
