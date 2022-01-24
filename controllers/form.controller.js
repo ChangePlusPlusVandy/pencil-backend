@@ -111,30 +111,33 @@ const addTeacher = async (req, res) => {
  * @param {Object} res - Response object.
  * */
 const addSupply = async (req, res) => {
-	try {
-		await connectSupplyFormDB();
+  try {
+    await connectSupplyFormDB();
 
-		SQShoppingForm.create({
-			itemId: req.body.itemId,
-			itemName: req.body.itemName,
-			maxLimit: req.body.maxLimit,
-			itemOrder: req.body.itemOrder,
-		}, (supply) => {
-			if (!supply) {
-				console.log("addSupply : Sup empty.")
-				return res.status(500).json({ error: "Internal Server Error" });
-			}
+    SQShoppingForm.create(
+      {
+        itemId: req.body.itemId,
+        itemName: req.body.itemName,
+        maxLimit: req.body.maxLimit,
+        itemOrder: req.body.itemOrder,
+      },
+      (supply) => {
+        if (!supply) {
+          console.log('addSupply : Sup empty.');
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
 
-			res.status(200).json(supply);
-		});
+        return res.status(200).json(supply);
+      }
+    );
 
-		console.log("addSupply : Improper Return.")
-		res.status(500).json({ error: "Internal Server Error" });
-	} catch (err) {
-		console.log("addSupply : can't connect");
-		return res.status(500).json({ error: "Internal Server Error" });
-    }
-  };
+    console.log('addSupply : Improper Return.');
+    return res.status(500).json({ error: 'Internal Server Error' });
+  } catch (err) {
+    console.log("addSupply : can't connect");
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 
 /**
  * Adds a supply to the form database.
@@ -179,24 +182,19 @@ const updateSupply = async (req, res) => {
  * @param {Object} res - Response Object
  */
 const fetchShopForm = async (req, res) => {
-	try {
-		await connectSupplyFormDB();
+  try {
+    await connectSupplyFormDB();
+    const supplies = await SQShoppingForm.findAll();
 
-		SQShoppingForm.findAll((supplies) => {
-			if (!supplies) {
-				console.log("fetchShopForm : supplies not found..");
-				return res.status(500).json({ error: "Internal Server Error" });
-			}
-
-			return res.status(200).json(supplies);
-		});
-
-		console.log("fetchForm : Improper Return.");
-		return res.status(500).json({ error: "Internal Server Error" });
-	} catch {
-    console.log("fetchForm : can't connect");
-		return res.status(500).json({ error: "Internal Server Error" });
-	}
+    if (!supplies) {
+      console.log('fetchForm - supplies not found..');
+      return res.status(400).json({ error: 'No items found' });
+    }
+    return res.status(200).json(supplies);
+  } catch (err) {
+    console.log('fetchForm - can not connect');
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 };
 
 /**
@@ -208,7 +206,7 @@ const submitTransaction = async (req, res) => {
   try {
     await connectTempTransactionDB();
     const infoObj = {
-			transactionId: "rand",
+      transactionId: 'rand',
       teacherId: req.body.teacher_id,
       schoolId: req.body.school_id,
       items: req.body.items,
