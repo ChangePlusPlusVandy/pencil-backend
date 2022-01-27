@@ -17,9 +17,9 @@ const submitTransaction = async (req, res) => {
   try {
     await connectTempTransactionDB();
     const infoObj = {
-      transactionId: 'rand',
-      teacherId: req.body.teacher_id,
-      schoolId: req.body.school_id,
+      transactionId: Math.floor(Math.random() * 100), // FIX
+      teacherId: req.body.teacherId,
+      schoolId: req.body.schoolId,
       items: req.body.items,
     };
 
@@ -31,6 +31,7 @@ const submitTransaction = async (req, res) => {
     }
     return res.status(200).json(infoObj);
   } catch (err) {
+    console.log(err);
     return res.status(400).json({ error: 'Submit Transaction - cant submit' });
   }
 };
@@ -70,7 +71,18 @@ const approveTransaction = async (req, res) => {
   }
 };
 
+const getAllTransactions = async (req, res) => {
+  try {
+    await connectTransactionDB();
+    const transactions = await SQTransaction.findAll();
+    return transactions;
+  } catch (err) {
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 export default {
   submitTransaction,
   approveTransaction,
+  getAllTransactions,
 };

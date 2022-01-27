@@ -11,4 +11,8 @@ router
   .route('/transaction/approve')
   .post(transactionController.approveTransaction);
 
+router
+  .route('/transaction/transactions')
+  .get(transactionController.getAllTransactions);
+
 export default router;
