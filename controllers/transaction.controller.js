@@ -73,10 +73,11 @@ const approveTransaction = async (req, res) => {
 
 const getAllTransactions = async (req, res) => {
   try {
-    await connectTransactionDB();
-    const transactions = await SQTransaction.findAll();
-    return transactions;
+    await connectTempTransactionDB();
+    const transactions = await SQTempTransaction.findAll();
+    return res.status(200).json(transactions);
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
