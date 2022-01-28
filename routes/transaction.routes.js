@@ -5,14 +5,14 @@ const router = express.Router();
 
 router
   .route('/transaction/submit')
-  .post(transactionController.submitTransaction);
+  .post(transactionController.submitTransaction); // submit transaction to temp table
 
 router
   .route('/transaction/approve')
-  .post(transactionController.approveTransaction);
+  .post(transactionController.approveTransaction); // approve transaction from temp table to transaction table
 
 router
   .route('/transaction/transactions')
-  .get(transactionController.getAllTransactions);
+  .get(transactionController.getAllTransactions); // get all transactions from temp table
 
 export default router;

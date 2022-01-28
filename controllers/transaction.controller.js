@@ -71,6 +71,12 @@ const approveTransaction = async (req, res) => {
   }
 };
 
+/**
+ * Provides all temporary transactions.
+ *
+ * @param {Object} req - Request Object
+ * @param {Object} res - Response Object with populated array of transactions to approve
+ */
 const getAllTransactions = async (req, res) => {
   try {
     await connectTempTransactionDB();
