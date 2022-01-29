@@ -17,7 +17,7 @@ const submitTransaction = async (req, res) => {
   try {
     await connectTempTransactionDB();
     const infoObj = {
-      transactionId: 'rand',
+      transactionId: req.body.transaction_id,
       teacherId: req.body.teacher_id,
       schoolId: req.body.school_id,
       items: req.body.items,
@@ -85,13 +85,9 @@ const denyTransaction = async (req, res) => {
 
     // Delete transaction from temp table
     await connectTempTransactionDB();
-    result = await transaction.destroy();
+    await transaction.destroy();
 
-    if (!result) {
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-
-    return res.status(200);
+    return res.status(200).json( { status: 'Record deleted' });
   }
   catch {
     return res.status(500).json({ error: 'Internal Server Error' });
