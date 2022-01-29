@@ -15,4 +15,10 @@ router
   .route('/transaction/transactions')
   .get(transactionController.getAllTransactions); // get all transactions from temp table
 
+router
+  .route('/transaction/:transactionID')
+  .get(transactionController.getTransaction); // get one transaction
+
+router.param('transactionID', transactionController.transactionByID); // param for transactionID
+
 export default router;
