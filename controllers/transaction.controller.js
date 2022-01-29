@@ -88,8 +88,24 @@ const getAllTransactions = async (req, res) => {
   }
 };
 
+/**
+ * Gets a transaction profile.
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
+ * */
+const getTransaction = async (req, res) => {
+  try {
+    return res.json(req.profile);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 export default {
   submitTransaction,
   approveTransaction,
   getAllTransactions,
+  getTransaction,
+  transactionByID,
 };
