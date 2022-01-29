@@ -70,7 +70,36 @@ const approveTransaction = async (req, res) => {
   }
 };
 
+/**
+
+ */
+const denyTransaction = async (req, res) => {
+  try {
+    // Get transaction from temp table
+    const transaction = await transactionByID(req.body.id);
+
+    if (!transaction) {
+      console.log('Row not found in temp table');
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Delete transaction from temp table
+    await connectTempTransactionDB();
+    result = await transaction.destroy();
+
+    if (!result) {
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    return res.status(200);
+  }
+  catch {
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
 export default {
   submitTransaction,
   approveTransaction,
+  denyTransaction
 };
