@@ -9,7 +9,6 @@ import {
  * @param {Object} res - Response object.
  * */
 const getTeacher = async (req, res) => {
-  console.log(req);
   try {
     return res.json(req.profile);
   } catch (err) {
@@ -34,10 +33,11 @@ const teacherByID = async (req, res, next, id) => {
     const teacher = await SQTeacher.findOne({ where: { teacherkey: id } })
       .then((data) => {
         if (!data) {
-          res.status(400).json({
-            error: 'Teacher not found',
+          return res.status(403).json({
+            error: 'Invalid teacher ID',
           });
         }
+        console.log('meh');
         req.profile = data;
         return next();
       })
@@ -46,13 +46,6 @@ const teacherByID = async (req, res, next, id) => {
           error: 'Teacher not found',
         })
       );
-
-    console.log(teacher);
-    if (!teacher) {
-      return res.status(400).json({
-        error: 'Teacher not found',
-      });
-    }
   } catch (err) {
     return res.status(400).json({
       error: 'Could not retrieve teacher',

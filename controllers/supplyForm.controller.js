@@ -88,6 +88,7 @@ const fetchSupplyForm = async (req, res) => {
       console.log('fetchForm - supplies not found..');
       return res.status(400).json({ error: 'No items found' });
     }
+    supplies.sort((a, b) => a.itemOrder - b.itemOrder);
     return res.status(200).json(supplies);
   } catch (err) {
     console.log('fetchForm - can not connect');

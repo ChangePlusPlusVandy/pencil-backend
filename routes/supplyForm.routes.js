@@ -7,6 +7,6 @@ router.route('/addSupply').post(formController.addSupply); // add Supply to shop
 
 router.route('/getShopForm').get(formController.fetchSupplyForm); // fetch Supply Form
 
-router.route('/updateSupply').put(formController.updateSupply);
+router.route('/updateSupply').put(formController.updateSupply); // update Supply in shopping form
 
 export default router;
