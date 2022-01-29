@@ -11,4 +11,10 @@ router
   .route('/transaction/approve')
   .post(transactionController.approveTransaction);
 
+router
+  .route('/transaction/deny')
+  .post(transactionController.denyTransaction);
+
+
+
 export default router;
