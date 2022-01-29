@@ -71,7 +71,10 @@ const approveTransaction = async (req, res) => {
 };
 
 /**
-
+ * Delete transaction from temporary transaction table.
+ * 
+ * @param {Object} req - Request Object with structure { id: INT }
+ * @param {Object} res - Response Object
  */
 const denyTransaction = async (req, res) => {
   try {
