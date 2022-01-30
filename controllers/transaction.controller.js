@@ -17,9 +17,9 @@ const submitTransaction = async (req, res) => {
   try {
     await connectTempTransactionDB();
     const infoObj = {
-      transactionId: req.body.transaction_id,
-      teacherId: req.body.teacher_id,
-      schoolId: req.body.school_id,
+      transactionId: Math.floor(Math.random() * 100), // FIX
+      teacherId: req.body.teacherId,
+      schoolId: req.body.schoolId,
       items: req.body.items,
     };
 
@@ -31,6 +31,7 @@ const submitTransaction = async (req, res) => {
     }
     return res.status(200).json(infoObj);
   } catch (err) {
+    console.log(err);
     return res.status(400).json({ error: 'Submit Transaction - cant submit' });
   }
 };
@@ -96,9 +97,26 @@ const denyTransaction = async (req, res) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 }
+/*
+ * Provides all temporary transactions.
+ *
+ * @param {Object} req - Request Object
+ * @param {Object} res - Response Object with populated array of transactions to approve
+ */
+const getAllTransactions = async (req, res) => {
+  try {
+    await connectTempTransactionDB();
+    const transactions = await SQTempTransaction.findAll();
+    return res.status(200).json(transactions);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 
 export default {
   submitTransaction,
   approveTransaction,
-  denyTransaction
+  denyTransaction,
+  getAllTransactions,
 };
