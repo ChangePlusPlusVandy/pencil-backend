@@ -15,4 +15,10 @@ router
   .route('/transaction/transactions')
   .get(transactionController.getAllTransactions); // get all transactions from temp table
 
+router
+  .route('/transaction/deny')
+  .post(transactionController.denyTransaction);
+
+
+
 export default router;
