@@ -72,6 +72,32 @@ const approveTransaction = async (req, res) => {
 };
 
 /**
+ * Delete transaction from temporary transaction table.
+ * 
+ * @param {Object} req - Request Object with structure { id: INT }
+ * @param {Object} res - Response Object
+ */
+const denyTransaction = async (req, res) => {
+  try {
+    // Get transaction from temp table
+    const transaction = await transactionByID(req.body.id);
+
+    if (!transaction) {
+      console.log('Row not found in temp table');
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Delete transaction from temp table
+    await connectTempTransactionDB();
+    await transaction.destroy();
+
+    return res.status(200).json( { status: 'Record deleted' });
+  }
+  catch {
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+/*
  * Provides all temporary transactions.
  *
  * @param {Object} req - Request Object
@@ -105,6 +131,7 @@ const getTransaction = async (req, res) => {
 export default {
   submitTransaction,
   approveTransaction,
+  denyTransaction,
   getAllTransactions,
   getTransaction,
   transactionByID,
