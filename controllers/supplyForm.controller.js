@@ -82,7 +82,9 @@ const updateSupply = async (req, res) => {
 const fetchSupplyForm = async (req, res) => {
   try {
     await connectSupplyFormDB();
-    const supplies = await SQShoppingForm.findAll();
+    const supplies = await SQShoppingForm.findAll({
+      attributes: ['itemId', 'itemName', 'maxLimit', 'itemOrder'],
+    });
 
     if (!supplies) {
       console.log('fetchForm - supplies not found..');
