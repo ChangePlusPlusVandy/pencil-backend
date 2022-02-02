@@ -73,7 +73,7 @@ const approveTransaction = async (req, res) => {
 
 /**
  * Delete transaction from temporary transaction table.
- * 
+ *
  * @param {Object} req - Request Object with structure { id: INT }
  * @param {Object} res - Response Object
  */
@@ -91,12 +91,11 @@ const denyTransaction = async (req, res) => {
     await connectTempTransactionDB();
     await transaction.destroy();
 
-    return res.status(200).json( { status: 'Record deleted' });
-  }
-  catch {
+    return res.status(200).json({ status: 'Record deleted' });
+  } catch (err) {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
-}
+};
 /*
  * Provides all temporary transactions.
  *
