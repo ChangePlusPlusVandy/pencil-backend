@@ -1,12 +1,16 @@
 import {
   connectDB as connectTransactionDB,
   SQTransaction,
-} from '../models/transaction-table.js';
+} from "../models/transaction-table.js";
 import {
   connectDB as connectTempTransactionDB,
   SQTempTransaction,
-} from '../models/temp-transaction-table.js';
-import transactionByID from '../helpers/transaction.helper.js';
+} from "../models/temp-transaction-table.js";
+import {
+  connectDB as connectDeniedTransactionDB,
+  SQDeniedTransaction,
+} from "../models/denied-transaction-table.js";
+import transactionByID from "../helpers/transaction.helper.js";
 
 /**
  * Submits a User Transaction and adds data to the Transaction Table.
@@ -26,13 +30,13 @@ const submitTransaction = async (req, res) => {
     const transaction = await SQTempTransaction.create(infoObj);
 
     if (!transaction) {
-      console.log('Transaction Info not added.');
-      return res.status(500).json({ error: 'Internal Server Error' });
+      console.log("Transaction Info not added.");
+      return res.status(500).json({ error: "Internal Server Error" });
     }
     return res.status(200).json(infoObj);
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ error: 'Submit Transaction - cant submit' });
+    return res.status(400).json({ error: "Submit Transaction - cant submit" });
   }
 };
 
@@ -46,19 +50,19 @@ const submitTransaction = async (req, res) => {
 const approveTransaction = async (req, res) => {
   try {
     // Get transaction from temp table
-    const transaction = await transactionByID(req.body.id);
+    const transaction = await transactionByID(req.body.transactionId);
 
     if (!transaction) {
-      console.log('Row not found in temp table');
-      return res.status(500).json({ error: 'Internal Server Error' });
+      console.log("Row not found in temp table");
+      return res.status(500).json({ error: "Internal Server Error" });
     }
 
     await connectTransactionDB();
     const finalTransaction = await SQTransaction.create(transaction.toJSON());
 
     if (!finalTransaction) {
-      console.log('Transaction approval failed');
-      return res.status(500).json({ error: 'Internal Server Error' });
+      console.log("Transaction approval failed");
+      return res.status(500).json({ error: "Internal Server Error" });
     }
 
     // Delete transaction from temp table
@@ -67,7 +71,7 @@ const approveTransaction = async (req, res) => {
 
     return res.status(200).json(finalTransaction);
   } catch (err) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -77,25 +81,35 @@ const approveTransaction = async (req, res) => {
  * @param {Object} req - Request Object with structure { id: INT }
  * @param {Object} res - Response Object
  */
+
 const denyTransaction = async (req, res) => {
   try {
     // Get transaction from temp table
-    const transaction = await transactionByID(req.body.id);
+    const transaction = await transactionByID(req.body.transactionId);
 
     if (!transaction) {
-      console.log('Row not found in temp table');
-      return res.status(500).json({ error: 'Internal Server Error' });
+      console.log("Row not found in temp table");
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    await connectDeniedTransactionDB();
+    const finalTransaction = await SQTransaction.create(transaction.toJSON());
+
+    if (!finalTransaction) {
+      console.log("Transaction approval failed");
+      return res.status(500).json({ error: "Internal Server Error" });
     }
 
     // Delete transaction from temp table
     await connectTempTransactionDB();
-    await transaction.destroy();
+    transaction.destroy();
 
-    return res.status(200).json({ status: 'Record deleted' });
+    return res.status(200).json(finalTransaction);
   } catch (err) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 /*
  * Provides all temporary transactions.
  *
@@ -109,7 +123,7 @@ const getAllTransactions = async (req, res) => {
     return res.status(200).json(transactions);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -123,7 +137,7 @@ const getTransaction = async (req, res) => {
     return res.json(req.profile);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -134,4 +148,5 @@ export default {
   getAllTransactions,
   getTransaction,
   transactionByID,
+  denyTransaction,
 };
