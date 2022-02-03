@@ -75,6 +75,34 @@ const approveTransaction = async (req, res) => {
   }
 };
 
+const denyTransaction = async (req, res) => {
+  try {
+    // Get transaction from temp table
+    const transaction = await transactionByID(req.body.transactionId);
+
+    if (!transaction) {
+      console.log('Row not found in temp table');
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    await connectDeniedTransactionDB();
+    const finalTransaction = await SQTransaction.create(transaction.toJSON());
+
+    if (!finalTransaction) {
+      console.log('Transaction approval failed');
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Delete transaction from temp table
+    await connectTempTransactionDB();
+    transaction.destroy();
+
+    return res.status(200).json(finalTransaction);
+  } catch (err) {
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 /**
  * Delete transaction from temporary transaction table.
  *
@@ -146,7 +174,5 @@ export default {
   approveTransaction,
   denyTransaction,
   getAllTransactions,
-  getTransaction,
-  transactionByID,
   denyTransaction,
 };
