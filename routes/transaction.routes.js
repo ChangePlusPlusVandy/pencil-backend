@@ -15,4 +15,9 @@ router
   .route('/transaction/transactions')
   .get(transactionController.getAllTransactions); // get all transactions from temp table
 
+// eslint-disable-next-line prettier/prettier
+router
+  .route('/transaction/deny')
+  .post(transactionController.denyTransaction); //  deny transaction from temp table to denied table
+
 export default router;

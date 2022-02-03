@@ -6,6 +6,10 @@ import {
   connectDB as connectTempTransactionDB,
   SQTempTransaction,
 } from '../models/temp-transaction-table.js';
+import {
+  connectDB as connectDeniedTransactionDB,
+  SQDeniedTransaction,
+} from '../models/denied-transaction-table.js';
 import transactionByID from '../helpers/transaction.helper.js';
 
 /**
@@ -46,7 +50,7 @@ const submitTransaction = async (req, res) => {
 const approveTransaction = async (req, res) => {
   try {
     // Get transaction from temp table
-    const transaction = await transactionByID(req.body.id);
+    const transaction = await transactionByID(req.body.transactionId);
 
     if (!transaction) {
       console.log('Row not found in temp table');
@@ -54,6 +58,34 @@ const approveTransaction = async (req, res) => {
     }
 
     await connectTransactionDB();
+    const finalTransaction = await SQTransaction.create(transaction.toJSON());
+
+    if (!finalTransaction) {
+      console.log('Transaction approval failed');
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Delete transaction from temp table
+    await connectTempTransactionDB();
+    transaction.destroy();
+
+    return res.status(200).json(finalTransaction);
+  } catch (err) {
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+const denyTransaction = async (req, res) => {
+  try {
+    // Get transaction from temp table
+    const transaction = await transactionByID(req.body.transactionId);
+
+    if (!transaction) {
+      console.log('Row not found in temp table');
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    await connectDeniedTransactionDB();
     const finalTransaction = await SQTransaction.create(transaction.toJSON());
 
     if (!finalTransaction) {
@@ -92,4 +124,5 @@ export default {
   submitTransaction,
   approveTransaction,
   getAllTransactions,
+  denyTransaction,
 };
