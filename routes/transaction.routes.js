@@ -22,5 +22,9 @@ router
   .get(transactionController.getTransaction); // get one transaction
 
 router.param("transactionID", transactionController.transactionByID); // param for transactionID
+// eslint-disable-next-line prettier/prettier
+router
+  .route('/transaction/deny')
+  .post(transactionController.denyTransaction); //  deny transaction from temp table to denied table
 
 export default router;
