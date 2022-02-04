@@ -146,5 +146,6 @@ export default {
   approveTransaction,
   denyTransaction,
   getAllTransactions,
-  denyTransaction,
+  getTransaction,
+  transactionByID,
 };
