@@ -12,6 +12,7 @@ import {
  * @return {Object} - The transaction corresponding to the specified ID or undefined (its type
  *                    is technically object, but it has the functions of a sequelize instance)
  */
+// eslint-disable-next-line consistent-return
 const transactionByID = async (req, res, next, id) => {
   try {
     await connectTempTransactionDB();
@@ -37,11 +38,9 @@ const transactionByID = async (req, res, next, id) => {
       .catch((err) =>
         res.status(400).json({ error: 'Could not retrieve transaction' })
       );
-
-    return transaction;
   } catch (err) {
-    console.log('Could not retrieve transaction from temp table');
-    return null;
+    console.log(err);
+    return res.status(400).json({ error: 'Could not retrieve transaction' });
   }
 };
 
