@@ -93,7 +93,9 @@ const denyTransaction = async (req, res) => {
     }
 
     await connectDeniedTransactionDB();
-    const finalTransaction = await SQTransaction.create(transaction.toJSON());
+    const finalTransaction = await SQDeniedTransaction.create(
+      transaction.toJSON()
+    );
 
     if (!finalTransaction) {
       console.log('Transaction approval failed');
