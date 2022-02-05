@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import {
   connectDB as connectTransactionDB,
   SQTransaction,
@@ -17,7 +18,7 @@ const submitTransaction = async (req, res) => {
   try {
     await connectTempTransactionDB();
     const infoObj = {
-      transactionId: Math.floor(Math.random() * 100), // FIX
+      transactionId: uuidv4(),
       teacherId: req.body.teacherId,
       schoolId: req.body.schoolId,
       items: req.body.items,
