@@ -28,11 +28,11 @@ const transactionByID = async (req, res, next, id) => {
     })
       .then((data) => {
         if (!data) {
-          return res.satus(403).json({
+          return res.status(403).json({
             error: 'Invalid transaction ID',
           });
         }
-        req.profile = data;
+        req.transaction = data;
         return next();
       })
       .catch((err) =>
@@ -44,4 +44,4 @@ const transactionByID = async (req, res, next, id) => {
   }
 };
 
-export default transactionByID;
+export default { transactionByID };
