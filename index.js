@@ -12,8 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/form', formRoutes);
-app.use('/api/form', teacherRoutes); // TODO: update route on frontend
-app.use('/api/form', transactionRoutes); // TODO: update route on frontend
+app.use('/api/teacher', teacherRoutes); // TODO: update route on frontend
+app.use('/api/transaction', transactionRoutes); // TODO: update route on frontend
 
 const port = process.env.PORT || 8080;
 
