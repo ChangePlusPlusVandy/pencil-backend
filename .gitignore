@@ -4,3 +4,4 @@ config
 
 # Macos files
 */.DS_Store
+.env
