@@ -130,7 +130,7 @@ const getPendingTransactions = async (req, res) => {
 const getDeniedTransactions = async (req, res) => {
   try {
     await connectDeniedTransactionDB();
-    const transactions = await SQTransaction.findAll();
+    const transactions = await SQDeniedTransaction.findAll();
     return res.status(200).json(transactions);
   } catch (err) {
     console.log(err);
