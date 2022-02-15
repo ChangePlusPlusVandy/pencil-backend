@@ -141,7 +141,7 @@ const getDeniedTransactions = async (req, res) => {
 const getApprovedTransactions = async (req, res) => {
   try {
     await connectTransactionDB();
-    const transactions = await SQDeniedTransaction.findAll();
+    const transactions = await SQTransaction.findAll();
     return res.status(200).json(transactions);
   } catch (err) {
     console.log(err);
