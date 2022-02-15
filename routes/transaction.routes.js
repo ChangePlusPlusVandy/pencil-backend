@@ -12,8 +12,16 @@ router
   .post(transactionController.approveTransaction); // approve transaction from temp table to transaction table
 
 router
-  .route('/transaction/transactions')
-  .get(transactionController.getAllTransactions); // get all transactions from temp table
+  .route('/transaction/pendingTransactions')
+  .get(transactionController.getPendingTransactions); // get all transactions from temp table
+
+router
+  .route('/transaction/approvedTransactions')
+  .get(transactionController.getApprovedTransactions); // get all transactions from temp table
+
+router
+  .route('/transaction/deniedTransactions')
+  .get(transactionController.getDeniedTransactions); // get all transactions from temp table
 
 router.route('/transaction/deny').post(transactionController.denyTransaction);
 

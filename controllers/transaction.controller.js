@@ -116,10 +116,32 @@ const denyTransaction = async (req, res) => {
  * @param {Object} req - Request Object
  * @param {Object} res - Response Object with populated array of transactions to approve
  */
-const getAllTransactions = async (req, res) => {
+const getPendingTransactions = async (req, res) => {
   try {
     await connectTempTransactionDB();
     const transactions = await SQTempTransaction.findAll();
+    return res.status(200).json(transactions);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+const getDeniedTransactions = async (req, res) => {
+  try {
+    await connectDeniedTransactionDB();
+    const transactions = await SQTransaction.findAll();
+    return res.status(200).json(transactions);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+const getApprovedTransactions = async (req, res) => {
+  try {
+    await connectTransactionDB();
+    const transactions = await SQDeniedTransaction.findAll();
     return res.status(200).json(transactions);
   } catch (err) {
     console.log(err);
@@ -145,7 +167,9 @@ export default {
   submitTransaction,
   approveTransaction,
   denyTransaction,
-  getAllTransactions,
+  getPendingTransactions,
   getTransaction,
   transactionByID,
+  getApprovedTransactions,
+  getDeniedTransactions,
 };
