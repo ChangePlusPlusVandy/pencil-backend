@@ -49,16 +49,15 @@ const submitTransaction = async (req, res) => {
  */
 const approveTransaction = async (req, res) => {
   try {
-    // Get transaction from temp table
-    const transaction = await transactionByID(req.body.transactionId);
-
-    if (!transaction) {
+    if (!req.transaction) {
       console.log('Row not found in temp table');
       return res.status(500).json({ error: 'Internal Server Error' });
     }
 
     await connectTransactionDB();
-    const finalTransaction = await SQTransaction.create(transaction.toJSON());
+    const finalTransaction = await SQTransaction.create(
+      req.transaction.toJSON()
+    );
 
     if (!finalTransaction) {
       console.log('Transaction approval failed');
@@ -67,7 +66,7 @@ const approveTransaction = async (req, res) => {
 
     // Delete transaction from temp table
     await connectTempTransactionDB();
-    transaction.destroy();
+    req.transaction.destroy();
 
     return res.status(200).json(finalTransaction);
   } catch (err) {
@@ -84,16 +83,15 @@ const approveTransaction = async (req, res) => {
 
 const denyTransaction = async (req, res) => {
   try {
-    // Get transaction from temp table
-    const transaction = await transactionByID(req.body.transactionId);
-
-    if (!transaction) {
+    if (!req.transaction) {
       console.log('Row not found in temp table');
       return res.status(500).json({ error: 'Internal Server Error' });
     }
 
     await connectDeniedTransactionDB();
-    const finalTransaction = await SQTransaction.create(transaction.toJSON());
+    const finalTransaction = await SQDeniedTransaction.create(
+      req.transaction.toJSON()
+    );
 
     if (!finalTransaction) {
       console.log('Transaction approval failed');
@@ -102,7 +100,7 @@ const denyTransaction = async (req, res) => {
 
     // Delete transaction from temp table
     await connectTempTransactionDB();
-    transaction.destroy();
+    req.transaction.destroy();
 
     return res.status(200).json(finalTransaction);
   } catch (err) {

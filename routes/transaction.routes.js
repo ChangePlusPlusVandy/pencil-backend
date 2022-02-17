@@ -8,7 +8,7 @@ router
   .post(transactionController.submitTransaction); // submit transaction to temp table
 
 router
-  .route('/transaction/approve')
+  .route('/transaction/approve/:transactionID')
   .post(transactionController.approveTransaction); // approve transaction from temp table to transaction table
 
 router
@@ -23,7 +23,9 @@ router
   .route('/transaction/deniedTransactions')
   .get(transactionController.getDeniedTransactions); // get all transactions from temp table
 
-router.route('/transaction/deny').post(transactionController.denyTransaction);
+router
+  .route('/transaction/deny/:transactionID')
+  .post(transactionController.denyTransaction);
 
 router
   .route('/transaction/:transactionID')
