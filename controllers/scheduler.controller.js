@@ -1,5 +1,8 @@
 import fetch from 'node-fetch';
 
+// List of valid locations. TODO: query from location database
+const LOCATIONS = ['nashville', 'antioch'];
+
 /**
  * Returns the current organization URI that will be
  * used to query for Calendly events
@@ -93,9 +96,8 @@ const getEvent = async (uuid) => {
  */
 // eslint-disable-next-line consistent-return
 const locationParam = async (req, res, next, loc) => {
-  const locations = ['nashville', 'antioch'];
   const locationString = loc.toLowerCase();
-  if (!locations.includes(locationString)) {
+  if (!LOCATIONS.includes(locationString)) {
     return res
       .status(403)
       .json({ error: 'The requested location is not found in database' });
