@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
-  connectDB as connectTransactionDB,
+  connectSelectTable as connectTransactionDB,
   SQTransaction,
 } from '../models/transaction-table.js';
 import {
-  connectDB as connectTempTransactionDB,
+  connectSelectTable as connectTempTransactionDB,
   SQTempTransaction,
 } from '../models/temp-transaction-table.js';
 import transactionHelper from '../helpers/transaction.helper.js';
@@ -16,7 +16,7 @@ import transactionHelper from '../helpers/transaction.helper.js';
  */
 const submitTransaction = async (req, res) => {
   try {
-    await connectTempTransactionDB();
+    await connectTempTransactionDB(req.location.name);
     const infoObj = {
       transactionId: uuidv4(),
       teacherId: req.body.teacherId,
@@ -46,7 +46,7 @@ const submitTransaction = async (req, res) => {
  */
 const approveTransaction = async (req, res) => {
   try {
-    await connectTransactionDB();
+    await connectTransactionDB(req.location.name);
     const finalTransaction = await SQTransaction.create(
       req.transaction.toJSON()
     );
@@ -57,7 +57,7 @@ const approveTransaction = async (req, res) => {
     }
 
     // Delete transaction from temp table
-    await connectTempTransactionDB();
+    await connectTempTransactionDB(req.location.name);
     req.transaction.destroy();
 
     return res.status(200).json(finalTransaction);
@@ -75,7 +75,7 @@ const approveTransaction = async (req, res) => {
 const denyTransaction = async (req, res) => {
   try {
     // Delete transaction from temp table
-    await connectTempTransactionDB();
+    await connectTempTransactionDB(req.location.name);
     await req.transaction.destroy();
 
     return res.status(200).json({ status: 'Record deleted' });
@@ -92,8 +92,11 @@ const denyTransaction = async (req, res) => {
  */
 const getAllTransactions = async (req, res) => {
   try {
-    await connectTempTransactionDB();
-    const transactions = await SQTempTransaction.findAll();
+    await connectTempTransactionDB(req.location.name);
+    // eslint-disable-next-line no-undef
+    const transactions = await SQTempTransaction.findAll(_, {
+      model: 'SQTempTransaction'.concat(req.location.name),
+    });
     return res.status(200).json(transactions);
   } catch (err) {
     console.log(err);
