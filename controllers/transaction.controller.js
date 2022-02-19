@@ -24,6 +24,8 @@ const submitTransaction = async (req, res) => {
       items: req.body.items,
     };
 
+    console.log("THIS IS THE TRANSACTION: ", req.body.items)
+
     const transaction = await SQTempTransaction.create(infoObj);
 
     if (!transaction) {
@@ -76,6 +78,7 @@ const denyTransaction = async (req, res) => {
   try {
     // Delete transaction from temp table
     await connectTempTransactionDB();
+    print("THIS IS THE TRANSACTION: ", req.transaction)
     await req.transaction.destroy();
 
     return res.status(200).json({ status: 'Record deleted' });
