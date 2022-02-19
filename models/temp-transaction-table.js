@@ -13,7 +13,7 @@ export async function connectDB() {
   SQTempTransaction.init(
     {
       transactionId: {
-        type: Sequelize.DataTypes.INTEGER,
+        type: Sequelize.DataTypes.STRING,
         primaryKey: true,
         unique: true,
       },
