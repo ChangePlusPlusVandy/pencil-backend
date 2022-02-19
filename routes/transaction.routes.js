@@ -14,7 +14,7 @@ router.route('/transactions').get(transactionController.getAllTransactions); // 
 
 router
   .route('/deny/:transactionID')
-  .post(transactionController.denyTransaction);
+  .put(transactionController.denyTransaction);
 
 router.route('/:transactionID').get(transactionController.getTransaction); // get one transaction
 
