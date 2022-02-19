@@ -25,7 +25,6 @@ const listEvents = async (organization) => {
       Authorization: `Bearer ${process.env.SCHEDULER_BEARER_AUTH_TOKEN}`,
     },
   };
-  console.log('this is org', encodeURIComponent(organization));
   return fetch(
     `https://api.calendly.com/scheduled_events/?organization=${encodeURIComponent(
       organization
@@ -71,6 +70,19 @@ const listEventInvitees = async (eventUuid) => {
     .catch((err) => console.log('error:', err));
 };
 
+const getEvent = async (uuid) => {
+  const options = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.SCHEDULER_BEARER_AUTH_TOKEN}`,
+    },
+  };
+  return fetch(`https://api.calendly.com/scheduled_events/${uuid}`, options)
+    .then((data) => data.json())
+    .catch((err) => console.log('error:', err));
+};
+
 /**
  *
  * @param {Object} req - Request object.
@@ -100,6 +112,9 @@ const locationParam = async (req, res, next, loc) => {
  *                3. Perform a GET request on calendly's LIST-EVENTS endpoint
  *                4. Find the event that contains the location param
  *                5. Perform a GET request on calendly's LIST-EVENT-INVITEES endpoint
+ *                6. Filter each invitees to keep only the relevant parameters
+ *                7. Perform a GET request on calendly's GET-EVENT to add start/end
+ *                    time information to invitee object
  */
 const getSchedule = async (req, res) => {
   try {
@@ -121,19 +136,36 @@ const getSchedule = async (req, res) => {
         return listEventInvitees(eventUuid);
       })
       .then((inviteesCollection) => {
+        // 6. Filter each invitees to keep only the relevant parameters
         const { collection } = inviteesCollection;
-        const newArr = collection.map((item) => {
-          console.log('this is one item', item);
-          return {
-            name: item.name,
-            email: item.email,
-            uri: item.uri,
-            school: item.questions_and_answers[0].answer,
-            phone: item.questions_and_answers[1].answer,
-          };
-        });
-        console.log('this is new collection', newArr);
-        return newArr;
+        const invitees = collection.map((item) => ({
+          name: item.name,
+          email: item.email,
+          uri: item.uri,
+          school: item.questions_and_answers[0].answer,
+          phone: item.questions_and_answers[1].answer,
+        }));
+        return invitees;
+      })
+      .then((invitees) => {
+        // 7. Perform a GET request on calendly's GET-EVENT to add start/end
+        //    time information to invitee object
+        const schedule = Promise.all(
+          invitees.map((invitee) => {
+            // Perform the GET request for each user
+            const inviteeEventUuid = invitee.uri.split('/')[4]; // get uuid
+            return getEvent(inviteeEventUuid).then((data) => {
+              // add start and end times to the invitee object
+              const newInviteeObject = {
+                ...invitee,
+                ...{ start_time: data.resource.start_time },
+                ...{ end_time: data.resource.end_time },
+              };
+              return newInviteeObject;
+            });
+          })
+        );
+        return schedule;
       })
       .catch((err) => err);
     return res.status(200).json(jsonResponse);
