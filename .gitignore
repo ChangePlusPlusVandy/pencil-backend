@@ -1,6 +1,7 @@
 /node_modules/
 package-lock.json
 config
+.env
 
 # Macos files
 */.DS_Store
