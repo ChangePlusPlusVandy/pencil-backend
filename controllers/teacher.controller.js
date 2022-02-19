@@ -37,7 +37,6 @@ const teacherByID = async (req, res, next, id) => {
             error: 'Invalid teacher ID',
           });
         }
-        console.log('meh');
         req.profile = data;
         return next();
       })

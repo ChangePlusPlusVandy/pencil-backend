@@ -3,7 +3,7 @@ import teacherController from '../controllers/teacher.controller.js';
 
 const router = express.Router();
 
-router.route('/teacher/:teacherID').get(teacherController.getTeacher); // get teacher information for form
+router.route('/:teacherID').get(teacherController.getTeacher); // get teacher information for form
 
 router.route('/create').post(teacherController.addTeacher); // add teacher to database
 

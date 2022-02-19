@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import {
   connectDB as connectTransactionDB,
   SQTransaction,
@@ -6,7 +7,7 @@ import {
   connectDB as connectTempTransactionDB,
   SQTempTransaction,
 } from '../models/temp-transaction-table.js';
-import transactionByID from '../helpers/transaction.helper.js';
+import transactionHelper from '../helpers/transaction.helper.js';
 
 /**
  * Submits a User Transaction and adds data to the Transaction Table.
@@ -17,7 +18,7 @@ const submitTransaction = async (req, res) => {
   try {
     await connectTempTransactionDB();
     const infoObj = {
-      transactionId: Math.floor(Math.random() * 100), // FIX
+      transactionId: uuidv4(),
       teacherId: req.body.teacherId,
       schoolId: req.body.schoolId,
       items: req.body.items,
@@ -45,16 +46,10 @@ const submitTransaction = async (req, res) => {
  */
 const approveTransaction = async (req, res) => {
   try {
-    // Get transaction from temp table
-    const transaction = await transactionByID(req.body.id);
-
-    if (!transaction) {
-      console.log('Row not found in temp table');
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-
     await connectTransactionDB();
-    const finalTransaction = await SQTransaction.create(transaction.toJSON());
+    const finalTransaction = await SQTransaction.create(
+      req.transaction.toJSON()
+    );
 
     if (!finalTransaction) {
       console.log('Transaction approval failed');
@@ -63,7 +58,7 @@ const approveTransaction = async (req, res) => {
 
     // Delete transaction from temp table
     await connectTempTransactionDB();
-    transaction.destroy();
+    req.transaction.destroy();
 
     return res.status(200).json(finalTransaction);
   } catch (err) {
@@ -79,20 +74,13 @@ const approveTransaction = async (req, res) => {
  */
 const denyTransaction = async (req, res) => {
   try {
-    // Get transaction from temp table
-    const transaction = await transactionByID(req.body.id);
-
-    if (!transaction) {
-      console.log('Row not found in temp table');
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-
     // Delete transaction from temp table
     await connectTempTransactionDB();
-    await transaction.destroy();
+    await req.transaction.destroy();
 
     return res.status(200).json({ status: 'Record deleted' });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
@@ -133,5 +121,4 @@ export default {
   denyTransaction,
   getAllTransactions,
   getTransaction,
-  transactionByID,
 };
