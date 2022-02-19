@@ -16,11 +16,7 @@ import {
 const transactionByID = async (req, res, next, id) => {
   try {
     await connectTempTransactionDB();
-    if (!Number(id)) {
-      return res
-        .status(403)
-        .json({ error: 'Invalid transaction ID. Expect only numeric ID' });
-    }
+    
     const transaction = await SQTempTransaction.findOne({
       where: {
         transactionId: id,

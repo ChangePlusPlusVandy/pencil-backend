@@ -9,11 +9,11 @@ export class SQRejectedTransactions extends Sequelize.Model {}
 export async function connectDB() {
   if (sequelize) return;
   sequelize = await connectSQLDB();
-  
+
   SQRejectedTransactions.init(
     {
       transactionId: {
-        type: Sequelize.DataTypes.INTEGER,
+        type: Sequelize.DataTypes.STRING,
         primaryKey: true,
         unique: true,
       },
@@ -24,9 +24,9 @@ export async function connectDB() {
     },
     {
       sequelize,
-      modelName: 'SQTransaction',
+      modelName: 'SQRejectedTransaction',
     }
   );
   
-  await SQRejectedTransaction.sync();
+  await SQRejectedTransactions.sync();
 }

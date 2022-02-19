@@ -7,6 +7,10 @@ import {
   connectDB as connectTempTransactionDB,
   SQTempTransaction,
 } from '../models/temp-transaction-table.js';
+import {
+  connectDB as connectRejectedDB,
+  SQRejectedTransactions,
+} from '../models/rejected-transactions.js';
 import transactionHelper from '../helpers/transaction.helper.js';
 
 /**
@@ -23,8 +27,6 @@ const submitTransaction = async (req, res) => {
       schoolId: req.body.schoolId,
       items: req.body.items,
     };
-
-    console.log("THIS IS THE TRANSACTION: ", req.body.items)
 
     const transaction = await SQTempTransaction.create(infoObj);
 
@@ -78,7 +80,11 @@ const denyTransaction = async (req, res) => {
   try {
     // Delete transaction from temp table
     await connectTempTransactionDB();
-    print("THIS IS THE TRANSACTION: ", req.transaction)
+    await connectRejectedDB();
+    
+    const archivedTransaction = await SQRejectedTransactions.create(
+      req.transaction.toJSON()
+    );
     await req.transaction.destroy();
 
     return res.status(200).json({ status: 'Record deleted' });
