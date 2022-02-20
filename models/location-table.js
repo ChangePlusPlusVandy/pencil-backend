@@ -13,6 +13,7 @@ export async function connectDB() {
   SQLocation.init(
     {
       name: Sequelize.DataTypes.STRING,
+      address: Sequelize.DataTypes.STRING,
     },
     {
       sequelize,

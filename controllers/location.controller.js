@@ -4,7 +4,7 @@ import {
 } from '../models/location-table.js';
 
 /**
- * Populates profile field with teacher information.
+ * Populates profile field with location information.
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * @param {function} next - Next middleware.
@@ -39,15 +39,26 @@ const locationByID = async (req, res, next, id) => {
 };
 
 /**
- * Adds a teacher to the database.
+ * Adds a location to the database.
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * */
 const addLocation = async (req, res) => {
   try {
     await connectLocationDB();
+    // if location already exists, return error
+    const loc = await SQLocation.findOne({
+      where: { name: req.body.name },
+    });
+    if (loc) {
+      return res.status(400).json({
+        error: 'Location already exists',
+      });
+    }
+    // if location does not exist, add location to database
     const location = await SQLocation.create({
       name: req.body.name,
+      address: req.body.address,
     });
     return res.status(200).json(location);
   } catch (err) {
@@ -62,6 +73,7 @@ const getAllLocations = async (req, res) => {
   try {
     await connectLocationDB();
     const locations = await SQLocation.findAll();
+    console.log(locations);
     return res.status(200).json(locations);
   } catch (err) {
     console.log(err);
