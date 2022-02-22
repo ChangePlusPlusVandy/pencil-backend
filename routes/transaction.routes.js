@@ -12,9 +12,7 @@ router
 
 router.route('/transactions').get(transactionController.getAllTransactions); // get all transactions from temp table
 
-router
-  .route('/deny/:transactionID')
-  .post(transactionController.denyTransaction);
+router.route('/deny/:transactionID').put(transactionController.denyTransaction);
 
 router.route('/:transactionID').get(transactionController.getTransaction); // get one transaction
 

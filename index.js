@@ -4,6 +4,8 @@ import cors from 'cors';
 import formRoutes from './routes/supplyForm.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
 import transactionRoutes from './routes/transaction.routes.js';
+import schedulerRoutes from './routes/scheduler.routes.js';
+import masterInventoryRoutes from './routes/masterInventory.routes.js';
 import locationRoutes from './routes/location.routes.js';
 
 import locationController from './controllers/location.controller.js';
@@ -14,6 +16,8 @@ app.use(cors());
 
 app.use(express.json());
 
+app.use('/api/schedule', schedulerRoutes);
+app.use('/api/masterInventory', masterInventoryRoutes);
 app.param('location', locationController.locationByID);
 
 app.use('/api/:location/form', formRoutes);
