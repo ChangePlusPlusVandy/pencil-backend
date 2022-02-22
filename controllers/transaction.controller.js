@@ -104,7 +104,7 @@ const getAllTransactions = async (req, res) => {
   try {
     await connectTempTransactionDB(req.location.name);
     // eslint-disable-next-line no-undef
-    const transactions = await SQTempTransaction.findAll(_, {
+    const transactions = await SQTempTransaction.findAll({
       model: 'SQTempTransaction'.concat(req.location.name),
     });
     return res.status(200).json(transactions);
