@@ -11,4 +11,6 @@ router
   .route('/checkInInv/:itemName-:itemPrice')
   .get(inventoryController.checkForItem);
 
+router.route('/getAllItems').get(inventoryController.getAllItems);
+
 export default router;

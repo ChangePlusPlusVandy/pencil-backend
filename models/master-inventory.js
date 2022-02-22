@@ -11,7 +11,6 @@ export async function connectDB() {
   if (sequelize) return;
   sequelize = await connectSQLDB();
 
-  console.log('BEFORE THINGY');
   SQMasterInventory.init(
     {
       itemId: {
@@ -21,15 +20,13 @@ export async function connectDB() {
       },
 
       itemName: Sequelize.DataTypes.STRING,
-      itemPrice: Sequelize.DataTypes.INTEGER,
+      itemPrice: Sequelize.DataTypes.DOUBLE,
     },
     {
       sequelize,
       modelName: 'SQMasterInventory',
     }
   );
-
-  console.log('AFTER THE INIT');
 
   await SQMasterInventory.sync();
 }
