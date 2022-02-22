@@ -27,6 +27,6 @@ export async function connectDB() {
       modelName: 'SQRejectedTransaction',
     }
   );
-  
+
   await SQRejectedTransactions.sync();
 }

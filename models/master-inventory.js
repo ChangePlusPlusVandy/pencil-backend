@@ -10,8 +10,8 @@ export class SQMasterInventory extends Sequelize.Model {}
 export async function connectDB() {
   if (sequelize) return;
   sequelize = await connectSQLDB();
-  
-  console.log("BEFORE THINGY")
+
+  console.log('BEFORE THINGY');
   SQMasterInventory.init(
     {
       itemId: {
@@ -29,8 +29,7 @@ export async function connectDB() {
     }
   );
 
-  console.log("AFTER THE INIT")
+  console.log('AFTER THE INIT');
 
-  
   await SQMasterInventory.sync();
 }

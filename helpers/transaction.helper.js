@@ -16,7 +16,7 @@ import {
 const transactionByID = async (req, res, next, id) => {
   try {
     await connectTempTransactionDB();
-    
+
     const transaction = await SQTempTransaction.findOne({
       where: {
         transactionId: id,

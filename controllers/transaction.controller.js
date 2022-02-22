@@ -81,7 +81,7 @@ const denyTransaction = async (req, res) => {
     // Delete transaction from temp table
     await connectTempTransactionDB();
     await connectRejectedDB();
-    
+
     const archivedTransaction = await SQRejectedTransactions.create(
       req.transaction.toJSON()
     );
