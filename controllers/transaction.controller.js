@@ -8,7 +8,7 @@ import {
   SQTempTransaction,
 } from '../models/temp-transaction-table.js';
 import {
-  connectDB as connectRejectedDB,
+  connectSelectTable as connectRejectedDB,
   SQRejectedTransactions,
 } from '../models/rejected-transactions.js';
 import transactionHelper from '../helpers/transaction.helper.js';
@@ -80,7 +80,7 @@ const denyTransaction = async (req, res) => {
   try {
     // Delete transaction from temp table
     await connectTempTransactionDB(req.location.name);
-    await connectRejectedDB();
+    await connectRejectedDB(req.location.name);
 
     const archivedTransaction = await SQRejectedTransactions.create(
       req.transaction.toJSON()

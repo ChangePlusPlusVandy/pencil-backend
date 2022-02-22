@@ -30,3 +30,27 @@ export async function connectDB() {
 
   await SQRejectedTransactions.sync();
 }
+
+export async function connectSelectTable(name) {
+  sequelize = await connectSQLDB();
+  const newName = 'SQRejectedTransactions'.concat(name);
+  SQRejectedTransactions.init(
+    {
+      transactionId: {
+        type: Sequelize.DataTypes.STRING,
+        primaryKey: true,
+        unique: true,
+      },
+
+      teacherId: Sequelize.DataTypes.INTEGER,
+      schoolId: Sequelize.DataTypes.INTEGER,
+      items: Sequelize.DataTypes.JSON,
+    },
+    {
+      freezeTableName: true,
+      sequelize,
+      modelName: newName,
+    }
+  );
+  await SQRejectedTransactions.sync();
+}
