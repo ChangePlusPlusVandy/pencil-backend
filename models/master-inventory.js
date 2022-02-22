@@ -6,10 +6,12 @@ let sequelize;
 
 export class SQMasterInventory extends Sequelize.Model {}
 
+// Connects to database and creates the table.
 export async function connectDB() {
   if (sequelize) return;
   sequelize = await connectSQLDB();
-
+  
+  console.log("BEFORE THINGY")
   SQMasterInventory.init(
     {
       itemId: {
@@ -18,14 +20,17 @@ export async function connectDB() {
         unique: true,
       },
 
-      itemName: sequelize.DataTypes.STRING,
-      itemPrice: sequelize.DataTypes.DOUBLE,
+      itemName: Sequelize.DataTypes.STRING,
+      itemPrice: Sequelize.DataTypes.INTEGER,
     },
     {
       sequelize,
       modelName: 'SQMasterInventory',
     }
   );
+
+  console.log("AFTER THE INIT")
+
   
   await SQMasterInventory.sync();
 }
