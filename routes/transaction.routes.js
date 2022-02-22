@@ -4,18 +4,32 @@ import transactionHelper from '../helpers/transaction.helper.js';
 
 const router = express.Router();
 
-router.route('/submit').post(transactionController.submitTransaction); // submit transaction to temp table
+// submit transaction to temp table
+router.route('/submit').post(transactionController.submitTransaction);
 
+// approve transaction from temp table to transaction table
 router
   .route('/approve/:transactionID')
-  .post(transactionController.approveTransaction); // approve transaction from temp table to transaction table
+  .post(transactionController.approveTransaction);
 
-router.route('/transactions').get(transactionController.getAllTransactions); // get all transactions from temp table
+// deny transaction from temp table to rejected table
+router
+  .route('/deny/:transactionID')
+  .post(transactionController.denyTransaction);
 
-router.route('/deny/:transactionID').put(transactionController.denyTransaction);
+// get all pending transactions from temp table
+router.route('/pending').get(transactionController.getAllPendingTransactions);
 
-router.route('/:transactionID').get(transactionController.getTransaction); // get one transaction
+// get all approved transactions from transaction table
+router.route('/approved').get(transactionController.getAllApprovedTransactions);
 
-router.param('transactionID', transactionHelper.transactionByID); // param for transactionID
+// get all rejected transactions from rejected table
+router.route('/denied').get(transactionController.getAllDeniedTransactions);
+
+// get one transaction from temp table
+router.route('/:transactionID').get(transactionController.getTransaction);
+
+// param for transactionID
+router.param('transactionID', transactionHelper.transactionByID);
 
 export default router;
