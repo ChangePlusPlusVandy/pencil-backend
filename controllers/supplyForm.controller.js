@@ -1,5 +1,5 @@
 import {
-  connectDB as connectSupplyFormDB,
+  connectSelectTable as connectSupplyFormDB,
   SQShoppingForm,
 } from '../models/shopping-form-table.js';
 
@@ -10,29 +10,21 @@ import {
  * */
 const addSupply = async (req, res) => {
   try {
-    await connectSupplyFormDB();
+    await connectSupplyFormDB(req.location.name);
+    const supply = await SQShoppingForm.create({
+      itemId: req.body.itemId,
+      itemName: req.body.itemName,
+      maxLimit: req.body.maxLimit,
+      itemOrder: req.body.itemOrder,
+    });
+    if (!supply) {
+      console.log('addSupply : Sup empty.');
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
 
-    SQShoppingForm.create(
-      {
-        itemId: req.body.itemId,
-        itemName: req.body.itemName,
-        maxLimit: req.body.maxLimit,
-        itemOrder: req.body.itemOrder,
-      },
-      (supply) => {
-        if (!supply) {
-          console.log('addSupply : Sup empty.');
-          return res.status(500).json({ error: 'Internal Server Error' });
-        }
-
-        return res.status(200).json(supply);
-      }
-    );
-
-    console.log('addSupply : Improper Return.');
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(200).json(supply);
   } catch (err) {
-    console.log("addSupply : can't connect");
+    console.log(err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
@@ -44,7 +36,7 @@ const addSupply = async (req, res) => {
  * */
 const updateSupply = async (req, res) => {
   try {
-    await connectSupplyFormDB();
+    await connectSupplyFormDB(req.location.name);
     console.log(req.body, 'body');
     // const sup = await SQShoppingForm.create({
     //   itemId: req.body.itemId,
@@ -81,7 +73,8 @@ const updateSupply = async (req, res) => {
  */
 const fetchSupplyForm = async (req, res) => {
   try {
-    await connectSupplyFormDB();
+    await connectSupplyFormDB(req.location.name);
+    const newName = 'SQShoppingForm'.concat(req.location.name);
     const supplies = await SQShoppingForm.findAll({
       attributes: ['itemId', 'itemName', 'maxLimit', 'itemOrder'],
     });
