@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
-  connectDB as connectMasterInvDB,
+  connectSelectTable as connectMasterInvDB,
   SQMasterInventory,
 } from '../models/master-inventory.js';
 
@@ -12,7 +12,7 @@ import {
  */
 const checkForItem = async (req, res, next) => {
   try {
-    await connectMasterInvDB();
+    await connectMasterInvDB(req.location.name);
 
     const isInInventory = await SQMasterInventory.findAll({
       where: {
@@ -39,7 +39,7 @@ const checkForItem = async (req, res, next) => {
  */
 const addItem = async (req, res, next) => {
   try {
-    await connectMasterInvDB();
+    await connectMasterInvDB(req.location.name);
 
     const itemObj = {
       itemId: uuidv4(),
@@ -62,7 +62,7 @@ const addItem = async (req, res, next) => {
 
 const getAllItems = async (req, res, next) => {
   try {
-    await connectMasterInvDB();
+    await connectMasterInvDB(req.location.name);
 
     const itemList = await SQMasterInventory.findAll({
       order: [['itemName', 'ASC']],
