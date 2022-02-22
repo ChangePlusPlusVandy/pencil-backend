@@ -68,15 +68,13 @@ const getAllItems = async (req, res, next) => {
       order: [['itemName', 'ASC']],
       attributes: ['itemId', 'itemName', 'itemPrice'],
     });
-    
+
     return res.status(200).json(itemList);
-  }
-  catch (err) {
+  } catch (err) {
     console.log(err);
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
-
 
 export default {
   addItem,
