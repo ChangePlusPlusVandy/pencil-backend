@@ -36,7 +36,7 @@ export async function connectSelectTable(name) {
   SQTempTransaction.init(
     {
       transactionId: {
-        type: Sequelize.DataTypes.INTEGER,
+        type: Sequelize.DataTypes.STRING,
         primaryKey: true,
         unique: true,
       },

@@ -11,10 +11,10 @@ import {
   connectSelectTable as connectRejectedDB,
   SQRejectedTransactions,
 } from '../models/rejected-transactions.js';
-import transactionHelper from '../helpers/transaction.helper.js';
+// import transactionHelper from '../helpers/transaction.helper.js';
 
 /**
- * Submits a User Transaction and adds data to the Transaction Table.
+ * Submits a User Transaction and adds data to the Temp Transaction Table.
  * @param {Object} req - Request Object
  * @param {Object} res - Response Object
  */
@@ -64,48 +64,89 @@ const approveTransaction = async (req, res) => {
     await connectTempTransactionDB(req.location.name);
     req.transaction.destroy();
 
-    return res.status(200).json(finalTransaction);
+    return res.status(200).json({ status: 'Record approved' });
   } catch (err) {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
 /**
- * Delete transaction from temporary transaction table.
+ * Transfers transaction from temporary transaction table (tempTransactionTable) to the rejected
+ * transaction table, deleting the entry in the former table in the process.
  *
- * @param {Object} req - Request Object with structure { id: INT }
+ * @param {Object} req - Request Object with structure { id: STRING }
  * @param {Object} res - Response Object
  */
 const denyTransaction = async (req, res) => {
   try {
-    // Delete transaction from temp table
     await connectTempTransactionDB(req.location.name);
-    await connectRejectedDB(req.location.name);
-
     const archivedTransaction = await SQRejectedTransactions.create(
       req.transaction.toJSON()
     );
+
+    if (!archivedTransaction) {
+      console.log('Transaction denial failed');
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    // Delete transaction from temp table
+    await connectRejectedDB(req.location.name);
     await req.transaction.destroy();
 
-    return res.status(200).json({ status: 'Record deleted' });
+    return res.status(200).json({ status: 'Record rejected' });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
-/*
- * Provides all temporary transactions.
+/**
+ * Returns all pending transactions from temp transaction table.
  *
  * @param {Object} req - Request Object
- * @param {Object} res - Response Object with populated array of transactions to approve
+ * @param {Object} res - Response Object with populated array of pending transactions
  */
-const getAllTransactions = async (req, res) => {
+const getAllPendingTransactions = async (req, res) => {
   try {
     await connectTempTransactionDB(req.location.name);
-    // eslint-disable-next-line no-undef
     const transactions = await SQTempTransaction.findAll({
       model: 'SQTempTransaction'.concat(req.location.name),
+    });
+    return res.status(200).json(transactions);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+/**
+ * Returns all approved transactions from transaction table.
+ * @param {Object} req - Request Object
+ * @param {Object} res - Response Object with populated array of approved transactions
+ */
+const getAllApprovedTransactions = async (req, res) => {
+  try {
+    await connectTransactionDB(req.location.name);
+    const transactions = await SQTransaction.findAll({
+      model: 'SQTransaction'.concat(req.location.name),
+    });
+    return res.status(200).json(transactions);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+/**
+ * Returns all rejected transactions from rejected transaction table.
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object with populated array of rejected transactions
+ */
+const getAllDeniedTransactions = async (req, res) => {
+  try {
+    await connectRejectedDB(req.location.name);
+    const transactions = await SQRejectedTransactions.findAll({
+      model: 'SQRejectedTransactions'.concat(req.location.name),
     });
     return res.status(200).json(transactions);
   } catch (err) {
@@ -132,6 +173,8 @@ export default {
   submitTransaction,
   approveTransaction,
   denyTransaction,
-  getAllTransactions,
+  getAllPendingTransactions,
+  getAllApprovedTransactions,
+  getAllDeniedTransactions,
   getTransaction,
 };
