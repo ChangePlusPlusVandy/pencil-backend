@@ -59,7 +59,7 @@ const teacherByID = async (req, res, next, id) => {
  * */
 const addTeacher = async (req, res) => {
   try {
-    console.log(req.body);
+    console.log('addTeacher:', req);
     await connectTeachersDB();
 
     // check if teacher already in database

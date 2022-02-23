@@ -1,15 +1,15 @@
 import express from 'express';
 import cors from 'cors';
-
+import dotenv from 'dotenv';
 import formRoutes from './routes/supplyForm.routes.js';
 import teacherRoutes from './routes/teacher.routes.js';
 import transactionRoutes from './routes/transaction.routes.js';
 import schedulerRoutes from './routes/scheduler.routes.js';
 import masterInventoryRoutes from './routes/masterInventory.routes.js';
 import locationRoutes from './routes/location.routes.js';
-
 import locationController from './controllers/location.controller.js';
 
+dotenv.config();
 const app = express();
 
 app.use(cors());
