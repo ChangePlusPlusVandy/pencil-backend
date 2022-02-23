@@ -76,8 +76,30 @@ const getAllItems = async (req, res, next) => {
   }
 };
 
+const updateMasterInventory = async (req, res, next) => {
+  try {
+    await connectMasterInvDB(req.location.name);
+
+    const wipe = await SQMasterInventory.destroy({
+      where: {},
+      truncate: true,
+    });
+
+    const updatedItems = await SQMasterInventory.bulkCreate(req.body);
+    if (!updatedItems) {
+      console.log('Items could not be updated');
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    return res.status(200).json(updatedItems);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 export default {
   addItem,
   checkForItem,
   getAllItems,
+  updateMasterInventory,
 };
