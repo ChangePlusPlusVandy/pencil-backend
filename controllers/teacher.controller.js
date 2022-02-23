@@ -61,21 +61,28 @@ const addTeacher = async (req, res) => {
   try {
     console.log(req.body);
     await connectTeachersDB();
+
+    // check if teacher already in database
+    const data = await SQTeacher.findOne({
+      where: { email: req.body.email },
+    });
+
+    if (data) {
+      return res.status(403).json({
+        teacher: data,
+        error: 'Teacher already exists',
+      });
+    }
+
     const teacher = await SQTeacher.create({
-      teacherkey: req.body.teacherkey,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
       phone: req.body.phone,
-      schoolId: req.body.schoolId,
+      school: req.body.school,
     });
 
-    if (!teacher) {
-      return res.status(400).json({
-        error: 'Teacher not found',
-      });
-    }
-    return res.status(200).json(teacher);
+    return res.status(200).json({ teacher });
   } catch (err) {
     console.log(err);
     return res.status(400).json({
