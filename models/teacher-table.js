@@ -12,7 +12,7 @@ export async function connectDB() {
   sequelize = await connectSQLDB();
   SQTeacher.init(
     {
-      teacherkey: {
+      teacherId: {
         type: Sequelize.DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,

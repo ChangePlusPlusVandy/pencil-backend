@@ -22,7 +22,7 @@ app.use('/api/:location/form', formRoutes);
 app.use('/api/teacher', teacherRoutes);
 app.use('/api/:location/transaction', transactionRoutes);
 app.use('/api/location', locationRoutes);
-app.use('/api/:location/schedule', schedulerRoutes);
+app.use('/api/schedule', schedulerRoutes);
 app.use('/api/:location/masterInventory', masterInventoryRoutes);
 
 const port = process.env.PORT || 8080;
