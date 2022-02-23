@@ -13,16 +13,16 @@ export async function connectDB() {
   SQTeacher.init(
     {
       teacherkey: {
-        type: Sequelize.DataTypes.STRING,
+        type: Sequelize.DataTypes.INTEGER,
         primaryKey: true,
-        unique: true,
+        autoIncrement: true,
       },
 
       firstName: Sequelize.DataTypes.STRING,
       lastName: Sequelize.DataTypes.STRING,
       email: Sequelize.DataTypes.STRING,
       phone: Sequelize.DataTypes.STRING,
-      // schoolId: Sequelize.DataTypes.INTEGER,
+      school: Sequelize.DataTypes.STRING, // CHANGE THIS TO SCHOOLID MAYBE
     },
     {
       sequelize,
