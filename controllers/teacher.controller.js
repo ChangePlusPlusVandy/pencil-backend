@@ -30,7 +30,7 @@ const teacherByID = async (req, res, next, id) => {
   try {
     await connectTeachersDB();
     console.log(id);
-    const teacher = await SQTeacher.findOne({ where: { teacherkey: id } })
+    const teacher = await SQTeacher.findOne({ where: { teacherId: id } })
       .then((data) => {
         if (!data) {
           return res.status(403).json({

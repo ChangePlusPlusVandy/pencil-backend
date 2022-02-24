@@ -181,64 +181,34 @@ const getSchedule = async (req, res) => {
         return listEventInvitees(eventUuid);
       })
       .then((inviteesCollection) => {
-        console.log('inviteees', inviteesCollection);
         // 6. Filter each invitees to keep only the relevant parameters
         // 6.1 Query teacher from teacher database
         const { collection } = inviteesCollection;
 
-        const collectionWithID = Promise.all(
-          collection.map((item) => {
-            console.log('I was here');
-            const teacherObj = addTeacher2({
-              name: item.name,
-              email: item.email,
-              phone: item.questions_and_answers[1].answer,
-              school: item.questions_and_answers[0].answer,
-            }).then((data) => ({
-              name: item.name,
-              email: item.email,
-              uri: item.uri,
-              school: item.questions_and_answers[0].answer,
-              phone: item.questions_and_answers[1].answer,
-              teacherId: teacherObj.teacher.SQTeacher.dataValues.teacherId,
-            }));
-            return teacherObj;
+        // add id to the collection of invitees by getting the ID from addTeacher2 return
+        const teacherCollection = Promise.all(
+          collection.map(async (invitee) => {
+            const teacherObj = {
+              name: invitee.name,
+              email: invitee.email,
+              phone: invitee.questions_and_answers[1].answer,
+              school: invitee.questions_and_answers[0].answer,
+            };
+
+            const teacher = await addTeacher2(teacherObj);
+            const teacherWithId = {
+              ...teacherObj,
+              teacherId: teacher.teacher.teacherId,
+              uri: invitee.uri,
+            };
+            return teacherWithId;
           })
         );
-
-        console.log('this is collection', collectionWithID);
-
-        return collectionWithID;
-
-        // const response = Promise.all(
-        //   collection.map((item) => {
-        //     const a = 0;
-        //     return addTeacher2({
-        //       name: item.name,
-        //       email: item.email,
-        //       phone: item.questions_and_answers[1].answer,
-        //       school: item.questions_and_answers[0].answer,
-        //     }).then((data) => {
-        //       console.log('this is data', data);
-        //       const scheduleObj = {
-        //         name: item.name,
-        //         email: item.email,
-        //         uri: item.uri,
-        //         school: item.questions_and_answers[0].answer,
-        //         phone: item.questions_and_answers[1].answer,
-        //         teacherId: data.teacher.SQTeacher.dataValues.teacherId,
-        //       };
-        //       return scheduleObj;
-        //     });
-        //   })
-        // );
-        // console.log('response is', response);
-        // return response;
+        return teacherCollection;
       })
       .then((invitees) => {
         // 7. Perform a GET request on calendly's GET-EVENT to add start/end
         //    time information to invitee object
-        console.log('HELLO', invitees);
         const schedule = Promise.all(
           invitees.map((invitee) => {
             // Perform the GET request for each user
