@@ -13,4 +13,8 @@ router
 
 router.route('/getAllItems').get(inventoryController.getAllItems);
 
+router
+  .route('/updateMasterInventory')
+  .put(inventoryController.updateMasterInventory);
+
 export default router;
