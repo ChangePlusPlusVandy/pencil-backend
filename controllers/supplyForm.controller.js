@@ -19,7 +19,7 @@ const addSupply = async (req, res) => {
     });
     if (!supply) {
       console.log('addSupply : Sup empty.');
-      return res.status(500).json({ error: 'Internal Server Error' });
+      return res.status(500).json({ error: 'Could not create supply' });
     }
 
     return res.status(200).json(supply);
@@ -56,7 +56,7 @@ const updateSupply = async (req, res) => {
 
     if (!sup) {
       console.log(sup);
-      return res.status(500).json({ error: 'Internal Server Error' });
+      return res.status(500).json({ error: 'Could not create supply' });
     }
 
     return res.status(200).json(sup);

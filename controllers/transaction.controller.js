@@ -66,6 +66,7 @@ const approveTransaction = async (req, res) => {
 
     return res.status(200).json({ status: 'Record approved' });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };

@@ -21,11 +21,7 @@ const checkForItem = async (req, res, next) => {
       },
     });
 
-    if (isInInventory) {
-      return res.status(200).json({ inInv: 'true' });
-    }
-
-    return res.status(200).json({ inInv: 'false' });
+    return res.status(200).json({ inInv: isInInventory ? 'true' : 'false' });
   } catch (err) {
     return res.status(500).json({ error: 'Internal server error' });
   }
@@ -49,8 +45,7 @@ const addItem = async (req, res, next) => {
 
     const addedItem = await SQMasterInventory.create(itemObj);
     if (!addedItem) {
-      console.log('Item could not be added');
-      return res.status(500).json({ error: 'Internal server error' });
+      return res.status(500).json({ error: 'Item could not be added' });
     }
 
     return res.status(200).json(addedItem);
