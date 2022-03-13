@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -30,7 +29,7 @@
     "mysql2": "^2.3.2",
     "node-fetch": "^3.2.0",
     "nodemon": "^2.0.14",
-    "sequelize": "^6.8.0",
+    "sequelize": "^6.17.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

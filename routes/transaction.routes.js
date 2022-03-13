@@ -1,6 +1,6 @@
-import express from 'express';
-import transactionController from '../controllers/transaction.controller.js';
-import transactionHelper from '../helpers/transaction.helper.js';
+const express = require('express');
+const transactionController = require('../controllers/transaction.controller.js');
+const { transactionByID } = require('../helpers/transaction.helper.js');
 
 const router = express.Router();
 
@@ -30,6 +30,6 @@ router.route('/denied').get(transactionController.getAllDeniedTransactions);
 router.route('/:transactionID').get(transactionController.getTransaction);
 
 // param for transactionID
-router.param('transactionID', transactionHelper.transactionByID);
+router.param('transactionID', transactionByID);
 
-export default router;
+module.exports = router;

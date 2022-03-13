@@ -1,7 +1,4 @@
-import {
-  connectSelectTable as connectSupplyFormDB,
-  SQShoppingForm,
-} from '../models/shopping-form-table.js';
+const { ShoppingForm } = require('../models');
 
 /**
  * Adds a supply to the form database.
@@ -10,8 +7,7 @@ import {
  * */
 const addSupply = async (req, res) => {
   try {
-    await connectSupplyFormDB(req.location.name);
-    const supply = await SQShoppingForm.create({
+    const supply = await ShoppingForm.create({
       itemId: req.body.itemId,
       itemName: req.body.itemName,
       maxLimit: req.body.maxLimit,
@@ -36,7 +32,6 @@ const addSupply = async (req, res) => {
  * */
 const updateSupply = async (req, res) => {
   try {
-    await connectSupplyFormDB(req.location.name);
     console.log(req.body, 'body');
     // const sup = await SQShoppingForm.create({
     //   itemId: req.body.itemId,
@@ -45,12 +40,12 @@ const updateSupply = async (req, res) => {
     //   itemOrder: req.body.itemOrder,
     // });
 
-    const wipe = await SQShoppingForm.destroy({
+    const wipe = await ShoppingForm.destroy({
       where: {},
       truncate: true,
     });
 
-    const sup = await SQShoppingForm.bulkCreate(req.body).catch((err) => {
+    const sup = await ShoppingForm.bulkCreate(req.body).catch((err) => {
       console.log(err);
     });
 
@@ -73,9 +68,7 @@ const updateSupply = async (req, res) => {
  */
 const fetchSupplyForm = async (req, res) => {
   try {
-    await connectSupplyFormDB(req.location.name);
-    const newName = 'SQShoppingForm'.concat(req.location.name);
-    const supplies = await SQShoppingForm.findAll({
+    const supplies = await ShoppingForm.findAll({
       attributes: ['itemId', 'itemName', 'maxLimit', 'itemOrder'],
     });
 
@@ -91,7 +84,7 @@ const fetchSupplyForm = async (req, res) => {
   }
 };
 
-export default {
+module.exports = {
   addSupply,
   fetchSupplyForm,
   updateSupply,

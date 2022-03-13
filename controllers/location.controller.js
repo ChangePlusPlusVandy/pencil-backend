@@ -1,7 +1,4 @@
-import {
-  connectDB as connectLocationDB,
-  SQLocation,
-} from '../models/location-table.js';
+const { Location } = require('../models');
 
 /**
  * Populates profile field with location information.
@@ -14,9 +11,8 @@ import {
 // eslint-disable-next-line consistent-return
 const locationByID = async (req, res, next, id) => {
   try {
-    await connectLocationDB();
     console.log(id);
-    const location = await SQLocation.findOne({ where: { name: id } })
+    const location = await Location.findOne({ where: { name: id } })
       .then((data) => {
         if (!data) {
           return res.status(403).json({
@@ -45,9 +41,8 @@ const locationByID = async (req, res, next, id) => {
  * */
 const addLocation = async (req, res) => {
   try {
-    await connectLocationDB();
     // if location already exists, return error
-    const loc = await SQLocation.findOne({
+    const loc = await Location.findOne({
       where: { name: req.body.name },
     });
     if (loc) {
@@ -56,7 +51,7 @@ const addLocation = async (req, res) => {
       });
     }
     // if location does not exist, add location to database
-    const location = await SQLocation.create({
+    const location = await Location.create({
       name: req.body.name,
       address: req.body.address,
     });
@@ -71,8 +66,7 @@ const addLocation = async (req, res) => {
 
 const getAllLocations = async (req, res) => {
   try {
-    await connectLocationDB();
-    const locations = await SQLocation.findAll();
+    const locations = await Location.findAll();
     console.log(locations);
     return res.status(200).json(locations);
   } catch (err) {
@@ -83,7 +77,7 @@ const getAllLocations = async (req, res) => {
   }
 };
 
-export default {
+module.exports = {
   locationByID,
   getAllLocations,
   addLocation,

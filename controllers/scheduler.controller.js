@@ -1,17 +1,12 @@
-import fetch from 'node-fetch';
-import {
-  connectDB as connectTeachersDB,
-  SQTeacher,
-} from '../models/teacher-table.js';
-// import addTeacher2 from './teacher.controller.js';
+const fetch = require('node-fetch');
+const { Teacher } = require('../models');
 
 const addTeacher2 = async (teacherObj) => {
   try {
     console.log('addTeacher:', teacherObj);
-    await connectTeachersDB();
 
     // check if teacher already in database
-    const data = await SQTeacher.findOne({
+    const data = await Teacher.findOne({
       where: { email: teacherObj.email },
     });
 
@@ -25,7 +20,7 @@ const addTeacher2 = async (teacherObj) => {
     const firstName = teacherObj.name.split(' ').slice(0, -1).join(' ');
     const lastName = teacherObj.name.split(' ').slice(-1).join(' ');
 
-    const teacher = await SQTeacher.create({
+    const teacher = await Teacher.create({
       firstName,
       lastName,
       email: teacherObj.email,
@@ -234,7 +229,7 @@ const getSchedule = async (req, res) => {
   }
 };
 
-export default {
+module.exports = {
   getSchedule,
   locationParam,
 };

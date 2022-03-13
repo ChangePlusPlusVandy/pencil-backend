@@ -1,5 +1,5 @@
-import express from 'express';
-import inventoryController from '../controllers/masterInventory.controller.js';
+const express = require('express');
+const inventoryController = require('../controllers/masterInventory.controller.js');
 
 const router = express.Router();
 
@@ -17,4 +17,4 @@ router
   .route('/updateMasterInventory')
   .put(inventoryController.updateMasterInventory);
 
-export default router;
+module.exports = router;

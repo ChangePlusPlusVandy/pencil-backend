@@ -1,17 +1,6 @@
-import { v4 as uuidv4 } from 'uuid';
-import {
-  connectSelectTable as connectTransactionDB,
-  SQTransaction,
-} from '../models/transaction-table.js';
-import {
-  connectSelectTable as connectTempTransactionDB,
-  SQTempTransaction,
-} from '../models/temp-transaction-table.js';
-import {
-  connectSelectTable as connectRejectedDB,
-  SQRejectedTransactions,
-} from '../models/rejected-transactions.js';
-// import transactionHelper from '../helpers/transaction.helper.js';
+const { v4 } = require('uuid');
+const { Transaction, Teacher } = require('../models');
+const { formatTransactions } = require('../helpers/transaction.helper.js');
 
 /**
  * Submits a User Transaction and adds data to the Temp Transaction Table.
@@ -20,15 +9,14 @@ import {
  */
 const submitTransaction = async (req, res) => {
   try {
-    await connectTempTransactionDB(req.location.name);
     const infoObj = {
-      transactionId: uuidv4(),
+      transactionId: v4(),
       teacherId: req.body.teacherId,
       schoolId: req.body.schoolId,
       items: req.body.items,
     };
 
-    const transaction = await SQTempTransaction.create(infoObj);
+    const transaction = await Transaction.create(infoObj);
 
     if (!transaction) {
       console.log('Transaction Info not added.');
@@ -50,10 +38,7 @@ const submitTransaction = async (req, res) => {
  */
 const approveTransaction = async (req, res) => {
   try {
-    await connectTransactionDB(req.location.name);
-    const finalTransaction = await SQTransaction.create(
-      req.transaction.toJSON()
-    );
+    const finalTransaction = await Transaction.create(req.transaction.toJSON());
 
     if (!finalTransaction) {
       console.log('Transaction approval failed');
@@ -61,7 +46,6 @@ const approveTransaction = async (req, res) => {
     }
 
     // Delete transaction from temp table
-    await connectTempTransactionDB(req.location.name);
     req.transaction.destroy();
 
     return res.status(200).json({ status: 'Record approved' });
@@ -80,8 +64,7 @@ const approveTransaction = async (req, res) => {
  */
 const denyTransaction = async (req, res) => {
   try {
-    await connectTempTransactionDB(req.location.name);
-    const archivedTransaction = await SQRejectedTransactions.create(
+    const archivedTransaction = await Transaction.create(
       req.transaction.toJSON()
     );
 
@@ -91,7 +74,6 @@ const denyTransaction = async (req, res) => {
     }
 
     // Delete transaction from temp table
-    await connectRejectedDB(req.location.name);
     await req.transaction.destroy();
 
     return res.status(200).json({ status: 'Record rejected' });
@@ -109,11 +91,23 @@ const denyTransaction = async (req, res) => {
  */
 const getAllPendingTransactions = async (req, res) => {
   try {
-    await connectTempTransactionDB(req.location.name);
-    const transactions = await SQTempTransaction.findAll({
+    console.log(req.location.name, 'hmm');
+    const curPage = req.query.page || 1;
+    const perPage = req.query.perPage || 10;
+    const transactions = await Transaction.findAll({
       model: 'SQTempTransaction'.concat(req.location.name),
+      limit: perPage,
+      offset: perPage * (curPage - 1),
+      include: [
+        {
+          as: 'SQTeacher',
+          model: Teacher,
+          attributes: ['id', 'firstName', 'lastName'],
+        },
+      ],
     });
-    return res.status(200).json(transactions);
+    const formattedTransactions = formatTransactions(transactions);
+    return res.status(200).json(formattedTransactions);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'Internal Server Error' });
@@ -127,8 +121,7 @@ const getAllPendingTransactions = async (req, res) => {
  */
 const getAllApprovedTransactions = async (req, res) => {
   try {
-    await connectTransactionDB(req.location.name);
-    const transactions = await SQTransaction.findAll({
+    const transactions = await Transaction.findAll({
       model: 'SQTransaction'.concat(req.location.name),
     });
     return res.status(200).json(transactions);
@@ -145,8 +138,7 @@ const getAllApprovedTransactions = async (req, res) => {
  */
 const getAllDeniedTransactions = async (req, res) => {
   try {
-    await connectRejectedDB(req.location.name);
-    const transactions = await SQRejectedTransactions.findAll({
+    const transactions = await Transaction.findAll({
       model: 'SQRejectedTransactions'.concat(req.location.name),
     });
     return res.status(200).json(transactions);
@@ -170,7 +162,7 @@ const getTransaction = async (req, res) => {
   }
 };
 
-export default {
+module.exports = {
   submitTransaction,
   approveTransaction,
   denyTransaction,

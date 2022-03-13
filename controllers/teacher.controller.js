@@ -1,7 +1,4 @@
-import {
-  connectDB as connectTeachersDB,
-  SQTeacher,
-} from '../models/teacher-table.js';
+const { Teacher } = require('../models');
 
 /**
  * Gets a teacher's profile.
@@ -28,9 +25,8 @@ const getTeacher = async (req, res) => {
 // eslint-disable-next-line consistent-return
 const teacherByID = async (req, res, next, id) => {
   try {
-    await connectTeachersDB();
     console.log(id);
-    const teacher = await SQTeacher.findOne({ where: { teacherId: id } })
+    const teacher = await Teacher.findOne({ where: { teacherId: id } })
       .then((data) => {
         if (!data) {
           return res.status(403).json({
@@ -61,10 +57,9 @@ const teacherByID = async (req, res, next, id) => {
 const addTeacher = async (req, res) => {
   try {
     console.log('addTeacher:', req);
-    await connectTeachersDB();
 
     // check if teacher already in database
-    const data = await SQTeacher.findOne({
+    const data = await Teacher.findOne({
       where: { email: req.body.email },
     });
 
@@ -75,7 +70,7 @@ const addTeacher = async (req, res) => {
       });
     }
 
-    const teacher = await SQTeacher.create({
+    const teacher = await Teacher.create({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
@@ -92,7 +87,7 @@ const addTeacher = async (req, res) => {
   }
 };
 
-export default {
+module.exports = {
   getTeacher,
   teacherByID,
   addTeacher,
