@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const fetch = require('cross-fetch'); // FIXXXX
 const { Teacher } = require('../models');
 
 const addTeacher2 = async (teacherObj) => {

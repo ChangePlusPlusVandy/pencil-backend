@@ -101,4 +101,4 @@ const formatTransactions = (transactions) => {
   return transactions;
 };
 
-export { transactionByID, formatTransactions };
+module.exports = { transactionByID, formatTransactions };
