@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      return { ...this.get(), id: undefined };
+      return { ...this.get(), id: undefined, schoolId: undefined };
     }
   }
   Teacher.init(
@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
       lastName: DataTypes.STRING,
       email: DataTypes.STRING,
       phone: DataTypes.STRING,
+      uuid: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
     },
     {
       sequelize,

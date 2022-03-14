@@ -18,13 +18,22 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      return { ...this.get(), id: undefined };
+      return {
+        ...this.get(),
+        id: undefined,
+        locationId: undefined,
+        itemId: undefined,
+      };
     }
   }
   ShoppingForm.init(
     {
       maxLimit: DataTypes.INTEGER,
       itemOrder: DataTypes.INTEGER,
+      uuid: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
     },
     {
       sequelize,

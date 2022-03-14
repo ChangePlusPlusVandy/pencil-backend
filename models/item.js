@@ -42,6 +42,10 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: { message: 'Item name cannot be empty' },
         },
       },
+      uuid: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       itemPrice: DataTypes.DOUBLE,
     },
     {
