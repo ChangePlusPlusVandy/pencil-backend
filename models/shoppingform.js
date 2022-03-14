@@ -9,6 +9,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.location, {
+        foreignKey: 'locationId',
+      });
+      this.hasMany(models.Item, {
+        foreignKey: 'shoppingFormId',
+      });
     }
   }
   ShoppingForm.init(

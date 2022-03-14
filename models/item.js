@@ -9,10 +9,21 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsToMany(models.shoppingForm, {
+        foreignKey: 'itemId',
+      });
+
+      this.belongsToMany(models.transactionItem, {
+        foreignKey: 'itemId',
+      });
     }
   }
   Item.init(
     {
+      uuid: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       itemName: DataTypes.STRING,
       itemPrice: DataTypes.DOUBLE,
     },

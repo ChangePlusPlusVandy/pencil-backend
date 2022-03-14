@@ -9,11 +9,29 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.hasMany(models.Transaction, {
+        foreignKey: 'locationId',
+      });
+
+      this.hasMany(models.shoppingForm, {
+        foreignKey: 'locationId',
+      });
     }
   }
   Location.init(
     {
-      name: DataTypes.STRING,
+      uuid: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: { message: 'Name cannot be null' },
+          notEmpty: { message: 'Name cannot be empty' },
+        },
+      },
       address: DataTypes.STRING,
     },
     {
