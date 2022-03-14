@@ -1,7 +1,4 @@
-import {
-  connectDB as connectTempTransactionDB,
-  SQTempTransaction,
-} from '../models/temp-transaction-table.js';
+const { Transaction } = require('../models');
 
 /**
  * Retrieves a row from the tempTransactionDB, given a transaction ID.
@@ -15,11 +12,9 @@ import {
 // eslint-disable-next-line consistent-return
 const transactionByID = async (req, res, next, id) => {
   try {
-    await connectTempTransactionDB();
-
-    const transaction = await SQTempTransaction.findOne({
+    const transaction = await Transaction.findOne({
       where: {
-        transactionId: id,
+        uuid: id,
       },
     })
       .then((data) => {
@@ -40,4 +35,10 @@ const transactionByID = async (req, res, next, id) => {
   }
 };
 
-export default { transactionByID };
+const formatTransactions = (transactions) => {
+  const formattedData = [];
+  console.log(transactions);
+  return transactions;
+};
+
+module.exports = { transactionByID, formatTransactions };

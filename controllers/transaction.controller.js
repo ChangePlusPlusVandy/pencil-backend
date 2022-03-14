@@ -1,17 +1,7 @@
-import { v4 as uuidv4 } from 'uuid';
-import {
-  connectSelectTable as connectTransactionDB,
-  SQTransaction,
-} from '../models/transaction-table.js';
-import {
-  connectSelectTable as connectTempTransactionDB,
-  SQTempTransaction,
-} from '../models/temp-transaction-table.js';
-import {
-  connectSelectTable as connectRejectedDB,
-  SQRejectedTransactions,
-} from '../models/rejected-transactions.js';
-// import transactionHelper from '../helpers/transaction.helper.js';
+/* eslint-disable no-underscore-dangle */
+const { v4 } = require('uuid');
+const { Transaction, Teacher, TransactionItem, Item } = require('../models');
+const { formatTransactions } = require('../helpers/transaction.helper.js');
 
 /**
  * Submits a User Transaction and adds data to the Temp Transaction Table.
@@ -20,21 +10,30 @@ import {
  */
 const submitTransaction = async (req, res) => {
   try {
-    await connectTempTransactionDB(req.location.name);
-    const infoObj = {
-      transactionId: uuidv4(),
-      teacherId: req.body.teacherId,
-      schoolId: req.body.schoolId,
-      items: req.body.items,
-    };
-
-    const transaction = await SQTempTransaction.create(infoObj);
-
+    const teacher = await Teacher.findOne({
+      where: { pencilId: req.body.teacherId },
+    });
+    const transaction = await Transaction.create({
+      _teacherId: teacher._id,
+      _schoolId: req.body.schoolId,
+      _locationId: req.location._id,
+    });
+    req.body.items.forEach(async (item) => {
+      const findItem = await Item.findOne({
+        where: { uuid: item.uuid },
+      });
+      const transactionItem = await TransactionItem.create({
+        _transactionId: transaction._id,
+        _itemId: findItem._id,
+        maxLimit: item.maxLimit,
+        amountTaken: item.itemCount,
+      });
+    });
     if (!transaction) {
       console.log('Transaction Info not added.');
       return res.status(500).json({ error: 'Internal Server Error' });
     }
-    return res.status(200).json(infoObj);
+    return res.status(200).json(transaction);
   } catch (err) {
     console.log(err);
     return res.status(400).json({ error: 'Submit Transaction - cant submit' });
@@ -45,24 +44,15 @@ const submitTransaction = async (req, res) => {
  * Transfers transaction from temporary transaction table (tempTransactionTable) to the final
  * transaction table, deleting the entry in the former table in the process.
  *
- * @param {Object} req - Request Object with structure { id: INT }
+ * @param {Object} req - Request Object with structure { _id: INT }
  * @param {Object} res - Response Object
  */
 const approveTransaction = async (req, res) => {
   try {
-    await connectTransactionDB(req.location.name);
-    const finalTransaction = await SQTransaction.create(
-      req.transaction.toJSON()
+    const finalTransaction = await Transaction.update(
+      { status: 1 },
+      { where: { uuid: req.body.transaction.uuid } }
     );
-
-    if (!finalTransaction) {
-      console.log('Transaction approval failed');
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-
-    // Delete transaction from temp table
-    await connectTempTransactionDB(req.location.name);
-    req.transaction.destroy();
 
     return res.status(200).json({ status: 'Record approved' });
   } catch (err) {
@@ -75,26 +65,17 @@ const approveTransaction = async (req, res) => {
  * Transfers transaction from temporary transaction table (tempTransactionTable) to the rejected
  * transaction table, deleting the entry in the former table in the process.
  *
- * @param {Object} req - Request Object with structure { id: STRING }
+ * @param {Object} req - Request Object with structure { _id: STRING }
  * @param {Object} res - Response Object
  */
 const denyTransaction = async (req, res) => {
   try {
-    await connectTempTransactionDB(req.location.name);
-    const archivedTransaction = await SQRejectedTransactions.create(
-      req.transaction.toJSON()
+    const finalTransaction = await Transaction.update(
+      { status: 2 },
+      { where: { uuid: req.body.transaction.uuid } }
     );
 
-    if (!archivedTransaction) {
-      console.log('Transaction denial failed');
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-
-    // Delete transaction from temp table
-    await connectRejectedDB(req.location.name);
-    await req.transaction.destroy();
-
-    return res.status(200).json({ status: 'Record rejected' });
+    return res.status(200).json({ status: 'Record denied' });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'Internal Server Error' });
@@ -109,11 +90,23 @@ const denyTransaction = async (req, res) => {
  */
 const getAllPendingTransactions = async (req, res) => {
   try {
-    await connectTempTransactionDB(req.location.name);
-    const transactions = await SQTempTransaction.findAll({
-      model: 'SQTempTransaction'.concat(req.location.name),
+    const curPage = req.query.page || 1;
+    const perPage = req.query.perPage || 10;
+    const transactions = await Transaction.findAll({
+      where: { _locationId: req.location._id, status: 0 },
+      limit: perPage,
+      offset: perPage * (curPage - 1),
+      include: [
+        {
+          model: TransactionItem,
+        },
+        {
+          model: Teacher,
+        },
+      ],
     });
-    return res.status(200).json(transactions);
+    const formattedTransactions = formatTransactions(transactions);
+    return res.status(200).json(formattedTransactions);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'Internal Server Error' });
@@ -127,9 +120,20 @@ const getAllPendingTransactions = async (req, res) => {
  */
 const getAllApprovedTransactions = async (req, res) => {
   try {
-    await connectTransactionDB(req.location.name);
-    const transactions = await SQTransaction.findAll({
-      model: 'SQTransaction'.concat(req.location.name),
+    const curPage = req.query.page || 1;
+    const perPage = req.query.perPage || 10;
+    const transactions = await Transaction.findAll({
+      where: { _locationId: req.location._id, status: 1 },
+      limit: perPage,
+      offset: perPage * (curPage - 1),
+      include: [
+        {
+          model: TransactionItem,
+        },
+        {
+          model: Teacher,
+        },
+      ],
     });
     return res.status(200).json(transactions);
   } catch (err) {
@@ -145,9 +149,20 @@ const getAllApprovedTransactions = async (req, res) => {
  */
 const getAllDeniedTransactions = async (req, res) => {
   try {
-    await connectRejectedDB(req.location.name);
-    const transactions = await SQRejectedTransactions.findAll({
-      model: 'SQRejectedTransactions'.concat(req.location.name),
+    const curPage = req.query.page || 1;
+    const perPage = req.query.perPage || 10;
+    const transactions = await Transaction.findAll({
+      where: { _locationId: req.location._id, status: 2 },
+      limit: perPage,
+      offset: perPage * (curPage - 1),
+      include: [
+        {
+          model: TransactionItem,
+        },
+        {
+          model: Teacher,
+        },
+      ],
     });
     return res.status(200).json(transactions);
   } catch (err) {
@@ -170,7 +185,7 @@ const getTransaction = async (req, res) => {
   }
 };
 
-export default {
+module.exports = {
   submitTransaction,
   approveTransaction,
   denyTransaction,

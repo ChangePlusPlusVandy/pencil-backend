@@ -1,5 +1,5 @@
-import express from 'express';
-import formController from '../controllers/supplyForm.controller.js';
+const express = require('express');
+const formController = require('../controllers/supplyForm.controller.js');
 
 const router = express.Router();
 
@@ -9,4 +9,4 @@ router.route('/getShopForm').get(formController.fetchSupplyForm); // fetch Suppl
 
 router.route('/updateSupply').put(formController.updateSupply); // update Supply in shopping form
 
-export default router;
+module.exports = router;

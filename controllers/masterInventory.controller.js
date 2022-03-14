@@ -1,8 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';
-import {
-  connectSelectTable as connectMasterInvDB,
-  SQMasterInventory,
-} from '../models/master-inventory.js';
+const { v4 } = require('uuid');
+const { Item } = require('../models');
 
 /**
  * Check whether a given item is in the master inventory table.
@@ -12,9 +9,7 @@ import {
  */
 const checkForItem = async (req, res, next) => {
   try {
-    await connectMasterInvDB(req.location.name);
-
-    const isInInventory = await SQMasterInventory.findAll({
+    const isInInventory = await Item.findOne({
       where: {
         itemName: req.params.itemName,
         itemPrice: req.params.itemPrice,
@@ -35,18 +30,12 @@ const checkForItem = async (req, res, next) => {
  */
 const addItem = async (req, res, next) => {
   try {
-    await connectMasterInvDB(req.location.name);
-
     const itemObj = {
-      itemId: uuidv4(),
       itemName: req.body.itemName,
       itemPrice: req.body.itemPrice,
     };
 
-    const addedItem = await SQMasterInventory.create(itemObj);
-    if (!addedItem) {
-      return res.status(500).json({ error: 'Item could not be added' });
-    }
+    const addedItem = await Item.create(itemObj);
 
     return res.status(200).json(addedItem);
   } catch (err) {
@@ -57,11 +46,9 @@ const addItem = async (req, res, next) => {
 
 const getAllItems = async (req, res, next) => {
   try {
-    await connectMasterInvDB(req.location.name);
-
-    const itemList = await SQMasterInventory.findAll({
+    const itemList = await Item.findAll({
       order: [['itemName', 'ASC']],
-      attributes: ['itemId', 'itemName', 'itemPrice'],
+      attributes: ['itemName', 'itemPrice'],
     });
 
     return res.status(200).json(itemList);
@@ -72,15 +59,14 @@ const getAllItems = async (req, res, next) => {
 };
 
 const updateMasterInventory = async (req, res, next) => {
+  // FIXME: Consult about master inventory
   try {
-    await connectMasterInvDB(req.location.name);
-
-    const wipe = await SQMasterInventory.destroy({
+    const wipe = await Item.destroy({
       where: {},
       truncate: true,
     });
 
-    const updatedItems = await SQMasterInventory.bulkCreate(req.body);
+    const updatedItems = await Item.bulkCreate(req.body);
     if (!updatedItems) {
       console.log('Items could not be updated');
       return res.status(500).json({ error: 'Internal server error' });
@@ -92,7 +78,7 @@ const updateMasterInventory = async (req, res, next) => {
   }
 };
 
-export default {
+module.exports = {
   addItem,
   checkForItem,
   getAllItems,

@@ -1,7 +1,4 @@
-import {
-  connectDB as connectTeachersDB,
-  SQTeacher,
-} from '../models/teacher-table.js';
+const { Teacher } = require('../models');
 
 /**
  * Gets a teacher's profile.
@@ -22,18 +19,16 @@ const getTeacher = async (req, res) => {
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * @param {function} next - Next middleware.
- * @param {id} id - Teacher id.
+ * @param {id} pencilId - Teacher id.
  * @returns {function} - Call to next controller.
  * */
 // eslint-disable-next-line consistent-return
-const teacherByID = async (req, res, next, id) => {
+const teacherByID = async (req, res, next, pencilId) => {
   try {
-    await connectTeachersDB();
-    console.log(id);
-    const teacher = await SQTeacher.findOne({ where: { teacherId: id } })
+    const teacher = await Teacher.findOne({ where: { pencilId } })
       .then((data) => {
         if (!data) {
-          return res.status(403).json({
+          return res.status(400).json({
             error: 'Invalid teacher ID',
           });
         }
@@ -61,21 +56,21 @@ const teacherByID = async (req, res, next, id) => {
 const addTeacher = async (req, res) => {
   try {
     console.log('addTeacher:', req);
-    await connectTeachersDB();
 
     // check if teacher already in database
-    const data = await SQTeacher.findOne({
+    const data = await Teacher.findOne({
       where: { email: req.body.email },
     });
 
     if (data) {
-      return res.status(403).json({
+      return res.status(400).json({
         teacher: data,
         error: 'Teacher already exists',
       });
     }
 
-    const teacher = await SQTeacher.create({
+    const teacher = await Teacher.create({
+      pencilId: req.body.pencilId,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
@@ -92,7 +87,7 @@ const addTeacher = async (req, res) => {
   }
 };
 
-export default {
+module.exports = {
   getTeacher,
   teacherByID,
   addTeacher,

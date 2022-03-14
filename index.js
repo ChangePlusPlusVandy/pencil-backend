@@ -1,13 +1,15 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import formRoutes from './routes/supplyForm.routes.js';
-import teacherRoutes from './routes/teacher.routes.js';
-import transactionRoutes from './routes/transaction.routes.js';
-import schedulerRoutes from './routes/scheduler.routes.js';
-import masterInventoryRoutes from './routes/masterInventory.routes.js';
-import locationRoutes from './routes/location.routes.js';
-import locationController from './controllers/location.controller.js';
+const cors = require('cors');
+const dotenv = require('dotenv');
+const express = require('express');
+const formRoutes = require('./routes/supplyForm.routes.js');
+const teacherRoutes = require('./routes/teacher.routes.js');
+const transactionRoutes = require('./routes/transaction.routes.js');
+const schedulerRoutes = require('./routes/scheduler.routes.js');
+const masterInventoryRoutes = require('./routes/masterInventory.routes.js');
+const locationRoutes = require('./routes/location.routes.js');
+const locationController = require('./controllers/location.controller.js');
+
+const { sequelize } = require('./models');
 
 dotenv.config();
 const app = express();
@@ -27,11 +29,15 @@ app.use('/api/:location/masterInventory', masterInventoryRoutes);
 
 const port = process.env.PORT || 8080;
 
-app.listen(port, (err) => {
-  if (err) {
-    console.log(err);
+app.listen(port, async () => {
+  try {
+    console.log('listening on port 8080');
+
+    await sequelize.authenticate();
+    console.log('db connected');
+  } catch (error) {
+    console.log(error);
   }
-  console.log(`Server is listening on port ${port}`);
 });
 
-export default app;
+module.exports = app;
