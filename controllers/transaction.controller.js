@@ -12,7 +12,7 @@ const submitTransaction = async (req, res) => {
     const transaction = await Transaction.create({
       teacherId: req.body.teacherId,
       schoolId: req.body.schoolId,
-      locationId: req.body.locationId,
+      locationId: req.location.id,
     });
     console.log(req.body);
     req.body.items.forEach(async (item) => {
@@ -20,6 +20,8 @@ const submitTransaction = async (req, res) => {
       const newItem = await TransactionItem.create({
         transactionId: transaction.id,
         itemId: item.itemId,
+        maxLimit: item.maxLimit,
+        amountTaken: item.itemCount,
       });
     });
     if (!transaction) {
