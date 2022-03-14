@@ -69,7 +69,7 @@ const updateSupply = async (req, res) => {
 const fetchSupplyForm = async (req, res) => {
   try {
     const supplies = await ShoppingForm.findAll({
-      attributes: ['itemId', 'itemName', 'maxLimit', 'itemOrder'],
+      attributes: ['itemName', 'maxLimit', 'itemOrder'],
     });
 
     if (!supplies) {

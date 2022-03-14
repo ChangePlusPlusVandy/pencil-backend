@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'transactionId',
       });
       this.hasOne(models.Item, {
-        foreignKey: 'itemId',
+        foreignKey: 'transactionItemId',
       });
     }
   }

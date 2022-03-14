@@ -22,7 +22,15 @@ module.exports = (sequelize, DataTypes) => {
   }
   Item.init(
     {
-      itemName: DataTypes.STRING,
+      itemName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          notNull: { message: 'Item name cannot be null' },
+          notEmpty: { message: 'Item name cannot be empty' },
+        },
+      },
       itemPrice: DataTypes.DOUBLE,
     },
     {

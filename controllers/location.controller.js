@@ -20,6 +20,7 @@ const locationByID = async (req, res, next, id) => {
           });
         }
         req.location = data;
+        console.log(data);
         return next();
       })
       .catch((err) =>

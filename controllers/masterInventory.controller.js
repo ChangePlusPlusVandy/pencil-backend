@@ -9,7 +9,7 @@ const { Item } = require('../models');
  */
 const checkForItem = async (req, res, next) => {
   try {
-    const isInInventory = await Item.findAll({
+    const isInInventory = await Item.findOne({
       where: {
         itemName: req.params.itemName,
         itemPrice: req.params.itemPrice,
@@ -31,15 +31,11 @@ const checkForItem = async (req, res, next) => {
 const addItem = async (req, res, next) => {
   try {
     const itemObj = {
-      itemId: v4(),
       itemName: req.body.itemName,
       itemPrice: req.body.itemPrice,
     };
 
     const addedItem = await Item.create(itemObj);
-    if (!addedItem) {
-      return res.status(500).json({ error: 'Item could not be added' });
-    }
 
     return res.status(200).json(addedItem);
   } catch (err) {
@@ -52,7 +48,7 @@ const getAllItems = async (req, res, next) => {
   try {
     const itemList = await Item.findAll({
       order: [['itemName', 'ASC']],
-      attributes: ['itemId', 'itemName', 'itemPrice'],
+      attributes: ['itemName', 'itemPrice'],
     });
 
     return res.status(200).json(itemList);
@@ -63,6 +59,7 @@ const getAllItems = async (req, res, next) => {
 };
 
 const updateMasterInventory = async (req, res, next) => {
+  // FIXME: Consult about master inventory
   try {
     const wipe = await Item.destroy({
       where: {},
