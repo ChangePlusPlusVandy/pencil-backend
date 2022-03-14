@@ -11,12 +11,12 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.belongsToMany(Location, {
         through: ShoppingForm,
-        foreignKey: 'shoppingFormId',
+        foreignKey: 'itemId',
       });
 
       this.belongsToMany(Transaction, {
         through: TransactionItem,
-        foreignKey: 'transactionItemId',
+        foreignKey: 'itemId',
       });
     }
   }

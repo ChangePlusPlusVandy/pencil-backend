@@ -7,8 +7,14 @@ module.exports = {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      items: {
-        type: DataTypes.JSON,
+      teacherId: {
+        type: DataTypes.INTEGER,
+      },
+      schoolId: {
+        type: DataTypes.INTEGER,
+      },
+      locationId: {
+        type: DataTypes.INTEGER,
       },
       status: {
         type: DataTypes.INTEGER,

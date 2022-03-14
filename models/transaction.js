@@ -18,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.School, {
         foreignKey: 'schoolId',
       });
-      this.hasMany(models.TransactionItem, {
+      this.belongsToMany(models.Item, {
+        through: 'TransactionItem',
         foreignKey: 'transactionId',
       });
     }

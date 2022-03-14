@@ -79,7 +79,7 @@ const fetchSupplyForm = async (req, res) => {
     supplies.sort((a, b) => a.itemOrder - b.itemOrder);
     return res.status(200).json(supplies);
   } catch (err) {
-    console.log('fetchForm - can not connect');
+    console.log(err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };

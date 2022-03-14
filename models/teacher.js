@@ -12,10 +12,14 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.School, {
         foreignKey: 'schoolId',
       });
+      this.hasMany(models.Transaction, {
+        foreignKey: 'teacherId',
+      });
     }
   }
   Teacher.init(
     {
+      pencilId: DataTypes.INTEGER,
       firstname: DataTypes.STRING,
       lastname: DataTypes.STRING,
       email: DataTypes.STRING,

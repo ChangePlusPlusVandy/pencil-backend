@@ -7,10 +7,13 @@ module.exports = {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      firstname: {
+      pencilId: {
+        type: DataTypes.INTEGER,
+      },
+      firstName: {
         type: DataTypes.STRING,
       },
-      lastname: {
+      lastName: {
         type: DataTypes.STRING,
       },
       email: {
@@ -18,6 +21,9 @@ module.exports = {
       },
       phone: {
         type: DataTypes.STRING,
+      },
+      schoolId: {
+        type: DataTypes.INTEGER,
       },
       createdAt: {
         allowNull: false,

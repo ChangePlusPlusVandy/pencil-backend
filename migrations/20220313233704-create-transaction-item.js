@@ -7,6 +7,12 @@ module.exports = {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
+      transactionId: {
+        type: DataTypes.INTEGER,
+      },
+      itemId: {
+        type: DataTypes.INTEGER,
+      },
       maxLimit: {
         type: DataTypes.INTEGER,
       },
