@@ -13,17 +13,17 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'locationId',
       });
 
-      this.hasMany(models.shoppingForm, {
+      this.hasMany(models.ShoppingForm, {
         foreignKey: 'locationId',
       });
+    }
+
+    toJSON() {
+      return { ...this.get(), id: undefined };
     }
   }
   Location.init(
     {
-      uuid: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,

@@ -15,7 +15,7 @@ const locationByID = async (req, res, next, id) => {
     const location = await Location.findOne({ where: { name: id } })
       .then((data) => {
         if (!data) {
-          return res.status(403).json({
+          return res.status(400).json({
             error: 'Invalid location ID',
           });
         }
