@@ -1,5 +1,5 @@
 const { v4 } = require('uuid');
-const { Transaction, Teacher } = require('../models');
+const { Transaction, Teacher, TransactionItem } = require('../models');
 const { formatTransactions } = require('../helpers/transaction.helper.js');
 
 /**
@@ -9,20 +9,24 @@ const { formatTransactions } = require('../helpers/transaction.helper.js');
  */
 const submitTransaction = async (req, res) => {
   try {
-    const infoObj = {
-      transactionId: v4(),
+    const transaction = await Transaction.create({
       teacherId: req.body.teacherId,
       schoolId: req.body.schoolId,
-      items: req.body.items,
-    };
-
-    const transaction = await Transaction.create(infoObj);
-
+      locationId: req.body.locationId,
+    });
+    console.log(req.body);
+    req.body.items.forEach(async (item) => {
+      console.log(item);
+      const newItem = await TransactionItem.create({
+        transactionId: transaction.id,
+        itemId: item.itemId,
+      });
+    });
     if (!transaction) {
       console.log('Transaction Info not added.');
       return res.status(500).json({ error: 'Internal Server Error' });
     }
-    return res.status(200).json(infoObj);
+    return res.status(200).json(transaction);
   } catch (err) {
     console.log(err);
     return res.status(400).json({ error: 'Submit Transaction - cant submit' });

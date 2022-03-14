@@ -26,10 +26,10 @@ const getTeacher = async (req, res) => {
 const teacherByID = async (req, res, next, id) => {
   try {
     console.log(id);
-    const teacher = await Teacher.findOne({ where: { teacherId: id } })
+    const teacher = await Teacher.findOne({ where: { pencilId: id } })
       .then((data) => {
         if (!data) {
-          return res.status(403).json({
+          return res.status(400).json({
             error: 'Invalid teacher ID',
           });
         }
@@ -64,13 +64,14 @@ const addTeacher = async (req, res) => {
     });
 
     if (data) {
-      return res.status(403).json({
+      return res.status(400).json({
         teacher: data,
         error: 'Teacher already exists',
       });
     }
 
     const teacher = await Teacher.create({
+      pencilId: req.body.pencilId,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,

@@ -25,8 +25,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Transaction.init(
     {
-      items: DataTypes.JSON,
-      status: DataTypes.INTEGER,
+      status: { type: DataTypes.INTEGER, defaultValue: 0 },
     },
     {
       sequelize,
