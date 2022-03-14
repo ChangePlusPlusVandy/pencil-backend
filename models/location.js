@@ -13,8 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'locationId',
       });
 
-      this.belongsToMany(models.Item, {
-        through: 'ShoppingForm',
+      this.hasMany(models.ShoppingForm, {
         foreignKey: 'locationId',
       });
     }

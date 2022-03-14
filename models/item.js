@@ -9,13 +9,20 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ Location, ShoppingForm, TransactionItem, Transaction }) {
       // define association here
-      this.belongsToMany(Location, {
-        through: ShoppingForm,
+      // this.belongsToMany(Location, {
+      //   through: ShoppingForm,
+      //   foreignKey: 'itemId',
+      // });
+
+      // this.belongsToMany(Transaction, {
+      //   through: TransactionItem,
+      //   foreignKey: 'itemId',
+      // });
+      this.hasMany(TransactionItem, {
         foreignKey: 'itemId',
       });
 
-      this.belongsToMany(Transaction, {
-        through: TransactionItem,
+      this.hasMany(ShoppingForm, {
         foreignKey: 'itemId',
       });
     }

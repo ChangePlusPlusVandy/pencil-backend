@@ -1,4 +1,4 @@
-const { ShoppingForm } = require('../models');
+const { ShoppingForm, Item, Location } = require('../models');
 
 /**
  * Adds a supply to the form database.
@@ -7,9 +7,18 @@ const { ShoppingForm } = require('../models');
  * */
 const addSupply = async (req, res) => {
   try {
+    let item = await Item.findOne({
+      where: { itemName: req.body.itemName },
+    });
+    if (!item) {
+      item = await Item.create({
+        itemName: req.body.itemName,
+        itemPrice: 0,
+      });
+    }
     const supply = await ShoppingForm.create({
-      itemId: req.body.itemId,
-      itemName: req.body.itemName,
+      itemId: item.id,
+      locationId: req.location.id,
       maxLimit: req.body.maxLimit,
       itemOrder: req.body.itemOrder,
     });
@@ -32,29 +41,32 @@ const addSupply = async (req, res) => {
  * */
 const updateSupply = async (req, res) => {
   try {
-    console.log(req.body, 'body');
-    // const sup = await SQShoppingForm.create({
-    //   itemId: req.body.itemId,
-    //   itemName: req.body.itemName,
-    //   maxLimit: req.body.maxLimit,
-    //   itemOrder: req.body.itemOrder,
-    // });
-
+    const responseItem = [];
     const wipe = await ShoppingForm.destroy({
-      where: {},
+      where: { locationId: req.location.id },
       truncate: true,
     });
-
-    const sup = await ShoppingForm.bulkCreate(req.body).catch((err) => {
-      console.log(err);
+    console.log('prev,', wipe);
+    req.body.forEach(async (item) => {
+      let newItem = await Item.findOne({
+        where: { itemName: item['Item.itemName'] },
+      });
+      if (!newItem) {
+        newItem = await Item.create({
+          itemName: item['Item.itemName'],
+          itemPrice: 0,
+        });
+      }
+      const supply = await ShoppingForm.create({
+        itemId: newItem.id,
+        locationId: req.location.id,
+        maxLimit: item.maxLimit,
+        itemOrder: item.itemOrder,
+      });
+      responseItem.push(supply);
     });
 
-    if (!sup) {
-      console.log(sup);
-      return res.status(500).json({ error: 'Could not create supply' });
-    }
-
-    return res.status(200).json(sup);
+    return res.status(200).json({ message: 'Supply Form Updated' });
   } catch (err) {
     console.log("addSupply : can't connect");
     return res.status(500).json({ error: 'Internal Server Error' });
@@ -69,7 +81,10 @@ const updateSupply = async (req, res) => {
 const fetchSupplyForm = async (req, res) => {
   try {
     const supplies = await ShoppingForm.findAll({
-      attributes: ['itemName', 'maxLimit', 'itemOrder'],
+      where: { locationId: req.location.id },
+      raw: true,
+
+      include: [{ model: Item, attributes: ['itemName', 'itemPrice'] }],
     });
 
     if (!supplies) {
