@@ -1,4 +1,4 @@
-const { Teacher } = require('../models');
+const { Teacher, School } = require('../models');
 
 /**
  * Gets a teacher's profile.
@@ -25,7 +25,10 @@ const getTeacher = async (req, res) => {
 // eslint-disable-next-line consistent-return
 const teacherByID = async (req, res, next, pencilId) => {
   try {
-    const teacher = await Teacher.findOne({ where: { pencilId } })
+    const teacher = await Teacher.findOne({
+      where: { pencilId },
+      include: [{ model: School }],
+    })
       .then((data) => {
         if (!data) {
           return res.status(400).json({

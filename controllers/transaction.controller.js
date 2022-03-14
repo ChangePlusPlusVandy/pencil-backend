@@ -1,6 +1,12 @@
 /* eslint-disable no-underscore-dangle */
 const { v4 } = require('uuid');
-const { Transaction, Teacher, TransactionItem, Item } = require('../models');
+const {
+  Transaction,
+  Teacher,
+  TransactionItem,
+  Item,
+  School,
+} = require('../models');
 const { formatTransactions } = require('../helpers/transaction.helper.js');
 
 /**
@@ -13,9 +19,12 @@ const submitTransaction = async (req, res) => {
     const teacher = await Teacher.findOne({
       where: { pencilId: req.body.teacherId },
     });
+    const school = await School.findOne({
+      where: { uuid: req.body.schoolId },
+    });
     const transaction = await Transaction.create({
       _teacherId: teacher._id,
-      _schoolId: req.body.schoolId,
+      _schoolId: school._id,
       _locationId: req.location._id,
     });
     req.body.items.forEach(async (item) => {
