@@ -1,5 +1,6 @@
+/* eslint-disable no-underscore-dangle */
 const { v4 } = require('uuid');
-const { Transaction, Teacher, TransactionItem } = require('../models');
+const { Transaction, Teacher, TransactionItem, Item } = require('../models');
 const { formatTransactions } = require('../helpers/transaction.helper.js');
 
 /**
@@ -13,14 +14,17 @@ const submitTransaction = async (req, res) => {
       where: { pencilId: req.body.teacherId },
     });
     const transaction = await Transaction.create({
-      teacherId: teacher.id,
-      schoolId: req.body.schoolId,
-      locationId: req.location.id,
+      _teacherId: teacher._id,
+      _schoolId: req.body.schoolId,
+      _locationId: req.location._id,
     });
     req.body.items.forEach(async (item) => {
-      const newItem = await TransactionItem.create({
-        transactionId: transaction.id,
-        itemId: item.itemId,
+      const findItem = await Item.findOne({
+        where: { uuid: item.uuid },
+      });
+      const transactionItem = await TransactionItem.create({
+        _transactionId: transaction._id,
+        _itemId: findItem._id,
         maxLimit: item.maxLimit,
         amountTaken: item.itemCount,
       });
@@ -40,14 +44,14 @@ const submitTransaction = async (req, res) => {
  * Transfers transaction from temporary transaction table (tempTransactionTable) to the final
  * transaction table, deleting the entry in the former table in the process.
  *
- * @param {Object} req - Request Object with structure { id: INT }
+ * @param {Object} req - Request Object with structure { _id: INT }
  * @param {Object} res - Response Object
  */
 const approveTransaction = async (req, res) => {
   try {
     const finalTransaction = await Transaction.update(
       { status: 1 },
-      { where: { id: req.body.transaction.id } }
+      { where: { uuid: req.body.transaction.uuid } }
     );
 
     return res.status(200).json({ status: 'Record approved' });
@@ -61,14 +65,14 @@ const approveTransaction = async (req, res) => {
  * Transfers transaction from temporary transaction table (tempTransactionTable) to the rejected
  * transaction table, deleting the entry in the former table in the process.
  *
- * @param {Object} req - Request Object with structure { id: STRING }
+ * @param {Object} req - Request Object with structure { _id: STRING }
  * @param {Object} res - Response Object
  */
 const denyTransaction = async (req, res) => {
   try {
     const finalTransaction = await Transaction.update(
       { status: 2 },
-      { where: { id: req.body.transaction.id } }
+      { where: { uuid: req.body.transaction.uuid } }
     );
 
     return res.status(200).json({ status: 'Record denied' });
@@ -89,7 +93,7 @@ const getAllPendingTransactions = async (req, res) => {
     const curPage = req.query.page || 1;
     const perPage = req.query.perPage || 10;
     const transactions = await Transaction.findAll({
-      where: { locationId: req.location.id, status: 0 },
+      where: { _locationId: req.location._id, status: 0 },
       limit: perPage,
       offset: perPage * (curPage - 1),
       include: [
@@ -119,7 +123,7 @@ const getAllApprovedTransactions = async (req, res) => {
     const curPage = req.query.page || 1;
     const perPage = req.query.perPage || 10;
     const transactions = await Transaction.findAll({
-      where: { locationId: req.location.id, status: 1 },
+      where: { _locationId: req.location._id, status: 1 },
       limit: perPage,
       offset: perPage * (curPage - 1),
       include: [
@@ -148,7 +152,7 @@ const getAllDeniedTransactions = async (req, res) => {
     const curPage = req.query.page || 1;
     const perPage = req.query.perPage || 10;
     const transactions = await Transaction.findAll({
-      where: { locationId: req.location.id, status: 2 },
+      where: { _locationId: req.location._id, status: 2 },
       limit: perPage,
       offset: perPage * (curPage - 1),
       include: [

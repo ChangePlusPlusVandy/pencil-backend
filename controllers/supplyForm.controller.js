@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const { ShoppingFormItem, Item, Location } = require('../models');
 
 /**
@@ -17,8 +18,8 @@ const addSupply = async (req, res) => {
       });
     }
     const supply = await ShoppingFormItem.create({
-      itemId: item.id,
-      locationId: req.location.id,
+      _itemId: item._id,
+      _locationId: req.location._id,
       maxLimit: req.body.maxLimit,
       itemOrder: req.body.itemOrder,
     });
@@ -43,10 +44,9 @@ const updateSupply = async (req, res) => {
   try {
     const responseItem = [];
     const wipe = await ShoppingFormItem.destroy({
-      where: { locationId: req.location.id },
+      where: { _locationId: req.location._id },
       truncate: true,
     });
-    console.log('prev,', wipe);
     req.body.forEach(async (item) => {
       let newItem = await Item.findOne({
         where: { itemName: item['Item.itemName'] },
@@ -58,8 +58,8 @@ const updateSupply = async (req, res) => {
         });
       }
       const supply = await ShoppingFormItem.create({
-        itemId: newItem.id,
-        locationId: req.location.id,
+        _itemId: newItem._id,
+        _locationId: req.location._id,
         maxLimit: item.maxLimit,
         itemOrder: item.itemOrder,
       });
@@ -81,7 +81,7 @@ const updateSupply = async (req, res) => {
 const fetchSupplyForm = async (req, res) => {
   try {
     const supplies = await ShoppingFormItem.findAll({
-      where: { locationId: req.location.id },
+      where: { _locationId: req.location._id },
       raw: true,
 
       include: [{ model: Item, attributes: ['itemName', 'itemPrice'] }],

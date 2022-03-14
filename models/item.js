@@ -9,18 +9,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ Location, ShoppingFormItem, TransactionItem }) {
       this.hasMany(TransactionItem, {
-        foreignKey: 'itemId',
+        foreignKey: '_itemId',
       });
 
       this.hasMany(ShoppingFormItem, {
-        foreignKey: 'itemId',
+        foreignKey: '_itemId',
       });
     }
 
     toJSON() {
       return {
         ...this.get(),
-        id: undefined,
+        _id: undefined,
         createdAt: undefined,
         updatedAt: undefined,
       };
@@ -28,6 +28,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Item.init(
     {
+      _id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
       uuid: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,

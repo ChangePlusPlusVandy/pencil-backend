@@ -19,14 +19,13 @@ const getTeacher = async (req, res) => {
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * @param {function} next - Next middleware.
- * @param {id} id - Teacher id.
+ * @param {id} pencilId - Teacher id.
  * @returns {function} - Call to next controller.
  * */
 // eslint-disable-next-line consistent-return
-const teacherByID = async (req, res, next, id) => {
+const teacherByID = async (req, res, next, pencilId) => {
   try {
-    console.log(id);
-    const teacher = await Teacher.findOne({ where: { pencilId: id } })
+    const teacher = await Teacher.findOne({ where: { pencilId } })
       .then((data) => {
         if (!data) {
           return res.status(400).json({

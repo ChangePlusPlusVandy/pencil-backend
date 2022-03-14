@@ -1,7 +1,7 @@
 module.exports = {
   async up(queryInterface, DataTypes) {
     await queryInterface.createTable('locations', {
-      id: {
+      _id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
@@ -23,10 +23,12 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
     });
   },

@@ -1,7 +1,7 @@
 module.exports = {
   async up(queryInterface, DataTypes) {
     await queryInterface.createTable('teachers', {
-      id: {
+      _id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
@@ -29,16 +29,18 @@ module.exports = {
         type: DataTypes.STRING,
         defaultValue: '',
       },
-      schoolId: {
+      _schoolId: {
         type: DataTypes.INTEGER,
       },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
     });
   },

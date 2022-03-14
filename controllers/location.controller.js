@@ -5,14 +5,13 @@ const { Location } = require('../models');
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * @param {function} next - Next middleware.
- * @param {id} id - Teacher id.
+ * @param {id} name - Location name.
  * @returns {function} - Call to next controller.
  * */
 // eslint-disable-next-line consistent-return
-const locationByID = async (req, res, next, id) => {
+const locationByID = async (req, res, next, name) => {
   try {
-    console.log(id);
-    const location = await Location.findOne({ where: { name: id } })
+    const location = await Location.findOne({ where: { name } })
       .then((data) => {
         if (!data) {
           return res.status(400).json({
@@ -20,7 +19,6 @@ const locationByID = async (req, res, next, id) => {
           });
         }
         req.location = data;
-        console.log(data);
         return next();
       })
       .catch((err) =>

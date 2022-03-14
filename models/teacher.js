@@ -10,18 +10,18 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.School, {
-        foreignKey: 'schoolId',
+        foreignKey: '_schoolId',
       });
       this.hasMany(models.Transaction, {
-        foreignKey: 'teacherId',
+        foreignKey: '_teacherId',
       });
     }
 
     toJSON() {
       return {
         ...this.get(),
-        id: undefined,
-        schoolId: undefined,
+        _id: undefined,
+        _schoolId: undefined,
         createdAt: undefined,
         updatedAt: undefined,
       };
@@ -29,6 +29,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Teacher.init(
     {
+      _id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
       pencilId: {
         type: DataTypes.INTEGER,
       },

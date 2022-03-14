@@ -1,7 +1,7 @@
 module.exports = {
   async up(queryInterface, DataTypes) {
     await queryInterface.createTable('shopping_form_items', {
-      id: {
+      _id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
@@ -33,21 +33,23 @@ module.exports = {
           },
         },
       },
-      itemId: {
+      _itemId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      locationId: {
+      _locationId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
     });
   },

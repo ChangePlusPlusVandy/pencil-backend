@@ -10,19 +10,19 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo(models.Transaction, {
-        foreignKey: 'transactionId',
+        foreignKey: '_transactionId',
       });
       this.belongsTo(models.Item, {
-        foreignKey: 'itemId',
+        foreignKey: '_itemId',
       });
     }
 
     toJSON() {
       return {
         ...this.get(),
-        id: undefined,
-        transactionId: undefined,
-        itemId: undefined,
+        _id: undefined,
+        _transactionId: undefined,
+        _itemId: undefined,
         createdAt: undefined,
         updatedAt: undefined,
       };
@@ -30,6 +30,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   TransactionItem.init(
     {
+      _id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
       maxLimit: {
         type: DataTypes.INTEGER,
         defaultValue: 0,

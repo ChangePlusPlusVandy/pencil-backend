@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const fetch = require('cross-fetch'); // FIXXXX
 const { Teacher } = require('../models');
 
@@ -193,7 +194,7 @@ const getSchedule = async (req, res) => {
             const teacher = await addTeacher2(teacherObj);
             const teacherWithId = {
               ...teacherObj,
-              teacherId: teacher.teacher.teacherId,
+              _teacherId: teacher.teacher._teacherId,
               uri: invitee.uri,
             };
             return teacherWithId;

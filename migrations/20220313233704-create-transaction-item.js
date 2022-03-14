@@ -1,7 +1,7 @@
 module.exports = {
   async up(queryInterface, DataTypes) {
     await queryInterface.createTable('transaction_items', {
-      id: {
+      _id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
@@ -15,21 +15,23 @@ module.exports = {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
-      transactionId: {
+      _transactionId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      itemId: {
+      _itemId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
     });
   },

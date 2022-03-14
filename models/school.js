@@ -10,17 +10,17 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.Teacher, {
-        foreignKey: 'schoolId',
+        foreignKey: '_schoolId',
       });
       this.hasMany(models.Transaction, {
-        foreignKey: 'schoolId',
+        foreignKey: '_schoolId',
       });
     }
 
     toJSON() {
       return {
         ...this.get(),
-        id: undefined,
+        _id: undefined,
         createdAt: undefined,
         updatedAt: undefined,
       };
@@ -28,6 +28,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   School.init(
     {
+      _id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
       uuid: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
