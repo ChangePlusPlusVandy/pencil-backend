@@ -9,14 +9,15 @@ const { formatTransactions } = require('../helpers/transaction.helper.js');
  */
 const submitTransaction = async (req, res) => {
   try {
+    const teacher = await Teacher.findOne({
+      where: { pencilId: req.body.teacherId },
+    });
     const transaction = await Transaction.create({
-      teacherId: req.body.teacherId,
+      teacherId: teacher.id,
       schoolId: req.body.schoolId,
       locationId: req.location.id,
     });
-    console.log(req.body);
     req.body.items.forEach(async (item) => {
-      console.log(item);
       const newItem = await TransactionItem.create({
         transactionId: transaction.id,
         itemId: item.itemId,
@@ -44,15 +45,10 @@ const submitTransaction = async (req, res) => {
  */
 const approveTransaction = async (req, res) => {
   try {
-    const finalTransaction = await Transaction.create(req.transaction.toJSON());
-
-    if (!finalTransaction) {
-      console.log('Transaction approval failed');
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-
-    // Delete transaction from temp table
-    req.transaction.destroy();
+    const finalTransaction = await Transaction.update(
+      { status: 1 },
+      { where: { id: req.body.transaction.id } }
+    );
 
     return res.status(200).json({ status: 'Record approved' });
   } catch (err) {
@@ -70,19 +66,12 @@ const approveTransaction = async (req, res) => {
  */
 const denyTransaction = async (req, res) => {
   try {
-    const archivedTransaction = await Transaction.create(
-      req.transaction.toJSON()
+    const finalTransaction = await Transaction.update(
+      { status: 2 },
+      { where: { id: req.body.transaction.id } }
     );
 
-    if (!archivedTransaction) {
-      console.log('Transaction denial failed');
-      return res.status(500).json({ error: 'Internal Server Error' });
-    }
-
-    // Delete transaction from temp table
-    await req.transaction.destroy();
-
-    return res.status(200).json({ status: 'Record rejected' });
+    return res.status(200).json({ status: 'Record denied' });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'Internal Server Error' });
@@ -97,18 +86,18 @@ const denyTransaction = async (req, res) => {
  */
 const getAllPendingTransactions = async (req, res) => {
   try {
-    console.log(req.location.name, 'hmm');
     const curPage = req.query.page || 1;
     const perPage = req.query.perPage || 10;
     const transactions = await Transaction.findAll({
-      model: 'SQTempTransaction'.concat(req.location.name),
+      where: { locationId: req.location.id, status: 0 },
       limit: perPage,
       offset: perPage * (curPage - 1),
       include: [
         {
-          as: 'SQTeacher',
+          model: TransactionItem,
+        },
+        {
           model: Teacher,
-          attributes: ['id', 'firstName', 'lastName'],
         },
       ],
     });
@@ -127,8 +116,20 @@ const getAllPendingTransactions = async (req, res) => {
  */
 const getAllApprovedTransactions = async (req, res) => {
   try {
+    const curPage = req.query.page || 1;
+    const perPage = req.query.perPage || 10;
     const transactions = await Transaction.findAll({
-      model: 'SQTransaction'.concat(req.location.name),
+      where: { locationId: req.location.id, status: 1 },
+      limit: perPage,
+      offset: perPage * (curPage - 1),
+      include: [
+        {
+          model: TransactionItem,
+        },
+        {
+          model: Teacher,
+        },
+      ],
     });
     return res.status(200).json(transactions);
   } catch (err) {
@@ -144,8 +145,20 @@ const getAllApprovedTransactions = async (req, res) => {
  */
 const getAllDeniedTransactions = async (req, res) => {
   try {
+    const curPage = req.query.page || 1;
+    const perPage = req.query.perPage || 10;
     const transactions = await Transaction.findAll({
-      model: 'SQRejectedTransactions'.concat(req.location.name),
+      where: { locationId: req.location.id, status: 2 },
+      limit: perPage,
+      offset: perPage * (curPage - 1),
+      include: [
+        {
+          model: TransactionItem,
+        },
+        {
+          model: Teacher,
+        },
+      ],
     });
     return res.status(200).json(transactions);
   } catch (err) {

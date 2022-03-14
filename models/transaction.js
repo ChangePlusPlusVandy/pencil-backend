@@ -22,9 +22,17 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'transactionId',
       });
     }
+
+    toJSON() {
+      return { ...this.get(), id: undefined };
+    }
   }
   Transaction.init(
     {
+      uuid: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       status: { type: DataTypes.INTEGER, defaultValue: 0 },
     },
     {
