@@ -1,6 +1,6 @@
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('Transactions', {
+    await queryInterface.createTable('transactions', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,17 +11,27 @@ module.exports = {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
+      status: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        validate: {
+          isIn: {
+            args: [[0, 1, 2]],
+            msg: 'Status must be 0, 1, or 2',
+          },
+        },
+      },
       teacherId: {
         type: DataTypes.INTEGER,
+        allowNull: false,
       },
       schoolId: {
         type: DataTypes.INTEGER,
+        allowNull: false,
       },
       locationId: {
         type: DataTypes.INTEGER,
-      },
-      status: {
-        type: DataTypes.INTEGER,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
@@ -34,6 +44,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('Transactions');
+    await queryInterface.dropTable('transactions');
   },
 };

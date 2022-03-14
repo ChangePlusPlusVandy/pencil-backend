@@ -1,6 +1,6 @@
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('Locations', {
+    await queryInterface.createTable('locations', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -13,10 +13,13 @@ module.exports = {
       },
       name: {
         type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: { message: 'Name cannot be null' },
+          notEmpty: { message: 'Name cannot be empty' },
+        },
       },
-      address: {
-        type: DataTypes.STRING,
-      },
+      address: { type: DataTypes.STRING, defaultValue: '' },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
@@ -28,6 +31,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('Locations');
+    await queryInterface.dropTable('locations');
   },
 };

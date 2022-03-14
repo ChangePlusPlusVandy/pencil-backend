@@ -1,6 +1,6 @@
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('Teachers', {
+    await queryInterface.createTable('teachers', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -18,9 +18,16 @@ module.exports = {
       },
       email: {
         type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: { message: 'Email cannot be null' },
+          notEmpty: { message: 'Email cannot be empty' },
+          isEmail: { message: 'Email must be valid' },
+        },
       },
       phone: {
         type: DataTypes.STRING,
+        defaultValue: '',
       },
       schoolId: {
         type: DataTypes.INTEGER,
@@ -36,6 +43,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('Teachers');
+    await queryInterface.dropTable('teachers');
   },
 };

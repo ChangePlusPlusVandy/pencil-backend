@@ -18,23 +18,43 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      return { ...this.get(), id: undefined, schoolId: undefined };
+      return {
+        ...this.get(),
+        id: undefined,
+        schoolId: undefined,
+        createdAt: undefined,
+        updatedAt: undefined,
+      };
     }
   }
   Teacher.init(
     {
-      pencilId: DataTypes.INTEGER,
-      firstName: DataTypes.STRING,
-      lastName: DataTypes.STRING,
-      email: DataTypes.STRING,
-      phone: DataTypes.STRING,
-      uuid: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+      pencilId: {
+        type: DataTypes.INTEGER,
+      },
+      firstName: {
+        type: DataTypes.STRING,
+      },
+      lastName: {
+        type: DataTypes.STRING,
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: { message: 'Email cannot be null' },
+          notEmpty: { message: 'Email cannot be empty' },
+          isEmail: { message: 'Email must be valid' },
+        },
+      },
+      phone: {
+        type: DataTypes.STRING,
+        defaultValue: '',
       },
     },
     {
       sequelize,
+      tableName: 'teachers',
       modelName: 'Teacher',
     }
   );

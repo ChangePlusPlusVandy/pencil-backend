@@ -18,19 +18,32 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      return { ...this.get(), id: undefined };
+      return {
+        ...this.get(),
+        id: undefined,
+        createdAt: undefined,
+        updatedAt: undefined,
+      };
     }
   }
   School.init(
     {
-      name: DataTypes.STRING,
       uuid: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: { message: 'Name cannot be null' },
+          notEmpty: { message: 'Name cannot be empty' },
+        },
+      },
     },
     {
       sequelize,
+      tableName: 'schools',
       modelName: 'School',
     }
   );

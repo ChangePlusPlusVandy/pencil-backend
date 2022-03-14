@@ -30,6 +30,8 @@ module.exports = (sequelize, DataTypes) => {
         locationId: undefined,
         teacherId: undefined,
         schoolId: undefined,
+        createdAt: undefined,
+        updatedAt: undefined,
       };
     }
   }
@@ -39,10 +41,20 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
       },
-      status: { type: DataTypes.INTEGER, defaultValue: 0 },
+      status: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        validate: {
+          isIn: {
+            args: [[0, 1, 2]],
+            msg: 'Status must be 0, 1, or 2',
+          },
+        },
+      },
     },
     {
       sequelize,
+      tableName: 'transactions',
       modelName: 'Transaction',
     }
   );

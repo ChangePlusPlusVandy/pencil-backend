@@ -7,32 +7,31 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ Location, ShoppingForm, TransactionItem, Transaction }) {
-      // define association here
-      // this.belongsToMany(Location, {
-      //   through: ShoppingForm,
-      //   foreignKey: 'itemId',
-      // });
-
-      // this.belongsToMany(Transaction, {
-      //   through: TransactionItem,
-      //   foreignKey: 'itemId',
-      // });
+    static associate({ Location, ShoppingFormItem, TransactionItem }) {
       this.hasMany(TransactionItem, {
         foreignKey: 'itemId',
       });
 
-      this.hasMany(ShoppingForm, {
+      this.hasMany(ShoppingFormItem, {
         foreignKey: 'itemId',
       });
     }
 
     toJSON() {
-      return { ...this.get(), id: undefined };
+      return {
+        ...this.get(),
+        id: undefined,
+        createdAt: undefined,
+        updatedAt: undefined,
+      };
     }
   }
   Item.init(
     {
+      uuid: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       itemName: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -42,14 +41,26 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: { message: 'Item name cannot be empty' },
         },
       },
-      uuid: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+      itemPrice: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+          isNumeric: {
+            message: 'Item price must be a number',
+          },
+          isValidPrice(val) {
+            const regex = /^[0-9]\d*(((,\d{3}){1})?(\.\d{0,2})?)$/;
+            if (!regex.test(val)) {
+              throw new Error('Item price is invalid');
+            }
+          },
+        },
       },
-      itemPrice: DataTypes.DOUBLE,
     },
     {
       sequelize,
+      tableName: 'items',
       modelName: 'Item',
     }
   );

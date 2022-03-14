@@ -23,16 +23,25 @@ module.exports = (sequelize, DataTypes) => {
         id: undefined,
         transactionId: undefined,
         itemId: undefined,
+        createdAt: undefined,
+        updatedAt: undefined,
       };
     }
   }
   TransactionItem.init(
     {
-      maxLimit: DataTypes.INTEGER,
-      amountTaken: DataTypes.INTEGER,
+      maxLimit: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      amountTaken: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
     },
     {
       sequelize,
+      tableName: 'transaction_items',
       modelName: 'TransactionItem',
     }
   );

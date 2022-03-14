@@ -1,6 +1,6 @@
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('Schools', {
+    await queryInterface.createTable('schools', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -13,6 +13,11 @@ module.exports = {
       },
       name: {
         type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: { message: 'Name cannot be null' },
+          notEmpty: { message: 'Name cannot be empty' },
+        },
       },
       createdAt: {
         allowNull: false,
@@ -25,6 +30,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('Schools');
+    await queryInterface.dropTable('schools');
   },
 };

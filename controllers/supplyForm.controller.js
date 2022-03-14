@@ -1,4 +1,4 @@
-const { ShoppingForm, Item, Location } = require('../models');
+const { ShoppingFormItem, Item, Location } = require('../models');
 
 /**
  * Adds a supply to the form database.
@@ -16,7 +16,7 @@ const addSupply = async (req, res) => {
         itemPrice: 0,
       });
     }
-    const supply = await ShoppingForm.create({
+    const supply = await ShoppingFormItem.create({
       itemId: item.id,
       locationId: req.location.id,
       maxLimit: req.body.maxLimit,
@@ -42,7 +42,7 @@ const addSupply = async (req, res) => {
 const updateSupply = async (req, res) => {
   try {
     const responseItem = [];
-    const wipe = await ShoppingForm.destroy({
+    const wipe = await ShoppingFormItem.destroy({
       where: { locationId: req.location.id },
       truncate: true,
     });
@@ -57,7 +57,7 @@ const updateSupply = async (req, res) => {
           itemPrice: 0,
         });
       }
-      const supply = await ShoppingForm.create({
+      const supply = await ShoppingFormItem.create({
         itemId: newItem.id,
         locationId: req.location.id,
         maxLimit: item.maxLimit,
@@ -80,7 +80,7 @@ const updateSupply = async (req, res) => {
  */
 const fetchSupplyForm = async (req, res) => {
   try {
-    const supplies = await ShoppingForm.findAll({
+    const supplies = await ShoppingFormItem.findAll({
       where: { locationId: req.location.id },
       raw: true,
 

@@ -1,23 +1,27 @@
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('TransactionItems', {
+    await queryInterface.createTable('transaction_items', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      transactionId: {
-        type: DataTypes.INTEGER,
-      },
-      itemId: {
-        type: DataTypes.INTEGER,
-      },
       maxLimit: {
         type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       amountTaken: {
         type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      transactionId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      itemId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
@@ -30,6 +34,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('TransactionItems');
+    await queryInterface.dropTable('transaction_items');
   },
 };

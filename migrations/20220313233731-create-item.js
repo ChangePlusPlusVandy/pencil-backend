@@ -1,6 +1,6 @@
 module.exports = {
   async up(queryInterface, DataTypes) {
-    await queryInterface.createTable('Items', {
+    await queryInterface.createTable('items', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -13,9 +13,28 @@ module.exports = {
       },
       itemName: {
         type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          notNull: { message: 'Item name cannot be null' },
+          notEmpty: { message: 'Item name cannot be empty' },
+        },
       },
       itemPrice: {
-        type: DataTypes.DOUBLE,
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+          isNumeric: {
+            message: 'Item price must be a number',
+          },
+          isValidPrice(val) {
+            const regex = /^[0-9]\d*(((,\d{3}){1})?(\.\d{0,2})?)$/;
+            if (!regex.test(val)) {
+              throw new Error('Item price is invalid');
+            }
+          },
+        },
       },
       createdAt: {
         allowNull: false,
@@ -28,6 +47,6 @@ module.exports = {
     });
   },
   async down(queryInterface, DataTypes) {
-    await queryInterface.dropTable('Items');
+    await queryInterface.dropTable('items');
   },
 };
