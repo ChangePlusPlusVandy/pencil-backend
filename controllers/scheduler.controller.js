@@ -230,26 +230,53 @@ const getSchedule = async (req, res) => {
         console.log('[6] getSchedule(): invitees: ', inviteesCollection);
         return inviteesCollection;
       })
-      .then((invitees) => {
+      .then((inviteesCollection) => {
         // 7. Perform a GET request on calendly's GET-EVENT to add start/end
         //    time information to invitee object
-        console.log('[7] getSchedule(): invitees', invitees);
-        const invitee = invitees[0].collection[0];
+        console.log('[7] getSchedule(): invitees', inviteesCollection);
 
-        const inviteeEventUuid = invitee.uri.split('/')[4]; // get uuid
-        return getEvent(inviteeEventUuid)
-          .then((data) => {
-            const newInviteeObject = {
-              ...invitee,
-              ...{ start_time: data.resource.start_time },
-              ...{ end_time: data.resource.end_time },
-            };
-            return newInviteeObject;
+        const inviteesCollection2 = Promise.all(
+          inviteesCollection.map(async (collection) => {
+            const invitee = collection.collection[0];
+            const inviteeEventUuid = invitee.uri.split('/')[4]; // get uuid
+            return getEvent(inviteeEventUuid)
+              .then((data) => {
+                const newInviteeObject = {
+                  ...invitee,
+                  ...{ start_time: data.resource.start_time },
+                  ...{ end_time: data.resource.end_time },
+                };
+                return newInviteeObject;
+              })
+              .then((data) => {
+                console.log(data);
+                return data;
+              });
           })
-          .then((data) => {
-            console.log(data);
-            return data;
-          });
+        );
+
+        console.log(
+          '[7] getSchedule(): inviteesCollection',
+          inviteesCollection2
+        );
+        return inviteesCollection2;
+
+        // const invitee = inviteesCollection[0].collection[0];
+
+        // const inviteeEventUuid = invitee.uri.split('/')[4]; // get uuid
+        // return getEvent(inviteeEventUuid)
+        //   .then((data) => {
+        //     const newInviteeObject = {
+        //       ...invitee,
+        //       ...{ start_time: data.resource.start_time },
+        //       ...{ end_time: data.resource.end_time },
+        //     };
+        //     return newInviteeObject;
+        //   })
+        //   .then((data) => {
+        //     console.log(data);
+        //     return data;
+        //   });
 
         // inviteesCollection.map((invitees) => {
         //   const schedule = Promise.all(
