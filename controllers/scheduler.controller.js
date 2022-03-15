@@ -203,48 +203,97 @@ const getSchedule = async (req, res) => {
         // 6.1 Query teacher from teacher database
         console.log('[6] getSchedule(): inviteesCollection:');
 
-        const { collection } = inviteesCollection[0];
-        // add id to the collection of invitees by getting the ID from addTeacher2 return
-        const teacherCollection = Promise.all(
-          collection.map(async (invitee) => {
-            const teacherObj = {
-              name: invitee.name,
-              email: invitee.email,
-              phone: invitee.questions_and_answers[1].answer,
-              school: invitee.questions_and_answers[0].answer,
-            };
+        inviteesCollection.map((item) => {
+          const { collection } = item;
 
-            const teacher = await addTeacher2(teacherObj);
-            const teacherWithId = {
-              ...teacherObj,
-              _teacherId: teacher.teacher._teacherId,
-              uri: invitee.uri,
-            };
-            return teacherWithId;
-          })
-        );
-        console.log('[6] getSchedule(): teacherCollection', teacherCollection);
-        return teacherCollection;
+          // add id to the collection of invitees by getting the ID from addTeacher2 return
+          const teacherCollection = Promise.all(
+            collection.map(async (invitee) => {
+              const teacherObj = {
+                name: invitee.name,
+                email: invitee.email,
+                phone: invitee.questions_and_answers[1].answer,
+                school: invitee.questions_and_answers[0].answer,
+              };
+
+              const teacher = await addTeacher2(teacherObj);
+              const teacherWithId = {
+                ...teacherObj,
+                _teacherId: teacher.teacher._teacherId,
+                uri: invitee.uri,
+              };
+              return teacherWithId;
+            })
+          );
+          return teacherCollection;
+        });
+        console.log('[6] getSchedule(): invitees: ', inviteesCollection);
+        return inviteesCollection;
       })
       .then((invitees) => {
         // 7. Perform a GET request on calendly's GET-EVENT to add start/end
         //    time information to invitee object
-        const schedule = Promise.all(
-          invitees.map((invitee) => {
-            // Perform the GET request for each user
-            const inviteeEventUuid = invitee.uri.split('/')[4]; // get uuid
-            return getEvent(inviteeEventUuid).then((data) => {
-              // add start and end times to the invitee object
-              const newInviteeObject = {
-                ...invitee,
-                ...{ start_time: data.resource.start_time },
-                ...{ end_time: data.resource.end_time },
-              };
-              return newInviteeObject;
-            });
+        console.log('[7] getSchedule(): invitees', invitees);
+        const invitee = invitees[0].collection[0];
+
+        const inviteeEventUuid = invitee.uri.split('/')[4]; // get uuid
+        return getEvent(inviteeEventUuid)
+          .then((data) => {
+            const newInviteeObject = {
+              ...invitee,
+              ...{ start_time: data.resource.start_time },
+              ...{ end_time: data.resource.end_time },
+            };
+            return newInviteeObject;
           })
-        );
-        return schedule;
+          .then((data) => {
+            console.log(data);
+            return data;
+          });
+
+        // inviteesCollection.map((invitees) => {
+        //   const schedule = Promise.all(
+        //     invitees.map((invitee) => {
+        //       // Perform the GET request for each user
+        //       const inviteeEventUuid = invitee.uri.split('/')[4]; // get uuid
+        //       return getEvent(inviteeEventUuid).then((data) => {
+        //         // add start and end times to the invitee object
+        //         const newInviteeObject = {
+        //           ...invitee,
+        //           ...{ start_time: data.resource.start_time },
+        //           ...{ end_time: data.resource.end_time },
+        //         };
+        //         return newInviteeObject;
+        //       });
+        //     })
+        //   );
+        //   return schedule;
+        // });
+        // console.log('[7] getSchedule(): invitees 2', output);
+        // return output;
+        // version 2
+        // 7. Perform a GET request on calendly's GET-EVENT to add start/end
+        //    time information to invitee object
+        // const schedules = [];
+        // inviteesCollection.forEach((invitees) => {
+        //   const schedule = Promise.all(
+        //     invitees.map((invitee) => {
+        //       // Perform the GET request for each user
+        //       const inviteeEventUuid = invitee.uri.split('/')[4]; // get uuid
+        //       return getEvent(inviteeEventUuid).then((data) => {
+        //         // add start and end times to the invitee object
+        //         const newInviteeObject = {
+        //           ...invitee,
+        //           ...{ start_time: data.resource.start_time },
+        //           ...{ end_time: data.resource.end_time },
+        //         };
+        //         return newInviteeObject;
+        //       });
+        //     })
+        //   );
+        //   schedules.push(schedule);
+        // });
+        // return Promise.all(schedules);
       })
       .catch((err) => err);
     return res.status(200).json(jsonResponse);
