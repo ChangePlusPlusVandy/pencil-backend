@@ -29,8 +29,8 @@ const submitTransaction = async (req, res) => {
     });
     req.body.items.forEach(async (item) => {
       const findItem = await Item.findOne({
-        where: { uuid: item.uuid },
-      });
+        where: { uuid: item['Item.uuid'] },
+      }); // TODO: Null check
       const transactionItem = await TransactionItem.create({
         _transactionId: transaction._id,
         _itemId: findItem._id,
@@ -111,6 +111,7 @@ const getAllPendingTransactions = async (req, res) => {
           include: [
             {
               model: Item,
+              raw: true,
             },
           ],
         },
@@ -178,6 +179,11 @@ const getAllDeniedTransactions = async (req, res) => {
       include: [
         {
           model: TransactionItem,
+          include: [
+            {
+              model: Item,
+            },
+          ],
         },
         {
           model: Teacher,

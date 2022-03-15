@@ -84,7 +84,7 @@ const fetchSupplyForm = async (req, res) => {
       where: { _locationId: req.location._id },
       raw: true,
 
-      include: [{ model: Item, attributes: ['itemName', 'itemPrice'] }],
+      include: [{ model: Item, attributes: ['uuid', 'itemName', 'itemPrice'] }],
     });
 
     if (!supplies) {
