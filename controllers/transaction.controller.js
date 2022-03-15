@@ -108,12 +108,18 @@ const getAllPendingTransactions = async (req, res) => {
       include: [
         {
           model: TransactionItem,
+          include: [
+            {
+              model: Item,
+            },
+          ],
         },
         {
           model: Teacher,
         },
       ],
     });
+    console.log(transactions);
     const formattedTransactions = formatTransactions(transactions);
     return res.status(200).json(formattedTransactions);
   } catch (err) {
@@ -138,6 +144,11 @@ const getAllApprovedTransactions = async (req, res) => {
       include: [
         {
           model: TransactionItem,
+          include: [
+            {
+              model: Item,
+            },
+          ],
         },
         {
           model: Teacher,
