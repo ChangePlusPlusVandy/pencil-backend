@@ -76,16 +76,23 @@ const listEvents = async (organization) => {
     .catch((err) => console.log('error:', err));
 };
 
-const findEventWithLocation = (eventCollection, locationToFind) => {
-  let eventIndex = -1;
-  // loop through eventsCollection to find the index where event name contains location
+const filterEvents = (eventCollection, locationToFind) => {
+  // Filters events by location and filter to keep only uncancelled events
+  let hasLocation = false;
+  const filteredEvents = [];
   eventCollection.forEach((event, index) => {
+    // check if event name includes the location
     if (event.name.toLowerCase().includes(locationToFind)) {
-      eventIndex = index;
+      hasLocation = true;
+      const tempEvent = eventCollection[index];
+      // check if event is not cancelled
+      if (!('cancellation' in tempEvent)) {
+        filteredEvents.push(tempEvent);
+      }
     }
   });
 
-  if (eventIndex !== -1) return eventCollection[eventIndex];
+  if (hasLocation) return filteredEvents;
 
   // Throw an error if location name is not found in any of the calendly events name
   // eslint-disable-next-line no-throw-literal
@@ -164,23 +171,39 @@ const getSchedule = async (req, res) => {
     const jsonResponse = await getCurrentUser()
       .then((userData) => {
         // 3. Perform a GET request on calendly's LIST-EVENTS endpoint
-        console.log(userData);
+        console.log(
+          '[3] getSchedule(): userData',
+          userData.resource.current_organization
+        );
         return listEvents(userData.resource.current_organization);
       })
-      .then((eventsList) =>
+      .then((eventsList) => {
         // 4. Find the event that contains the location param
-        findEventWithLocation(eventsList.collection, location)
-      )
+        console.log('[4] getSchedule(): eventsList', eventsList.collection);
+        return filterEvents(eventsList.collection, location);
+      })
       .then((eventData) => {
         // 5. Perform a GET request on calendly's LIST-EVENT-INVITEES endpoint
-        const eventUuid = eventData.uri.split('/').pop();
-        return listEventInvitees(eventUuid);
+        console.log('[5] getSchedule(): eventData', eventData);
+        const eventUuids = [];
+        eventData.forEach((event) => {
+          // if event has property uri, then add eventuuid
+          if (Object.prototype.hasOwnProperty.call(event, 'uri')) {
+            eventUuids.push(event.uri.split('/').pop());
+          }
+        });
+        const eventInviteesCollections = [];
+        eventUuids.forEach((uuid) =>
+          eventInviteesCollections.push(listEventInvitees(uuid))
+        );
+        return Promise.all(eventInviteesCollections);
       })
       .then((inviteesCollection) => {
         // 6. Filter each invitees to keep only the relevant parameters
         // 6.1 Query teacher from teacher database
-        const { collection } = inviteesCollection;
+        console.log('[6] getSchedule(): inviteesCollection:');
 
+        const { collection } = inviteesCollection[0];
         // add id to the collection of invitees by getting the ID from addTeacher2 return
         const teacherCollection = Promise.all(
           collection.map(async (invitee) => {
@@ -200,6 +223,7 @@ const getSchedule = async (req, res) => {
             return teacherWithId;
           })
         );
+        console.log('[6] getSchedule(): teacherCollection', teacherCollection);
         return teacherCollection;
       })
       .then((invitees) => {
