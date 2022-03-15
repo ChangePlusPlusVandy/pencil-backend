@@ -60,7 +60,7 @@ const approveTransaction = async (req, res) => {
   try {
     const finalTransaction = await Transaction.update(
       { status: 1 },
-      { where: { uuid: req.body.transaction.uuid } }
+      { where: { uuid: req.body.uuid } }
     );
 
     return res.status(200).json({ status: 'Record approved' });
@@ -81,7 +81,7 @@ const denyTransaction = async (req, res) => {
   try {
     const finalTransaction = await Transaction.update(
       { status: 2 },
-      { where: { uuid: req.body.transaction.uuid } }
+      { where: { uuid: req.body.uuid } }
     );
 
     return res.status(200).json({ status: 'Record denied' });

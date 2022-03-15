@@ -30,7 +30,6 @@ module.exports = (sequelize, DataTypes) => {
         _locationId: undefined,
         _teacherId: undefined,
         _schoolId: undefined,
-        createdAt: undefined,
         updatedAt: undefined,
       };
     }
