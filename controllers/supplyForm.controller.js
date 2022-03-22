@@ -8,15 +8,10 @@ const { ShoppingFormItem, Item, Location } = require('../models');
  * */
 const addSupply = async (req, res) => {
   try {
-    let item = await Item.findOne({
+    const item = await Item.findOne({
       where: { itemName: req.body.itemName },
     });
-    if (!item) {
-      item = await Item.create({
-        itemName: req.body.itemName,
-        itemPrice: 0,
-      });
-    }
+
     const supply = await ShoppingFormItem.create({
       _itemId: item._id,
       _locationId: req.location._id,
