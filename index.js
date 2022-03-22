@@ -7,6 +7,7 @@ const transactionRoutes = require('./routes/transaction.routes.js');
 const schedulerRoutes = require('./routes/scheduler.routes.js');
 const masterInventoryRoutes = require('./routes/masterInventory.routes.js');
 const locationRoutes = require('./routes/location.routes.js');
+const reportRoutes = require('./routes/reports.routes.js');
 const locationController = require('./controllers/location.controller.js');
 
 const { sequelize } = require('./models');
@@ -18,6 +19,8 @@ app.use(cors());
 
 app.use(express.json());
 
+app.use('/static', express.static('public'));
+
 app.param('location', locationController.locationByID);
 
 app.use('/api/:location/form', formRoutes);
@@ -26,6 +29,7 @@ app.use('/api/:location/transaction', transactionRoutes);
 app.use('/api/location', locationRoutes);
 app.use('/api/schedule', schedulerRoutes);
 app.use('/api/:location/masterInventory', masterInventoryRoutes);
+app.use('/api/reports', reportRoutes);
 
 const port = process.env.PORT || 8080;
 
