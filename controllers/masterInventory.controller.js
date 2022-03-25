@@ -48,7 +48,7 @@ const getAllItems = async (req, res, next) => {
   try {
     const itemList = await Item.findAll({
       order: [['itemName', 'ASC']],
-      attributes: ['itemName', 'itemPrice'],
+      attributes: ['uuid', 'itemName', 'itemPrice'],
     });
 
     return res.status(200).json(itemList);
