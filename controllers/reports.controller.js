@@ -8,6 +8,7 @@ const {
 const { teacherByID } = require('./teacher.controller.js');
 
 const { Op } = require('sequelize');
+const ExcelJS = require('exceljs/dist/es6');
 const teacher = require('../models/teacher');
 
 // displayReport1
@@ -57,10 +58,6 @@ const report1 = async (req, res) => {
 
       transactions[transIndex].dataValues.totalItemPrice = cumulativeItemPrice;
     }
-
-    transactions.forEach((transaction) =>
-      console.log('DIS DA SCHOOL', transaction.dataValues.School.uuid)
-    );
 
     return res.status(200).json(transactions);
   } catch (err) {
