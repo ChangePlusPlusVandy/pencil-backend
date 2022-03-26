@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const {
   Teacher,
   Transaction,
@@ -7,21 +8,49 @@ const {
 } = require('../models');
 const { teacherByID } = require('./teacher.controller.js');
 
-const { Op } = require('sequelize');
-//const ExcelJS = require('exceljs/dist/es5');
+// const ExcelJS = require('exceljs/dist/es5');
 const teacher = require('../models/teacher');
 
-// displayReport1
+const getTransaction = async (req, res, next) => {
+  try {
+    let transactions = await Transaction.findAll({
+      attributes: ['createdAt'],
+      where: transactionWhereStatement,
+      include: [
+        {
+          model: TransactionItem,
+          include: {
+            model: Item,
+          },
+        },
+        {
+          model: Teacher,
+          attributes: ['firstName', 'lastName', 'email'],
+        },
+        {
+          model: School,
+          where: schoolWhereStatement,
+        },
+      ],
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err });
+  }
+};
+
+// Report 1 : - Date shopped,Teacher name,Teacher email,Teacher school,Value of products.
+// Elements of list are individual shopping trips by teachers.
 const report1 = async (req, res) => {
   // Construct where statement for transaction query according to passed parameters
-  let transactionWhereStatement = {};
+  const transactionWhereStatement = {};
   if (req.query.startDate && req.query.endDate) {
     transactionWhereStatement.createdAt = {
       [Op.between]: [req.query.startDate, req.query.endDate],
     };
   }
 
-  let schoolWhereStatement = {};
+  const schoolWhereStatement = {};
   if (req.query.school) {
     schoolWhereStatement.uuid = req.query.school;
   }
