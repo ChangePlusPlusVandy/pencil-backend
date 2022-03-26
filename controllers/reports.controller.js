@@ -8,22 +8,22 @@ const {
 const { teacherByID } = require('./teacher.controller.js');
 
 const { Op } = require('sequelize');
-const ExcelJS = require('exceljs/dist/es6');
+//const ExcelJS = require('exceljs/dist/es5');
 const teacher = require('../models/teacher');
 
 // displayReport1
 const report1 = async (req, res) => {
   // Construct where statement for transaction query according to passed parameters
   let transactionWhereStatement = {};
-  if (req.body.startDate && req.body.endDate) {
+  if (req.query.startDate && req.query.endDate) {
     transactionWhereStatement.createdAt = {
-      [Op.between]: [req.body.startDate, req.body.endDate],
+      [Op.between]: [req.query.startDate, req.query.endDate],
     };
   }
 
   let schoolWhereStatement = {};
-  if (req.body.school) {
-    schoolWhereStatement.uuid = req.body.school;
+  if (req.query.school) {
+    schoolWhereStatement.uuid = req.query.school;
   }
 
   try {
