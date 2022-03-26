@@ -10,13 +10,25 @@ const { teacherByID } = require('./teacher.controller.js');
 const { Op } = require('sequelize');
 const teacher = require('../models/teacher');
 
+// displayReport1
 const report1 = async (req, res) => {
+  // Construct where statement for transaction query according to passed parameters
+  let transactionWhereStatement = {};
+  if (req.body.startDate && req.body.endDate) {
+    transactionWhereStatement.createdAt = {
+      [Op.between]: [req.body.startDate, req.body.endDate],
+    };
+  }
+
+  let schoolWhereStatement = {};
+  if (req.body.school) {
+    schoolWhereStatement.uuid = req.body.school;
+  }
+
   try {
     let transactions = await Transaction.findAll({
       attributes: ['createdAt'],
-      where: {
-        createdAt: { [Op.between]: [req.body.startDate, req.body.endDate] },
-      },
+      where: transactionWhereStatement,
       include: [
         {
           model: TransactionItem,
@@ -30,21 +42,25 @@ const report1 = async (req, res) => {
         },
         {
           model: School,
+          where: schoolWhereStatement,
         },
       ],
     });
-    //console.log(transactions);
 
     for (transIndex in transactions) {
       let cumulativeItemPrice = 0;
       for (let item of transactions[transIndex].TransactionItems) {
-        cumulativeItemPrice += item.dataValues.Item.dataValues.itemPrice;
+        cumulativeItemPrice +=
+          item.dataValues.Item.dataValues.itemPrice *
+          item.dataValues.amountTaken;
       }
 
-      transactions[transIndex].totalItemPrice = cumulativeItemPrice;
-
-      console.log(transactions[trans]);
+      transactions[transIndex].dataValues.totalItemPrice = cumulativeItemPrice;
     }
+
+    transactions.forEach((transaction) =>
+      console.log('DIS DA SCHOOL', transaction.dataValues.School.uuid)
+    );
 
     return res.status(200).json(transactions);
   } catch (err) {
