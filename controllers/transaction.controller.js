@@ -99,12 +99,12 @@ const denyTransaction = async (req, res) => {
  */
 const getAllPendingTransactions = async (req, res) => {
   try {
-    const curPage = req.query.page || 1;
-    const perPage = req.query.perPage || 10;
+    const perPage = parseInt(req.query.perPage, 10) || 10;
+    const previousItems = parseInt(req.query.previous, 10) || 0;
     const transactions = await Transaction.findAll({
       where: { _locationId: req.location._id, status: 0 },
       limit: perPage,
-      offset: perPage * (curPage - 1),
+      offset: previousItems,
       include: [
         {
           model: TransactionItem,
