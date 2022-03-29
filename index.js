@@ -28,12 +28,8 @@ app.use('/api/teacher', teacherRoutes);
 app.use('/api/:location/transaction', transactionRoutes);
 app.use('/api/location', locationRoutes);
 app.use('/api/schedule', schedulerRoutes);
-<<<<<<< HEAD
-app.use('/api/masterInventory', masterInventoryRoutes);
-=======
 app.use('/api/:location/masterInventory', masterInventoryRoutes);
 app.use('/api/reports', reportRoutes);
->>>>>>> d62fe365845c88b223c5be53551a8c6e8deb43b6
 
 const port = process.env.PORT || 8080;
 
