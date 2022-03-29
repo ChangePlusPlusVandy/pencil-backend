@@ -54,14 +54,13 @@ const getTransaction = async (req, res, next) => {
   }
 };
 
-// Report 1 : - Date shopped,Teacher name,Teacher email,Teacher school,Value of products.
+// Report 1 : Date shopped,Teacher name,Teacher email,Teacher school,Value of products.
 // Elements of list are individual shopping trips by teachers.
 const report1 = async (req, res) => {
   // Construct where statement for transaction query according to passed parameters.
   // NOTE : Aidan & Arthur look at these query statements and see if its appropriate.
   console.log('THIS IS THE REQ BODY: ', req.body);
-  getTransaction(req, res);
-  // eslint-disable-next-line prefer-destructuring
+
   const transactions = req.transactions;
 
   const pricedTransactions = transactions.map((transaction) => {
@@ -86,6 +85,32 @@ const report1 = async (req, res) => {
   return res.status(200).json(pricedTransactions);
 };
 
+// Report 2 : Number of Teachers shopped per school, Number of unique IDs shopped.
+const report2 = async (req, res) => {
+  const report2Summary = {};
+  const teacherIDs = [];
+  const transactions = req.transactions;
+
+  transactions.forEach((transaction) => {
+    const schoolName = transaction.dataValues.School.dataValues.name;
+    const teacherID = transaction.dataValues.Teacher.dataValues._id;
+
+    if (report2Summary[schoolName]) {
+      report2Summary[schoolName] += 1;
+    } else {
+      report2Summary[schoolName] = 1;
+    }
+
+    teacherIDs.push(teacherID);
+  });
+
+  const numUniqueIDs = [...new Set(teacherIDs)].length;
+  report2Summary['Unique IDs'] = numUniqueIDs;
+
+  return res.status(200).json(report2Summary);
+};
+
 module.exports = {
   report1,
+  report2,
 };
