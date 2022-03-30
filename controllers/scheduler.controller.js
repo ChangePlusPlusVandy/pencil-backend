@@ -230,7 +230,13 @@ const getSchedule = async (req, res) => {
   }
 };
 
+const addAppointment = async (req, res) => {
+  console.log(req.body);
+  return res.status(200).json({ message: 'Appointment added' });
+};
+
 module.exports = {
+  addAppointment,
   getSchedule,
   locationParam,
 };
