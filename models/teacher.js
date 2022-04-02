@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Transaction, {
         foreignKey: '_teacherId',
       });
+      this.hasMany(models.ScheduleItem, {
+        foreignKey: '_teacherId',
+      });
     }
 
     toJSON() {
