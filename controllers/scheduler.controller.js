@@ -232,6 +232,15 @@ const getSchedule = async (req, res) => {
 
 const addAppointment = async (req, res) => {
   console.log(req.body);
+  const options = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.SCHEDULER_BEARER_AUTH_TOKEN}`,
+    },
+  };
+  const eventInfo = await fetch(req.body.payload.event, options);
+  console.log(eventInfo);
   return res.status(200).json({ message: 'Appointment added' });
 };
 
