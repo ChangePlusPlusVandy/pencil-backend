@@ -240,7 +240,7 @@ const addAppointment = async (req, res) => {
     },
   };
   const eventInfo = await fetch(req.body.payload.event, options);
-  console.log(eventInfo);
+  console.log(eventInfo.json());
   return res.status(200).json({ message: 'Appointment added' });
 };
 
