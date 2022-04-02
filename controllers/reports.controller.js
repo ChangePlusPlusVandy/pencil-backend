@@ -10,6 +10,7 @@ const { teacherByID } = require('./teacher.controller.js');
 
 // const ExcelJS = require('exceljs/dist/es5');
 const teacher = require('../models/teacher');
+const { restart } = require('nodemon');
 
 // eslint-disable-next-line consistent-return
 const getTransaction = async (req, res, next) => {
@@ -59,7 +60,6 @@ const getTransaction = async (req, res, next) => {
 const report1 = async (req, res) => {
   // Construct where statement for transaction query according to passed parameters.
   // NOTE : Aidan & Arthur look at these query statements and see if its appropriate.
-  console.log('THIS IS THE REQ BODY: ', req.body);
   // eslint-disable-next-line prefer-destructuring
   const transactions = req.transactions;
 
@@ -75,25 +75,45 @@ const report1 = async (req, res) => {
     // eslint-disable-next-line
     transaction.dataValues.totalItemPrice = cumulativeItemPrice;
 
-    console.log('the total price is ', transaction.totalItemPrice);
-    console.log('For transaction: ', transaction.TransactionItems);
-    console.log('\n\n\n');
     return transaction;
   });
-
-  console.log('THESE ARE THE TRANSACTIONS: ', transactions);
 
   return res.status(200).json(pricedTransactions);
 };
 
-const report5 = async (res, req) => {
-  const transactions = req.transactions;
+const report5 = async (req, res) => {
+  try {
+    const transactions = req.transactions;
 
-  for (let transaction of transactions) {
-    console.log('Dis a transaction', transaction);
+    let teacherInfo;
+    let teacherData = {};
+    transactions.forEach((transaction) => {
+      teacherInfo = transaction.Teacher.dataValues;
+      // FIXME: ONLY USE UNTIL WE HAVE UUIDs FOR TEACHERS
+      let teacherID =
+        teacherInfo.firstName +
+        '-' +
+        teacherInfo.lastName +
+        '-' +
+        teacherInfo.email;
+
+      if (!(teacherID in teacherData)) {
+        teacherData[teacherID] = {
+          timesShopped: 1,
+          schoolName: transaction.School.dataValues.name,
+          firstName: teacherInfo.firstName,
+          lastName: teacherInfo.lastName,
+        };
+      } else {
+        teacherData[teacherID].timesShopped += 1;
+      }
+    });
+
+    return res.status(200).json(teacherData);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal server error' });
   }
-
-  return res.status_code(200);
 };
 
 module.exports = {
