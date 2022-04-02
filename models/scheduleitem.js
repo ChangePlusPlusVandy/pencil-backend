@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Schedule, {
         foreignKey: '_scheduleId',
       });
+      this.belongsTo(models.Teacher, {
+        foreignKey: '_teacherId',
+      });
     }
   }
   ScheduleItem.init(
