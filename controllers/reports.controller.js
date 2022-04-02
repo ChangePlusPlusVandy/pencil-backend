@@ -1,4 +1,5 @@
 const { Op } = require('sequelize');
+const { restart } = require('nodemon');
 const {
   Teacher,
   Transaction,
@@ -10,7 +11,6 @@ const { teacherByID } = require('./teacher.controller.js');
 
 // const ExcelJS = require('exceljs/dist/es5');
 const teacher = require('../models/teacher');
-const { restart } = require('nodemon');
 
 // eslint-disable-next-line consistent-return
 const getTransaction = async (req, res, next) => {
@@ -60,7 +60,7 @@ const getTransaction = async (req, res, next) => {
 const report1 = async (req, res) => {
   // Construct where statement for transaction query according to passed parameters.
   console.log('THIS IS THE REQ BODY: ', req.body);
-  
+
   const transactions = req.transactions;
 
   const pricedTransactions = transactions.map((transaction) => {
@@ -112,11 +112,14 @@ const report5 = async (req, res) => {
     const transactions = req.transactions;
 
     let teacherInfo;
+    // eslint-disable-next-line prefer-const
     let teacherData = {};
     transactions.forEach((transaction) => {
       teacherInfo = transaction.Teacher.dataValues;
       // FIXME: ONLY USE UNTIL WE HAVE UUIDs FOR TEACHERS
+      // eslint-disable-next-line prefer-const
       let teacherID =
+        // eslint-disable-next-line prefer-template
         teacherInfo.firstName +
         '-' +
         teacherInfo.lastName +
@@ -147,5 +150,4 @@ module.exports = {
   report1,
   report2,
   report5,
-  getTransaction,
 };
