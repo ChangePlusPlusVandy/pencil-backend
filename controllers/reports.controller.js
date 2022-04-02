@@ -58,9 +58,8 @@ const getTransaction = async (req, res, next) => {
 // Elements of list are individual shopping trips by teachers.
 const report1 = async (req, res) => {
   // Construct where statement for transaction query according to passed parameters.
-  // NOTE : Aidan & Arthur look at these query statements and see if its appropriate.
   console.log('THIS IS THE REQ BODY: ', req.body);
-
+  
   const transactions = req.transactions;
 
   const pricedTransactions = transactions.map((transaction) => {
@@ -68,19 +67,15 @@ const report1 = async (req, res) => {
 
     transaction.TransactionItems.forEach((transactionItem) => {
       cumulativeItemPrice +=
-        transactionItem.dataValues.Item.dataValues.itemPrice;
+        transactionItem.dataValues.Item.dataValues.itemPrice *
+        transactionItem.dataValues.amountTaken;
     });
 
     // eslint-disable-next-line
-    transaction.totalItemPrice = cumulativeItemPrice;
+    transaction.dataValues.totalItemPrice = cumulativeItemPrice;
 
-    console.log('the total price is ', transaction.totalItemPrice);
-    console.log('For transaction: ', transaction.TransactionItems);
-    console.log('\n\n\n');
     return transaction;
   });
-
-  console.log('THESE ARE THE TRANSACTIONS: ', transactions);
 
   return res.status(200).json(pricedTransactions);
 };
@@ -111,6 +106,7 @@ const report2 = async (req, res) => {
 };
 
 module.exports = {
+  getTransaction,
   report1,
   report2,
 };
