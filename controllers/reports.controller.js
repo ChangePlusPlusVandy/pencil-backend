@@ -16,7 +16,7 @@ const teacher = require('../models/teacher');
 // eslint-disable-next-line consistent-return
 const getTransaction = async (req, res, next) => {
   try {
-    const transactionWhereStatement = {};
+    const transactionWhereStatement = { status: 1 };
     if (req.query.startDate && req.query.endDate) {
       transactionWhereStatement.createdAt = {
         [Op.between]: [req.query.startDate, req.query.endDate],
