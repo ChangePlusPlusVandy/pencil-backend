@@ -263,7 +263,7 @@ const addAppointment = async (req, res) => {
 
     const [findSchool] = await School.findOrCreate({
       where: {
-        name: event.payload.questions_and_answers[0].answer, // FIX BASED ON ACTUAL FORM
+        name: req.body.payload.questions_and_answers[0].answer, // FIX BASED ON ACTUAL FORM
       },
     });
 
@@ -276,7 +276,7 @@ const addAppointment = async (req, res) => {
       defaults: {
         firstName: nameArr[0],
         lastName: nameArr.length > 1 ? nameArr[nameArr.length - 1] : null,
-        phone: event.payload.questions_and_answers[1].answer, // FIX BASED ON ACTUAL FORM
+        phone: req.body.payload.questions_and_answers[1].answer, // FIX BASED ON ACTUAL FORM
         _schoolId: findSchool._id,
       },
     });
