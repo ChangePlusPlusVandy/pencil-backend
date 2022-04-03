@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-const fetch = require('cross-fetch'); // FIXXXX
+const fetch = require('cross-fetch');
 const {
   Teacher,
   Schedule,
@@ -9,7 +9,7 @@ const {
 } = require('../models');
 
 /**
- * Get schedule from Calendly by making sequential API calls
+ * Get total schedule.
  *
  * @description   1. Retrieve location from request profile
  *                2. Perform a GET request on calendly's GET-CURRENT-USER endpoint
@@ -90,6 +90,9 @@ const addAppointment = async (req, res) => {
         phone: req.body.payload.questions_and_answers[1].answer, // FIX BASED ON ACTUAL FORM
         _schoolId: findSchool._id,
       },
+    });
+    findTeacher.update({
+      pencilId: findTeacher._id,
     });
     const newScheduleItem = await ScheduleItem.create({
       _scheduleId: findSchedule._id,
