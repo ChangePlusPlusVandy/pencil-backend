@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 const fetch = require('cross-fetch'); // FIXXXX
-const { Teacher } = require('../models');
+const { Teacher, Schedule, ScheduleItem, Location } = require('../models');
 
 const addTeacher2 = async (teacherObj) => {
   try {
@@ -231,18 +231,49 @@ const getSchedule = async (req, res) => {
 };
 
 const addAppointment = async (req, res) => {
-  console.log(req.body);
-  const options = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.SCHEDULER_BEARER_AUTH_TOKEN}`,
-    },
-  };
-  const eventInfo = await fetch(req.body.payload.event, options);
-  const event = await eventInfo.json();
-  console.log(event);
-  return res.status(200).json({ message: 'Appointment added' });
+  try {
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.SCHEDULER_BEARER_AUTH_TOKEN}`,
+      },
+    };
+    const eventInfo = await fetch(req.body.payload.event, options);
+    const event = await eventInfo.json();
+    const location = await Location.findOne({
+      name: event.resource.name,
+    });
+
+    const [findSchedule] = await Schedule.findOrCreate({
+      where: {
+        start_date: event.resource.start_time,
+        end_date: event.resource.end_time,
+        _locationId: location._id,
+      },
+    });
+
+    const nameArr = event.resource.name.split(' ');
+
+    const [findTeacher] = await Teacher.findOrCreate({
+      where: {
+        email: req.body.payload.email,
+      },
+      defaults: {
+        firstName: nameArr[0],
+        lastName: nameArr.length > 1 ? nameArr[nameArr.length - 1] : null,
+      },
+    });
+    const newScheduleItem = await ScheduleItem.create({
+      _scheduleId: findSchedule._id,
+      _teacherId: findTeacher._id,
+    });
+
+    return res.status(200).json({ message: 'Appointment added' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ err: 'Error adding appointment' });
+  }
 };
 
 module.exports = {
