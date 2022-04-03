@@ -19,6 +19,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Schedule.init(
     {
+      _id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
       start_date: DataTypes.DATE,
       end_date: DataTypes.DATE,
     },

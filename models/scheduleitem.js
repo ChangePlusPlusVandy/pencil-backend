@@ -18,7 +18,14 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   ScheduleItem.init(
-    {},
+    {
+      _id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
+    },
     {
       sequelize,
       tableName: 'schedule_items',
