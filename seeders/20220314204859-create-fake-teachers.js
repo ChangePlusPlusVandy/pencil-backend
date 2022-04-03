@@ -5,8 +5,7 @@ module.exports = {
       [
         {
           pencilId: 1,
-          firstName: 'Joel',
-          lastName: 'Wright',
+          name: 'Joel Wright',
           email: 'joelwright@pencil.com',
           _schoolId: 1,
           createdAt: new Date(),
@@ -14,8 +13,7 @@ module.exports = {
         },
         {
           pencilId: 2,
-          firstName: 'Kevin',
-          lastName: 'Jin',
+          name: 'Kevin Jin',
           email: 'kevinjin@pencil.com',
           _schoolId: 2,
           createdAt: new Date(),
@@ -23,8 +21,7 @@ module.exports = {
         },
         {
           pencilId: 3,
-          firstName: 'Intiser',
-          lastName: 'Parash',
+          name: 'Intiser Parash',
           email: 'intiserparash@pencil.com',
           _schoolId: 2,
           createdAt: new Date(),
@@ -32,8 +29,7 @@ module.exports = {
         },
         {
           pencilId: 4,
-          firstName: 'Rafael',
-          lastName: 'Voorhis-Allen',
+          name: 'Rafael Voorhis-Allen',
           email: 'rafaelvoorhisallen@pencil.com',
           _schoolId: 2,
           createdAt: new Date(),
@@ -41,8 +37,7 @@ module.exports = {
         },
         {
           pencilId: 5,
-          firstName: 'Arthur',
-          lastName: 'Sung',
+          name: 'Arthur Sung',
           email: 'arthursung@pencil.com',
           _schoolId: 2,
           createdAt: new Date(),
@@ -50,8 +45,7 @@ module.exports = {
         },
         {
           pencilId: 6,
-          firstName: 'Catherine',
-          lastName: 'Yang',
+          name: 'Catherine Yang',
           email: 'catherineyang@pencil.com',
           _schoolId: 2,
           createdAt: new Date(),
@@ -59,8 +53,7 @@ module.exports = {
         },
         {
           pencilId: 7,
-          firstName: 'Izzy',
-          lastName: 'Hood',
+          name: 'Izzy Hood',
           email: 'izzyhood@pencil.com',
           _schoolId: 2,
           createdAt: new Date(),
@@ -68,8 +61,7 @@ module.exports = {
         },
         {
           pencilId: 8,
-          firstName: 'Kyle',
-          lastName: 'Burgess',
+          name: 'Kyle Burgess',
           email: 'kyleburgess@pencil.com',
           _schoolId: 2,
           createdAt: new Date(),
@@ -77,8 +69,7 @@ module.exports = {
         },
         {
           pencilId: 9,
-          firstName: 'Zi Nean',
-          lastName: 'Teoh',
+          name: 'Zi Nean Teoh',
           email: 'zineanteoh@pencil.com',
           _schoolId: 2,
           createdAt: new Date(),
@@ -86,8 +77,7 @@ module.exports = {
         },
         {
           pencilId: 10,
-          firstName: 'Juyoung',
-          lastName: 'Kim',
+          name: 'Juyoung Kim',
           email: 'juyoungkim@pencil.com',
           _schoolId: 3,
           createdAt: new Date(),

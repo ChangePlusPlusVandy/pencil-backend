@@ -41,11 +41,9 @@ module.exports = (sequelize, DataTypes) => {
       pencilId: {
         type: DataTypes.INTEGER,
       },
-      firstName: {
+      name: {
         type: DataTypes.STRING,
-      },
-      lastName: {
-        type: DataTypes.STRING,
+        required: true,
       },
       email: {
         type: DataTypes.STRING,

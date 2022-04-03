@@ -8,42 +8,6 @@ const {
   School,
 } = require('../models');
 
-const addTeacher2 = async (teacherObj) => {
-  try {
-    console.log('addTeacher:', teacherObj);
-
-    // check if teacher already in database
-    const data = await Teacher.findOne({
-      where: { email: teacherObj.email },
-    });
-
-    if (data) {
-      return {
-        teacher: data,
-        error: 'Teacher already exists',
-      };
-    }
-
-    const firstName = teacherObj.name.split(' ').slice(0, -1).join(' ');
-    const lastName = teacherObj.name.split(' ').slice(-1).join(' ');
-
-    const teacher = await Teacher.create({
-      firstName,
-      lastName,
-      email: teacherObj.email,
-      phone: teacherObj.phone,
-      school: teacherObj.school,
-    });
-
-    return { teacher };
-  } catch (err) {
-    console.log(err);
-    return {
-      error: 'Could not create teacher',
-    };
-  }
-};
-
 /**
  * Get schedule from Calendly by making sequential API calls
  *
@@ -117,15 +81,12 @@ const addAppointment = async (req, res) => {
       },
     });
 
-    const nameArr = req.body.payload.name.split(' ');
-
     const [findTeacher] = await Teacher.findOrCreate({
       where: {
         email: req.body.payload.email,
       },
       defaults: {
-        firstName: nameArr[0],
-        lastName: nameArr.length > 1 ? nameArr[nameArr.length - 1] : null,
+        name: req.body.payload.name,
         phone: req.body.payload.questions_and_answers[1].answer, // FIX BASED ON ACTUAL FORM
         _schoolId: findSchool._id,
       },
