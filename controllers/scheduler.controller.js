@@ -1,6 +1,12 @@
 /* eslint-disable no-underscore-dangle */
 const fetch = require('cross-fetch'); // FIXXXX
-const { Teacher, Schedule, ScheduleItem, Location } = require('../models');
+const {
+  Teacher,
+  Schedule,
+  ScheduleItem,
+  Location,
+  School,
+} = require('../models');
 
 const addTeacher2 = async (teacherObj) => {
   try {
@@ -255,6 +261,12 @@ const addAppointment = async (req, res) => {
       },
     });
 
+    const [findSchool] = await School.findOrCreate({
+      where: {
+        name: event.resource.questions_and_answers[0].answer, // FIX BASED ON ACTUAL FORM
+      },
+    });
+
     const nameArr = req.body.payload.name.split(' ');
 
     const [findTeacher] = await Teacher.findOrCreate({
@@ -264,6 +276,8 @@ const addAppointment = async (req, res) => {
       defaults: {
         firstName: nameArr[0],
         lastName: nameArr.length > 1 ? nameArr[nameArr.length - 1] : null,
+        phone: event.resources.questions_and_answers[1].answer, // FIX BASED ON ACTUAL FORM
+        _schoolId: findSchool._id,
       },
     });
     const newScheduleItem = await ScheduleItem.create({
