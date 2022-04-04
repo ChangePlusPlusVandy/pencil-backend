@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Transaction, {
         foreignKey: '_teacherId',
       });
+      this.hasMany(models.ScheduleItem, {
+        foreignKey: '_teacherId',
+      });
     }
 
     toJSON() {
@@ -38,11 +41,9 @@ module.exports = (sequelize, DataTypes) => {
       pencilId: {
         type: DataTypes.INTEGER,
       },
-      firstName: {
+      name: {
         type: DataTypes.STRING,
-      },
-      lastName: {
-        type: DataTypes.STRING,
+        required: true,
       },
       email: {
         type: DataTypes.STRING,
