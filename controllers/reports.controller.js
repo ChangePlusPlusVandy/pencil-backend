@@ -79,14 +79,12 @@ const report1 = async (req, res) => {
   });
 
   // TODO: implement no show rate
-  const reportSummary = {
+  const summary = {
     totalSignups: teacherIds.length,
     numUniqueTeachers: [...new Set(teacherIds)].length,
   };
 
-  return res
-    .status(200)
-    .json({ transactions: pricedTransactions, reportSummary });
+  return res.status(200).json({ transactions: pricedTransactions, summary });
 };
 
 // Report 5.
