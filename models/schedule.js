@@ -16,6 +16,16 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: '_scheduleId',
       });
     }
+
+    toJSON() {
+      return {
+        ...this.get(),
+        _id: undefined,
+        _locationId: undefined,
+        createdAt: undefined,
+        updatedAt: undefined,
+      };
+    }
   }
   Schedule.init(
     {
