@@ -9,6 +9,10 @@ router
   .get(reportController.getTransaction, reportController.report1); // report 1
 
 router
+  .route('/report4')
+  .get(reportController.getTransaction, reportController.report4); // report 4
+
+router
   .route('/report5')
   .get(reportController.getTransaction, reportController.report5); // report 5
 
