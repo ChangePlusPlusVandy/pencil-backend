@@ -12,6 +12,8 @@ const { teacherByID } = require('./teacher.controller.js');
 
 // const ExcelJS = require('exceljs/dist/es5');
 const teacher = require('../models/teacher');
+const { restart } = require('nodemon');
+const { json } = require('express/lib/response');
 
 // eslint-disable-next-line consistent-return
 const getTransaction = async (req, res, next) => {
@@ -22,6 +24,7 @@ const getTransaction = async (req, res, next) => {
         [Op.between]: [req.query.startDate, req.query.endDate],
       };
     }
+
     const schoolWhereStatement = {};
     if (req.query.school) schoolWhereStatement.uuid = req.query.school;
 
@@ -87,6 +90,72 @@ const report1 = async (req, res) => {
   return res.status(200).json({ transactions: pricedTransactions, summary });
 };
 
+const report4 = async (req, res) => {
+  try {
+    const transactions = req.transactions;
+    const products = await Item.findAll();
+
+    // Create hashmap with stats about each possible product/item
+    let productData = {};
+    products.forEach((product) => {
+      productData[product.itemName] = {
+        itemPrice: product.itemPrice,
+        numTaken: 0,
+        takenByNShoppers: 0,
+        numTakenAtMax: 0,
+      };
+    });
+
+    // If there are no transactions in selected time period return unchanged list of products
+    if (transactions.length === 0) {
+      return res.status(200).json(productData);
+    }
+
+    let numTransactions = 0; // The total number of transactions in specified time period
+    let itemName;
+    transactions.forEach((transaction) => {
+      ++numTransactions;
+
+      transaction.TransactionItems.forEach((transItem) => {
+        itemName = transItem.Item.itemName;
+        if (itemName in productData) {
+          productData[itemName].takenByNShoppers += 1;
+          productData[itemName].numTaken += transItem.amountTaken;
+
+          if (transItem.amountTaken >= transItem.maxLimit) {
+            productData[itemName].numTakenAtMax += 1;
+          }
+        } else {
+          throw 'item in transaction not in item database';
+        }
+      });
+    });
+
+    let productArr = [];
+    for (key in productData) {
+      productData[key].totalValueTaken =
+        productData[key].itemPrice * productData[key].numTaken;
+
+      productData[key].percentageOfShoppers =
+        productData[key].takenByNShoppers / numTransactions;
+
+      productData[key].percentageTakenAtMax =
+        productData[key].takenByNShoppers === 0
+          ? 0
+          : productData[key].numTakenAtMax / productData[key].takenByNShoppers;
+
+      productData[key].itemName = key;
+
+      productArr.push(productData[key]);
+    }
+
+    return res.status(200).json(productArr);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'internal server error' });
+  }
+};
+
 // Report 5.
 const report5 = async (req, res) => {
   try {
@@ -124,5 +193,6 @@ const report5 = async (req, res) => {
 module.exports = {
   getTransaction,
   report1,
+  report4,
   report5,
 };
