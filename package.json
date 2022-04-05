@@ -31,6 +31,7 @@
     "node-fetch": "^3.2.0",
     "nodemon": "^2.0.14",
     "sequelize": "^6.17.0",
+    "socket.io": "^4.4.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
@@ -72,7 +73,9 @@
       "no-unused-vars": "warn",
       "no-var": "error",
       "prefer-const": "error",
-      "import/extensions": "off"
+      "import/extensions": "off",
+      "no-underscore-dangle": "off",
+      "prefer-destructuring": "off"
     }
   }
 }

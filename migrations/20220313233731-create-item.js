@@ -21,7 +21,7 @@ module.exports = {
         },
       },
       itemPrice: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DOUBLE,
         allowNull: false,
         defaultValue: 0,
         validate: {
@@ -29,6 +29,7 @@ module.exports = {
             message: 'Item price must be a number',
           },
           isValidPrice(val) {
+            // allows numeric up to two decimals
             const regex = /^[0-9]\d*(((,\d{3}){1})?(\.\d{0,2})?)$/;
             if (!regex.test(val)) {
               throw new Error('Item price is invalid');

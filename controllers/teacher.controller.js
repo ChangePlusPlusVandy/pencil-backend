@@ -74,8 +74,7 @@ const addTeacher = async (req, res) => {
 
     const teacher = await Teacher.create({
       pencilId: req.body.pencilId,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
+      name: req.body.name,
       email: req.body.email,
       phone: req.body.phone,
       school: req.body.school,
