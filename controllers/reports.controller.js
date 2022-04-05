@@ -37,7 +37,7 @@ const getTransaction = async (req, res, next) => {
         },
         {
           model: Teacher,
-          attributes: ['pencilId', 'firstName', 'lastName', 'email'],
+          attributes: ['pencilId', 'name', 'email'],
         },
         {
           model: School,
@@ -101,18 +101,13 @@ const report5 = async (req, res) => {
       // eslint-disable-next-line prefer-const
       let teacherID =
         // eslint-disable-next-line prefer-template
-        teacherInfo.firstName +
-        '-' +
-        teacherInfo.lastName +
-        '-' +
-        teacherInfo.email;
+        teacherInfo.name + '-' + teacherInfo.email;
 
       if (!(teacherID in teacherData)) {
         teacherData[teacherID] = {
           timesShopped: 1,
           schoolName: transaction.School.dataValues.name,
-          firstName: teacherInfo.firstName,
-          lastName: teacherInfo.lastName,
+          name: teacherInfo.name,
         };
       } else {
         teacherData[teacherID].timesShopped += 1;
