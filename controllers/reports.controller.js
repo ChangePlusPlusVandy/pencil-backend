@@ -131,13 +131,18 @@ const report4 = async (req, res) => {
       productData[productName].totalValueTaken =
         productData[productName].itemPrice * productData[productName].numTaken;
 
-      productData[productName].percentageOfShoppers =
-        productData[productName].numShoppers / numTransactions;
+      // round it to 2 decimal places
+      productData[productName].percentageOfShoppers = parseFloat(
+        (productData[productName].numShoppers / numTransactions).toFixed(2)
+      );
 
       if (productData[productName].numShoppers !== 0) {
-        productData[productName].percentageTakenAtMax =
+        let percent =
           productData[productName].numTakenAtMax /
           productData[productName].numShoppers;
+        // round it to 2 decimal places
+        percent = parseFloat(percent.toFixed(2));
+        productData[productName].percentageTakenAtMax = percent;
       }
 
       productArr.push(productData[productName]);
