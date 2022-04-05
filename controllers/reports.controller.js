@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 const { Op } = require('sequelize');
-const { restart } = require('nodemon');
 const {
   Teacher,
   Transaction,
@@ -8,12 +7,8 @@ const {
   TransactionItem,
   Item,
 } = require('../models');
-const { teacherByID } = require('./teacher.controller.js');
 
 // const ExcelJS = require('exceljs/dist/es5');
-const teacher = require('../models/teacher');
-const { restart } = require('nodemon');
-const { json } = require('express/lib/response');
 
 // eslint-disable-next-line consistent-return
 const getTransaction = async (req, res, next) => {
@@ -96,13 +91,17 @@ const report4 = async (req, res) => {
     const products = await Item.findAll();
 
     // Create hashmap with stats about each possible product/item
-    let productData = {};
+    const productData = {};
     products.forEach((product) => {
       productData[product.itemName] = {
+        itemName: product.itemName,
         itemPrice: product.itemPrice,
         numTaken: 0,
-        takenByNShoppers: 0,
+        numShoppers: 0,
         numTakenAtMax: 0,
+        percentageOfShoppers: 0,
+        percentageTakenAtMax: 0,
+        totalValueTaken: 0,
       };
     });
 
@@ -111,43 +110,35 @@ const report4 = async (req, res) => {
       return res.status(200).json(productData);
     }
 
-    let numTransactions = 0; // The total number of transactions in specified time period
-    let itemName;
     transactions.forEach((transaction) => {
-      ++numTransactions;
+      transaction.TransactionItems.forEach((transactionItem) => {
+        const itemName = transactionItem.Item.itemName;
+        productData[itemName].numShoppers += 1;
+        productData[itemName].numTaken += transactionItem.amountTaken;
 
-      transaction.TransactionItems.forEach((transItem) => {
-        itemName = transItem.Item.itemName;
-        if (itemName in productData) {
-          productData[itemName].takenByNShoppers += 1;
-          productData[itemName].numTaken += transItem.amountTaken;
-
-          if (transItem.amountTaken >= transItem.maxLimit) {
-            productData[itemName].numTakenAtMax += 1;
-          }
-        } else {
-          throw 'item in transaction not in item database';
+        if (transactionItem.amountTaken >= transactionItem.maxLimit) {
+          productData[itemName].numTakenAtMax += 1;
         }
       });
     });
 
-    let productArr = [];
-    for (key in productData) {
-      productData[key].totalValueTaken =
-        productData[key].itemPrice * productData[key].numTaken;
+    const numTransactions = transactions.length;
+    const productArr = [];
+    Object.keys(productData).forEach((productName) => {
+      productData[productName].totalValueTaken =
+        productData[productName].itemPrice * productData[productName].numTaken;
 
-      productData[key].percentageOfShoppers =
-        productData[key].takenByNShoppers / numTransactions;
+      productData[productName].percentageOfShoppers =
+        productData[productName].numShoppers / numTransactions;
 
-      productData[key].percentageTakenAtMax =
-        productData[key].takenByNShoppers === 0
-          ? 0
-          : productData[key].numTakenAtMax / productData[key].takenByNShoppers;
+      if (productData[productName].numShoppers !== 0) {
+        productData[productName].percentageTakenAtMax =
+          productData[productName].numTakenAtMax /
+          productData[productName].numShoppers;
+      }
 
-      productData[key].itemName = key;
-
-      productArr.push(productData[key]);
-    }
+      productArr.push(productData[productName]);
+    });
 
     return res.status(200).json(productArr);
   } catch (err) {
