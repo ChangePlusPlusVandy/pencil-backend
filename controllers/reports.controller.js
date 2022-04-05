@@ -13,7 +13,10 @@ const {
 // eslint-disable-next-line consistent-return
 const getTransaction = async (req, res, next) => {
   try {
-    const transactionWhereStatement = { status: 1 };
+    const transactionWhereStatement = {
+      status: 1,
+      _locationId: req.location._id,
+    };
     if (req.query.startDate && req.query.endDate) {
       transactionWhereStatement.createdAt = {
         [Op.between]: [req.query.startDate, req.query.endDate],
