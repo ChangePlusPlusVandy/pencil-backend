@@ -54,7 +54,7 @@ const getTransaction = async (req, res, next) => {
   }
 };
 
-// Report 1 : Date shopped,Teacher name,Teacher email,Teacher school,Value of products.
+// Report 1 : Date shopped, Teacher name, Teacher email, Teacher school, Value of products.
 // Elements of list are individual shopping trips by teachers.
 const report1 = async (req, res) => {
   const transactions = req.transactions;
