@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 const fetch = require('cross-fetch');
+const { Op } = require('sequelize');
 const {
   Teacher,
   Schedule,
@@ -22,10 +23,17 @@ const {
  */
 const getSchedule = async (req, res) => {
   try {
+    const perPage = parseInt(req.query.perPage, 10) || 2;
+
+    console.log('BRUHHH', perPage, req.query.mode === 'Today');
+    const page = parseInt(req.query.page, 10) || 1;
     const schedule = await Schedule.findAll({
       include: [
         {
+          separate: true,
           model: ScheduleItem,
+          limit: perPage,
+          offset: perPage * (page - 1),
           include: [
             {
               model: Teacher,
@@ -40,8 +48,21 @@ const getSchedule = async (req, res) => {
       ],
       where: {
         _locationId: req.location._id,
+        start_date: {
+          [Op.gte]: (function () {
+            if (req.query.mode === 'Upcoming') return new Date();
+            return 0;
+          })(),
+          [Op.lt]: (function () {
+            if (req.query.mode === 'Today') return new Date();
+            return null;
+          })(),
+        },
       },
+      limit: perPage,
+      offset: perPage * (page - 1),
     });
+    console.log(schedule);
 
     return res.status(200).json(schedule);
   } catch (err) {
