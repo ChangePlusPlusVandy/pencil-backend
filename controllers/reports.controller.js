@@ -1,11 +1,12 @@
 /* eslint-disable no-param-reassign */
-const { Op } = require('sequelize');
+const { Op, fn, col } = require('sequelize');
 const {
   Teacher,
   Transaction,
   School,
   TransactionItem,
   Item,
+  ScheduleItem,
 } = require('../models');
 
 // const ExcelJS = require('exceljs/dist/es5');
@@ -13,6 +14,11 @@ const {
 // eslint-disable-next-line consistent-return
 const getTransaction = async (req, res, next) => {
   try {
+    // TODO: Integrate this logic
+    // const noShowList = scheduleArr.filter((schedule) => !schedule.showed);
+    // const noShowNum = noShowList.length;
+    // const totalNumAppointments = scheduleArr.length;
+
     const transactionWhereStatement = {
       status: 1,
       _locationId: req.location._id,
@@ -87,6 +93,42 @@ const report1 = async (req, res) => {
   };
 
   return res.status(200).json({ transactions: pricedTransactions, summary });
+};
+
+const report3 = async (req, res) => {
+  try {
+    // 1. Find all schedule items bewteen date range whose showed is false
+    const scheduleWhereStatement = { showed: 0 };
+    if (req.query.startDate && req.query.endDate) {
+      scheduleWhereStatement.createdAt = {
+        [Op.between]: [req.query.startDate, req.query.endDate],
+      };
+    }
+
+    // 2. Get teacher name and email and school name
+    const scheduleArr = await ScheduleItem.findAll({
+      attributes: [],
+      where: scheduleWhereStatement,
+      include: [
+        {
+          model: Teacher,
+          attributes: ['name', 'email'],
+          include: [
+            {
+              model: School,
+              attributes: ['name'],
+            },
+          ],
+        },
+      ],
+      raw: true,
+    });
+
+    return res.status(200).json(scheduleArr);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'internal server error' });
+  }
 };
 
 const report4 = async (req, res) => {
@@ -197,6 +239,7 @@ const report5 = async (req, res) => {
 module.exports = {
   getTransaction,
   report1,
+  report3,
   report4,
   report5,
 };
