@@ -17,6 +17,7 @@ const getTransaction = async (req, res, next) => {
       status: 1,
       _locationId: req.location._id,
     };
+    console.log(transactionWhereStatement);
     if (req.query.startDate && req.query.endDate) {
       transactionWhereStatement.createdAt = {
         [Op.between]: [req.query.startDate, req.query.endDate],
@@ -110,7 +111,11 @@ const report4 = async (req, res) => {
 
     // If there are no transactions in selected time period return unchanged list of products
     if (transactions.length === 0) {
-      return res.status(200).json(productData);
+      // convert productData into an array
+      const productArray = Object.keys(productData).map(
+        (key) => productData[key]
+      );
+      return res.status(200).json(productArray);
     }
 
     transactions.forEach((transaction) => {
