@@ -7,6 +7,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      showed: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       _scheduleId: {
         type: Sequelize.INTEGER,
         allowNull: false,
