@@ -49,7 +49,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
-          uuid: '7fbcee32-acd0-4595-94c9-783a3fg978ee',
+          uuid: '7fbcee32-acd0-4595-94c9-783a3fg978ef',
           status: 0,
           _teacherId: 4,
           _schoolId: 2,
