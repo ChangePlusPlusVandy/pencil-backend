@@ -8,6 +8,10 @@ router
   .get(reportController.getTransaction, reportController.report1); // Report 1
 
 router
+  .route('/printReport1')
+  .get(reportController.getTransaction, reportController.printReport1);
+
+router
   .route('/report4')
   .get(reportController.getTransaction, reportController.report4); // report 4
 
