@@ -3,23 +3,23 @@ const Joi = require('joi');
 const { Item } = require('../models');
 const { app } = require('../index');
 
+const options = {
+  allowUnknown: true,
+};
+
 /**
  * Check whether a given item is in the master inventory table.
  *
  * @param {Object} req - Request Object with structure { itemName: STRING, itemPrice: DOUBLE }
  * @param {Object} res - Response Object
  */
-
 const checkForItem = async (req, res, next) => {
   try {
     const schema = Joi.object().keys({
       itemName: Joi.string().required().max(500),
-      itemPrice: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
+      itemPrice: Joi.number().required().max(100000000),
     });
-    await schema.validateAsync(req.params);
+    await schema.validateAsync(req.params, options);
     const isInInventory = await Item.findOne({
       where: {
         itemName: req.params.itemName,
@@ -41,14 +41,12 @@ const checkForItem = async (req, res, next) => {
  */
 const addItem = async (req, res, next) => {
   try {
+    console.log('PLEASE');
     const schema = Joi.object().keys({
       itemName: Joi.string().required().max(500),
-      itemPrice: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
+      itemPrice: Joi.number().required().max(100000000),
     });
-    await schema.validateAsync(req.body);
+    await schema.validateAsync(req.body, options);
     const itemObj = {
       itemName: req.body.itemName,
       itemPrice: req.body.itemPrice,
@@ -85,14 +83,11 @@ const updateMasterInventory = async (req, res, next) => {
   const responseItem = [];
   try {
     const schema = Joi.array().items({
-      uuid: Joi.string().required().length(36),
+      uuid: Joi.string().length(36),
       itemName: Joi.string().required().max(500),
-      itemPrice: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
+      itemPrice: Joi.number().required().max(100000000),
     });
-    await schema.validateAsync(req.body);
+    await schema.validateAsync(req.body, options);
     req.body.forEach(async (item) => {
       if (item.archive) {
         const updatedItem = await Item.update(
@@ -100,6 +95,9 @@ const updateMasterInventory = async (req, res, next) => {
           { where: { uuid: item.uuid } }
         );
         responseItem.push(updatedItem);
+      } else if (!item.uuid) {
+        const newItem = await Item.create(item);
+        responseItem.push(newItem);
       } else {
         const [findSchedule, created] = await Item.findOrCreate({
           where: {

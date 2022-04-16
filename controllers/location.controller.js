@@ -1,6 +1,10 @@
 const Joi = require('joi');
 const { Location } = require('../models');
 
+const options = {
+  allowUnknown: true,
+};
+
 /**
  * Populates profile field with location information.
  * @param {Object} req - Request object.
@@ -45,7 +49,7 @@ const addLocation = async (req, res) => {
       name: Joi.string().required().max(500),
       address: Joi.string().required().max(500),
     });
-    await schema.validateAsync(req.body);
+    await schema.validateAsync(req.body, options);
     // if location already exists, return error
     const loc = await Location.findOne({
       where: { name: req.body.name },

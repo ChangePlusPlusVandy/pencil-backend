@@ -11,6 +11,10 @@ const {
 } = require('../models');
 const { formatTransactions } = require('../helpers/transaction.helper.js');
 
+const options = {
+  allowUnknown: true,
+};
+
 /**
  * Submits a User Transaction and adds data to the Temp Transaction Table.
  * @param {Object} req - Request Object
@@ -18,17 +22,12 @@ const { formatTransactions } = require('../helpers/transaction.helper.js');
  */
 const submitTransaction = async (req, res) => {
   try {
+    console.log(req.body.schoolId);
     const schema = Joi.object().keys({
-      teacherId: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
-      schoolId: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
+      teacherId: Joi.number().required().max(100000000),
+      schoolId: Joi.string().length(36).required(),
     });
-    await schema.validateAsync(req.params);
+    await schema.validateAsync(req.body, options);
     const teacher = await Teacher.findOne({
       where: { pencilId: req.body.teacherId },
     });
@@ -78,7 +77,7 @@ const approveTransaction = async (req, res) => {
     const schema = Joi.object().keys({
       transuuid: Joi.string().required().length(36),
     });
-    await schema.validateAsync(req.params);
+    await schema.validateAsync(req.params, options);
     const finalTransaction = await Transaction.update(
       { status: 1 },
       { where: { uuid: req.params.transuuid } }
@@ -103,7 +102,7 @@ const denyTransaction = async (req, res) => {
     const schema = Joi.object().keys({
       transuuid: Joi.string().required().length(36),
     });
-    await schema.validateAsync(req.params);
+    await schema.validateAsync(req.params, options);
     const finalTransaction = await Transaction.update(
       { status: 2 },
       { where: { uuid: req.params.transuuid } }
@@ -125,16 +124,10 @@ const denyTransaction = async (req, res) => {
 const getAllPendingTransactions = async (req, res) => {
   try {
     const schema = Joi.object().keys({
-      perPage: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
-      previous: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
+      perPage: Joi.number().required().max(100000000),
+      previous: Joi.number().required().max(100000000),
     });
-    await schema.validateAsync(req.query);
+    await schema.validateAsync(req.query, options);
     const perPage = parseInt(req.query.perPage, 10) || 10;
     const previousItems = parseInt(req.query.previous, 10) || 0;
     const transactions = await Transaction.findAll({
@@ -175,16 +168,10 @@ const getAllPendingTransactions = async (req, res) => {
 const getAllApprovedTransactions = async (req, res) => {
   try {
     const schema = Joi.object({
-      perPage: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
-      previous: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
+      perPage: Joi.number().required().max(100000000),
+      previous: Joi.number().required().max(100000000),
     });
-    await schema.validateAsync(req.query);
+    await schema.validateAsync(req.query, options);
     const perPage = parseInt(req.query.perPage, 10) || 10;
     const previousItems = parseInt(req.query.previous, 10) || 0;
     const transactions = await Transaction.findAll({
@@ -220,16 +207,10 @@ const getAllApprovedTransactions = async (req, res) => {
 const getAllDeniedTransactions = async (req, res) => {
   try {
     const schema = Joi.object().keys({
-      perPage: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
-      previous: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
+      perPage: Joi.number().required().max(100000000),
+      previous: Joi.number().required().max(100000000),
     });
-    await schema.validateAsync(req.query);
+    await schema.validateAsync(req.query, options);
     const perPage = parseInt(req.query.perPage, 10) || 10;
     const previousItems = parseInt(req.query.previous, 10) || 0;
     const transactions = await Transaction.findAll({

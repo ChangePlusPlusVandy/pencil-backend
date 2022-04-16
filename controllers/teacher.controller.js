@@ -1,6 +1,10 @@
 const Joi = require('joi');
 const { Teacher, School } = require('../models');
 
+const options = {
+  allowUnknown: true,
+};
+
 /**
  * Gets a teacher's profile.
  * @param {Object} req - Request object.
@@ -60,17 +64,14 @@ const teacherByID = async (req, res, next, pencilId) => {
 const addTeacher = async (req, res) => {
   try {
     const schema = Joi.object().keys({
-      pencilId: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
+      pencilId: Joi.number().required().max(100000000),
       firstName: Joi.string().required().max(500),
       lastName: Joi.string().required().max(500),
       email: Joi.string().email().required().max(500),
       phone: Joi.string().required().max(300),
       school: Joi.string().required().max(500),
     });
-    await schema.validateAsync(req.body);
+    await schema.validateAsync(req.body, options);
     console.log('addTeacher:', req);
 
     // check if teacher already in database

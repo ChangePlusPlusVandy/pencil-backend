@@ -2,6 +2,10 @@
 const Joi = require('joi');
 const { ShoppingFormItem, Item, Location } = require('../models');
 
+const options = {
+  allowUnknown: true,
+};
+
 /**
  * Adds a supply to the form database.
  * @param {Object} req - Request object.
@@ -11,16 +15,10 @@ const addSupply = async (req, res) => {
   try {
     const schema = Joi.object().keys({
       itemName: Joi.string().required().max(500),
-      maxLimit: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
-      itemOrder: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .max(500),
+      maxLimit: Joi.number().required().max(100000000),
+      itemOrder: Joi.number().required().max(100000000),
     });
-    await schema.validateAsync(req.params);
+    await schema.validateAsync(req.body, options);
     const item = await Item.findOne({
       where: { itemName: req.body.itemName },
     });
@@ -51,9 +49,11 @@ const addSupply = async (req, res) => {
 const updateSupply = async (req, res) => {
   try {
     const schema = Joi.array().items({
+      maxLimit: Joi.number().max(100000),
+      itemOrder: Joi.number().max(100000),
       'Item.itemName': Joi.string().max(500),
     });
-    await schema.validateAsync(req.body);
+    await schema.validateAsync(req.body, options);
     const responseItem = [];
     const wipe = await ShoppingFormItem.destroy({
       where: { _locationId: req.location._id },
@@ -80,7 +80,7 @@ const updateSupply = async (req, res) => {
 
     return res.status(200).json({ message: 'Supply Form Updated' });
   } catch (err) {
-    console.log("addSupply : can't connect");
+    console.log(err);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
