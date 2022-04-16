@@ -26,7 +26,7 @@ const submitTransaction = async (req, res) => {
     const scheduleItem = await ScheduleItem.findOne({
       where: { _teacherId: teacher._id, showed: false },
     });
-    scheduleItem.update({ showed: true });
+    if (scheduleItem) scheduleItem.update({ showed: true });
     const transaction = await Transaction.create({
       _teacherId: teacher._id,
       _schoolId: school._id,
