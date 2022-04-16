@@ -58,6 +58,36 @@ const getAllItems = async (req, res, next) => {
   }
 };
 
+const getArchived = async (req, res, next) => {
+  try {
+    const archivedItems = await Item.findAll({
+      order: [['itemName', 'ASC']],
+      attributes: ['uuid', 'itemName', 'itemPrice'],
+      where: { archived: true },
+    });
+
+    return res.status(200).json(archivedItems);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const getActive = async (req, res, next) => {
+  try {
+    const activeItems = await Item.findAll({
+      order: [['itemName', 'ASC']],
+      attributes: ['uuid', 'itemName', 'itemPrice'],
+      where: { archived: false },
+    });
+
+    return res.status(200).json(activeItems);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 const updateMasterInventory = async (req, res, next) => {
   // FIXME: Consult about master inventory
   try {
@@ -83,4 +113,6 @@ module.exports = {
   checkForItem,
   getAllItems,
   updateMasterInventory,
+  getArchived,
+  getActive,
 };
