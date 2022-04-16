@@ -26,7 +26,7 @@ const submitTransaction = async (req, res) => {
     const scheduleItem = await ScheduleItem.findOne({
       where: { _teacherId: teacher._id, showed: false },
     });
-    scheduleItem.update({ showed: true });
+    if (scheduleItem) scheduleItem.update({ showed: true });
     const transaction = await Transaction.create({
       _teacherId: teacher._id,
       _schoolId: school._id,
@@ -65,7 +65,7 @@ const approveTransaction = async (req, res) => {
   try {
     const finalTransaction = await Transaction.update(
       { status: 1 },
-      { where: { uuid: req.body.uuid } }
+      { where: { uuid: req.params.transuuid } }
     );
 
     return res.status(200).json({ status: 'Record approved' });
@@ -86,7 +86,7 @@ const denyTransaction = async (req, res) => {
   try {
     const finalTransaction = await Transaction.update(
       { status: 2 },
-      { where: { uuid: req.body.uuid } }
+      { where: { uuid: req.params.transuuid } }
     );
 
     return res.status(200).json({ status: 'Record denied' });

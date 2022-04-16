@@ -49,6 +49,9 @@ const getAllItems = async (req, res, next) => {
     const itemList = await Item.findAll({
       order: [['itemName', 'ASC']],
       attributes: ['uuid', 'itemName', 'itemPrice'],
+      where: {
+        archived: false,
+      },
     });
 
     return res.status(200).json(itemList);
@@ -60,18 +63,29 @@ const getAllItems = async (req, res, next) => {
 
 const updateMasterInventory = async (req, res, next) => {
   // FIXME: Consult about master inventory
+  const responseItem = [];
   try {
-    const wipe = await Item.destroy({
-      where: {},
-      truncate: true,
+    req.body.forEach(async (item) => {
+      if (item.archive) {
+        const updatedItem = await Item.update(
+          { archived: true },
+          { where: { uuid: item.uuid } }
+        );
+        responseItem.push(updatedItem);
+      } else {
+        const [findSchedule, created] = await Item.findOrCreate({
+          where: {
+            uuid: item.uuid,
+          },
+          defaults: {
+            itemName: item.itemName,
+            itemPrice: item.itemPrice,
+          },
+        });
+        responseItem.push(findSchedule);
+      }
     });
-
-    const updatedItems = await Item.bulkCreate(req.body);
-    if (!updatedItems) {
-      console.log('Items could not be updated');
-      return res.status(500).json({ error: 'Internal server error' });
-    }
-    return res.status(200).json(updatedItems);
+    return res.status(200).json(responseItem);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'Internal server error' });

@@ -61,7 +61,6 @@ const getSchedule = async (req, res) => {
 
 const addAppointment = async (req, res) => {
   try {
-    console.log(req.body);
     const options = {
       method: 'GET',
       headers: {
@@ -71,7 +70,6 @@ const addAppointment = async (req, res) => {
     };
     const eventInfo = await fetch(req.body.payload.event, options);
     const event = await eventInfo.json();
-    console.log(event);
     const location = await Location.findOne({
       name: event.resource.name,
     });
@@ -115,7 +113,13 @@ const addAppointment = async (req, res) => {
   }
 };
 
+const cancelAppointment = async (req, res) => {
+  console.log('test');
+  return req;
+};
+
 module.exports = {
   addAppointment,
+  cancelAppointment,
   getSchedule,
 };

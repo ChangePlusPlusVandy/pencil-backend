@@ -37,6 +37,10 @@ module.exports = {
           },
         },
       },
+      archived: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
