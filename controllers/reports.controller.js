@@ -142,33 +142,24 @@ const printReport1 = async (req, res, next) => {
       });
     });
 
-    // TODO: Make filename dynamic
+    let dateString;
+    if (req.query.startDate && req.query.endDate) {
+      dateString = `from-${req.query.startDate}-${req.query.endDate}`;
+    } else {
+      dateString = `all-dates-${Math.floor(Date.now() / 1000)}`;
+    }
+
     const location = './downloads/';
-    const filename = 'test.xlsx';
-    // FIXME: FILE OUTPUT IS NOT xlsx UNLESS MANUALLY CONVERTED
+    const filename = `weekly-report-${dateString}`;
+
     await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
 
-    res.redirect(`/report-downloads/${filename}`);
+    console.log(req);
 
-    const wait = async () => {
-      console.log('begin');
-      let n;
-      for (let i = 0; i < 10000000; i++) {
-        for (let j = 0; j < 1000; j++) {
-          n = ((0.004 * i * j * j) / 15) * 1.12;
-        }
-      }
-      console.log('end');
-    };
-
-    //await wait();
-    //fs.unlinkSync(filename);
-
-    return;
-
-    return res.status(200).json({ result: 'Report downloaded' });
+    return res.status(200).json({ filename: filename });
   } catch (err) {
-    return res.status(500).json({ error: 'we dun broke it' });
+    console.log(err);
+    return res.status(500).json({ error: 'internal server error' });
   }
 };
 
@@ -274,6 +265,18 @@ const report5 = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const deleteReportSheet = (req, res, next) => {
+  try {
+    const filename = req.body.filename;
+    fs.unlinkSync(filename);
+
+    return res.status(200).json({ result: 'File deleted' });
+  } catch (err) {
+    console.log(err);
+    return res.status(200).json({ error: 'internal server error' });
   }
 };
 
