@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-const { Joi } = require('joi');
+const Joi = require('joi');
 const { ShoppingFormItem, Item, Location } = require('../models');
 
 /**
@@ -11,8 +11,14 @@ const addSupply = async (req, res) => {
   try {
     const schema = Joi.object().keys({
       itemName: Joi.string().required().max(500),
-      maxLimit: Joi.number().required().max(1000000),
-      itemOrder: Joi.number().required().max(1000000),
+      maxLimit: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
+      itemOrder: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
     });
     await schema.validateAsync(req.params);
     const item = await Item.findOne({

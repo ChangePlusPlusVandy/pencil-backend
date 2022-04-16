@@ -1,5 +1,5 @@
 const { v4 } = require('uuid');
-const { Joi } = require('joi');
+const Joi = require('joi');
 const { Item } = require('../models');
 const { app } = require('../index');
 
@@ -14,7 +14,10 @@ const checkForItem = async (req, res, next) => {
   try {
     const schema = Joi.object().keys({
       itemName: Joi.string().required().max(500),
-      itemPrice: Joi.number().required().max(100000),
+      itemPrice: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
     });
     await schema.validateAsync(req.params);
     const isInInventory = await Item.findOne({
@@ -40,7 +43,10 @@ const addItem = async (req, res, next) => {
   try {
     const schema = Joi.object().keys({
       itemName: Joi.string().required().max(500),
-      itemPrice: Joi.number().required().max(100000),
+      itemPrice: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
     });
     await schema.validateAsync(req.body);
     const itemObj = {
@@ -76,7 +82,10 @@ const updateMasterInventory = async (req, res, next) => {
   try {
     const schema = Joi.object().keys({
       itemName: Joi.string().required().max(500),
-      itemPrice: Joi.number().required().max(100000),
+      itemPrice: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
     });
     await schema.validateAsync(req.body);
     const wipe = await Item.destroy({

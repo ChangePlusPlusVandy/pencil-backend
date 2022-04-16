@@ -19,8 +19,14 @@ const { formatTransactions } = require('../helpers/transaction.helper.js');
 const submitTransaction = async (req, res) => {
   try {
     const schema = Joi.object().keys({
-      teacherId: Joi.number().required().max(100000000),
-      schoolId: Joi.number().required().max(1000000),
+      teacherId: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
+      schoolId: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
     });
     await schema.validateAsync(req.params);
     const teacher = await Teacher.findOne({
@@ -119,8 +125,14 @@ const denyTransaction = async (req, res) => {
 const getAllPendingTransactions = async (req, res) => {
   try {
     const schema = Joi.object().keys({
-      perPage: Joi.number().required(),
-      previous: Joi.number().required(),
+      perPage: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
+      previous: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
     });
     await schema.validateAsync(req.query);
     const perPage = parseInt(req.query.perPage, 10) || 10;
@@ -163,8 +175,14 @@ const getAllPendingTransactions = async (req, res) => {
 const getAllApprovedTransactions = async (req, res) => {
   try {
     const schema = Joi.object({
-      perPage: Joi.number().required(),
-      previous: Joi.number().required(),
+      perPage: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
+      previous: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
     });
     await schema.validateAsync(req.query);
     const perPage = parseInt(req.query.perPage, 10) || 10;
@@ -202,8 +220,14 @@ const getAllApprovedTransactions = async (req, res) => {
 const getAllDeniedTransactions = async (req, res) => {
   try {
     const schema = Joi.object().keys({
-      perPage: Joi.number().required(),
-      previous: Joi.number().required(),
+      perPage: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
+      previous: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
     });
     await schema.validateAsync(req.query);
     const perPage = parseInt(req.query.perPage, 10) || 10;

@@ -1,4 +1,4 @@
-const { Joi } = require('joi');
+const Joi = require('joi');
 const { Teacher, School } = require('../models');
 
 /**
@@ -60,7 +60,10 @@ const teacherByID = async (req, res, next, pencilId) => {
 const addTeacher = async (req, res) => {
   try {
     const schema = Joi.object().keys({
-      pencilId: Joi.number().required().integer().max(10000000),
+      pencilId: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .required()
+        .max(500),
       firstName: Joi.string().required().max(500),
       lastName: Joi.string().required().max(500),
       email: Joi.string().email().required().max(500),
