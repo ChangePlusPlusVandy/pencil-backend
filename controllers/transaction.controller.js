@@ -6,6 +6,7 @@ const {
   TransactionItem,
   Item,
   School,
+  ScheduleItem,
 } = require('../models');
 const { formatTransactions } = require('../helpers/transaction.helper.js');
 
@@ -22,6 +23,10 @@ const submitTransaction = async (req, res) => {
     const school = await School.findOne({
       where: { uuid: req.body.schoolId },
     });
+    const scheduleItem = await ScheduleItem.findOne({
+      where: { _teacherId: teacher._id, showed: false },
+    });
+    scheduleItem.update({ showed: true });
     const transaction = await Transaction.create({
       _teacherId: teacher._id,
       _schoolId: school._id,
