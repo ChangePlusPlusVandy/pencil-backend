@@ -1,3 +1,4 @@
+const { Joi } = require('joi');
 const { Location } = require('../models');
 
 /**
@@ -40,6 +41,11 @@ const locationByID = async (req, res, next, name) => {
  * */
 const addLocation = async (req, res) => {
   try {
+    const schema = Joi.object().keys({
+      name: Joi.string().required().max(500),
+      address: Joi.string().required().max(500),
+    });
+    await schema.validateAsync(req.body);
     // if location already exists, return error
     const loc = await Location.findOne({
       where: { name: req.body.name },

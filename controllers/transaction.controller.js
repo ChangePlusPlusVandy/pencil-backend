@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+const Joi = require('joi');
 const { v4 } = require('uuid');
 const {
   Transaction,
@@ -17,6 +18,11 @@ const { formatTransactions } = require('../helpers/transaction.helper.js');
  */
 const submitTransaction = async (req, res) => {
   try {
+    const schema = Joi.object().keys({
+      teacherId: Joi.number().required().max(100000000),
+      schoolId: Joi.number().required().max(1000000),
+    });
+    await schema.validateAsync(req.params);
     const teacher = await Teacher.findOne({
       where: { pencilId: req.body.teacherId },
     });
@@ -63,6 +69,10 @@ const submitTransaction = async (req, res) => {
  */
 const approveTransaction = async (req, res) => {
   try {
+    const schema = Joi.object().keys({
+      transuuid: Joi.string().required().length(36),
+    });
+    await schema.validateAsync(req.params);
     const finalTransaction = await Transaction.update(
       { status: 1 },
       { where: { uuid: req.params.transuuid } }
@@ -84,6 +94,10 @@ const approveTransaction = async (req, res) => {
  */
 const denyTransaction = async (req, res) => {
   try {
+    const schema = Joi.object().keys({
+      transuuid: Joi.string().required().length(36),
+    });
+    await schema.validateAsync(req.params);
     const finalTransaction = await Transaction.update(
       { status: 2 },
       { where: { uuid: req.params.transuuid } }
@@ -104,6 +118,11 @@ const denyTransaction = async (req, res) => {
  */
 const getAllPendingTransactions = async (req, res) => {
   try {
+    const schema = Joi.object().keys({
+      perPage: Joi.number().required(),
+      previous: Joi.number().required(),
+    });
+    await schema.validateAsync(req.query);
     const perPage = parseInt(req.query.perPage, 10) || 10;
     const previousItems = parseInt(req.query.previous, 10) || 0;
     const transactions = await Transaction.findAll({
@@ -143,6 +162,11 @@ const getAllPendingTransactions = async (req, res) => {
  */
 const getAllApprovedTransactions = async (req, res) => {
   try {
+    const schema = Joi.object({
+      perPage: Joi.number().required(),
+      previous: Joi.number().required(),
+    });
+    await schema.validateAsync(req.query);
     const perPage = parseInt(req.query.perPage, 10) || 10;
     const previousItems = parseInt(req.query.previous, 10) || 0;
     const transactions = await Transaction.findAll({
@@ -177,6 +201,11 @@ const getAllApprovedTransactions = async (req, res) => {
  */
 const getAllDeniedTransactions = async (req, res) => {
   try {
+    const schema = Joi.object().keys({
+      perPage: Joi.number().required(),
+      previous: Joi.number().required(),
+    });
+    await schema.validateAsync(req.query);
     const perPage = parseInt(req.query.perPage, 10) || 10;
     const previousItems = parseInt(req.query.previous, 10) || 0;
     const transactions = await Transaction.findAll({

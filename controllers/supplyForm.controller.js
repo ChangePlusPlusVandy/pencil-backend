@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+const { Joi } = require('joi');
 const { ShoppingFormItem, Item, Location } = require('../models');
 
 /**
@@ -8,6 +9,12 @@ const { ShoppingFormItem, Item, Location } = require('../models');
  * */
 const addSupply = async (req, res) => {
   try {
+    const schema = Joi.object().keys({
+      itemName: Joi.string().required().max(500),
+      maxLimit: Joi.number().required().max(1000000),
+      itemOrder: Joi.number().required().max(1000000),
+    });
+    await schema.validateAsync(req.params);
     const item = await Item.findOne({
       where: { itemName: req.body.itemName },
     });
@@ -37,6 +44,10 @@ const addSupply = async (req, res) => {
  * */
 const updateSupply = async (req, res) => {
   try {
+    const schema = Joi.array().items({
+      'Item.itemName': Joi.string().max(500),
+    });
+    await schema.validateAsync(req.body);
     const responseItem = [];
     const wipe = await ShoppingFormItem.destroy({
       where: { _locationId: req.location._id },
