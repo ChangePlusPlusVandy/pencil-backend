@@ -97,6 +97,37 @@ const denyTransaction = async (req, res) => {
 };
 
 /**
+ * Approves a denied transaction and updates the amount of items taken in the transaction.
+ *
+ * @param {Object} req - Request Object with transuuid params and body with items
+ * @param {*} res - Response Object
+ */
+const approveDeniedTransaction = async (req, res) => {
+  try {
+    const transaction = await Transaction.findOne({
+      where: { uuid: req.params.transuuid },
+    });
+    req.body.items.forEach(async (item) => {
+      const findItem = await Item.findOne({
+        where: { uuid: item.Item.uuid },
+      });
+      await TransactionItem.update(
+        { amountTaken: item.amountTaken },
+        { where: { _transactionId: transaction._id, _itemId: findItem._id } }
+      );
+    });
+    await Transaction.update(
+      { status: 1 },
+      { where: { uuid: req.params.transuuid } }
+    );
+    return res.status(200).json({ status: 'Record approved' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+/**
  * Returns all pending transactions from temp transaction table.
  *
  * @param {Object} req - Request Object
@@ -222,6 +253,7 @@ module.exports = {
   submitTransaction,
   approveTransaction,
   denyTransaction,
+  approveDeniedTransaction,
   getAllPendingTransactions,
   getAllApprovedTransactions,
   getAllDeniedTransactions,
