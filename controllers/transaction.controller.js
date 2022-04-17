@@ -142,7 +142,6 @@ const getAllPendingTransactions = async (req, res) => {
       limit: perPage,
       offset: previousItems,
       order: [['createdAt', 'DESC']],
-
       include: [
         {
           model: TransactionItem,
@@ -180,6 +179,7 @@ const getAllApprovedTransactions = async (req, res) => {
       where: { _locationId: req.location._id, status: 1 },
       limit: perPage,
       offset: previousItems,
+      order: [['createdAt', 'DESC']],
       include: [
         {
           model: TransactionItem,
@@ -214,6 +214,7 @@ const getAllDeniedTransactions = async (req, res) => {
       where: { _locationId: req.location._id, status: 2 },
       limit: perPage,
       offset: previousItems,
+      order: [['createdAt', 'DESC']],
       include: [
         {
           model: TransactionItem,
