@@ -65,25 +65,30 @@ const updateMasterInventory = async (req, res, next) => {
   // FIXME: Consult about master inventory
   const responseItem = [];
   try {
+    let allItems = await Item.findAll({});
+    console.log(allItems);
     req.body.forEach(async (item) => {
-      if (item.archive) {
-        const updatedItem = await Item.update(
-          { archived: true },
-          { where: { uuid: item.uuid } }
-        );
-        responseItem.push(updatedItem);
-      } else {
-        const [findSchedule, created] = await Item.findOrCreate({
-          where: {
-            uuid: item.uuid,
-          },
-          defaults: {
-            itemName: item.itemName,
-            itemPrice: item.itemPrice,
-          },
+      const [findSchedule, created] = await Item.findOrCreate({
+        where: {
+          uuid: item.uuid,
+        },
+        defaults: {
+          itemName: item.itemName,
+          itemPrice: item.itemPrice,
+        },
+      });
+      if (!created) {
+        allItems = allItems.filter((i) => i.Item.dataValues.uuid !== item.uuid);
+        await findSchedule.update({
+          archived: false,
         });
-        responseItem.push(findSchedule);
       }
+      responseItem.push(findSchedule);
+    });
+    allItems.forEach(async (item) => {
+      await item.update({
+        archived: true,
+      });
     });
     return res.status(200).json(responseItem);
   } catch (err) {

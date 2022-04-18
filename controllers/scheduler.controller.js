@@ -9,18 +9,6 @@ const {
   School,
 } = require('../models');
 
-/**
- * Get total schedule.
- *
- * @description   1. Retrieve location from request profile
- *                2. Perform a GET request on calendly's GET-CURRENT-USER endpoint
- *                3. Perform a GET request on calendly's LIST-EVENTS endpoint
- *                4. Find the event that contains the location param
- *                5. Perform a GET request on calendly's LIST-EVENT-INVITEES endpoint
- *                6. Filter each invitees to keep only the relevant parameters
- *                7. Perform a GET request on calendly's GET-EVENT to add start/end
- *                    time information to invitee object
- */
 const getSchedule = async (req, res) => {
   try {
     const scheduleWhereStatement = {
@@ -114,7 +102,7 @@ const addAppointment = async (req, res) => {
 };
 
 const cancelAppointment = async (req, res) => {
-  console.log('test');
+  console.log(req.body);
   return req;
 };
 
