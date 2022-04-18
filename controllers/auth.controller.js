@@ -24,7 +24,10 @@ const requireKey = async (req, res, next) => {
     }
   );
 
-  if (!t || !signature) throw new Error('Invalid Signature');
+  if (!t || !signature) {
+    console.log('no t or signature');
+    throw new Error('Invalid Signature');
+  }
 
   const data = `${t}.${JSON.stringify(req.body)}`;
 
@@ -34,6 +37,7 @@ const requireKey = async (req, res, next) => {
     .digest('hex');
 
   if (expectedSignature !== signature) {
+    console.log('Invalid Signature');
     throw new Error('Invalid Signature');
   }
 
@@ -44,6 +48,7 @@ const requireKey = async (req, res, next) => {
   const timestampMilliseconds = Number(t) * 1000;
 
   if (timestampMilliseconds < Date.now() - tolerance) {
+    console.log('Timestamp is too old');
     throw new Error(
       "Invalid Signature. The signature's timestamp is outside of the tolerance zone."
     );
