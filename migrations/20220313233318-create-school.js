@@ -19,6 +19,10 @@ module.exports = {
           notEmpty: { message: 'Name cannot be empty' },
         },
       },
+      verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,

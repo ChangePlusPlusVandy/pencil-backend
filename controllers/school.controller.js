@@ -7,7 +7,7 @@ const getSchools = async (req, res) => {
         verified: true,
       },
     });
-    return res.status(200).json({ schools });
+    return res.status(200).json(schools);
   } catch (err) {
     console.log(err);
     return res.status(400).json({
@@ -33,7 +33,7 @@ const addSchool = async (req, res) => {
         verified: true,
       });
     }
-    return res.status(200).json({ school });
+    return res.status(200).json(school);
   } catch (err) {
     console.log(err);
     return res.status(400).json({
@@ -42,7 +42,32 @@ const addSchool = async (req, res) => {
   }
 };
 
+const updateSchool = async (req, res) => {
+  try {
+    const school = await School.findOne({
+      where: {
+        uuid: req.body.uuid,
+      },
+    });
+    if (!school) {
+      return res.status(400).json({
+        error: 'School not found',
+      });
+    }
+    await school.update({
+      name: req.body.name,
+    });
+    return res.status(200).json(school);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
+      error: 'Could not update school',
+    });
+  }
+};
+
 module.exports = {
   getSchools,
   addSchool,
+  updateSchool,
 };
