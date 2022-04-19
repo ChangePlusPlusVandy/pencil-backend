@@ -75,6 +75,9 @@ const addAppointment = async (req, res) => {
       where: {
         name: req.body.payload.questions_and_answers[0].answer, // FIX BASED ON ACTUAL FORM
       },
+      defaults: {
+        verified: false,
+      },
     });
 
     const [findTeacher] = await Teacher.findOrCreate({
