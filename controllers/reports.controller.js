@@ -124,7 +124,17 @@ const report3 = async (req, res) => {
       raw: true,
     });
 
-    return res.status(200).json(scheduleArr);
+    // 3. Construct the object to return
+    const returnedData = {
+      noShowNum: scheduleArr.length,
+      noShowList: scheduleArr.map((schedule) => ({
+        name: schedule['Teacher.name'],
+        email: schedule['Teacher.email'],
+        school: schedule['Teacher.School.name'],
+      })),
+    };
+
+    return res.status(200).json(returnedData);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'internal server error' });
