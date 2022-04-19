@@ -24,8 +24,13 @@ const addSchool = async (req, res) => {
       },
     });
     if (!created) {
-      return res.status(400).json({
-        error: 'School already exists',
+      if (school.verified) {
+        return res.status(400).json({
+          error: 'School already exists',
+        });
+      }
+      await school.update({
+        verified: true,
       });
     }
     return res.status(200).json({ school });
