@@ -1,3 +1,7 @@
+/* eslint-disable arrow-body-style */
+/* eslint-disable import/order */
+/* eslint-disable spaced-comment */
+/* eslint-disable consistent-return */
 /* eslint-disable no-param-reassign */
 const { Op, SequelizeScopeError, fn, col } = require('sequelize');
 const {
@@ -149,7 +153,7 @@ const printReport1 = async (req, res) => {
     await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
 
     // Frontend accesses file using filename
-    return res.status(200).json({ filename: filename });
+    return res.status(200).json({ filename });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'internal server error' });
@@ -274,7 +278,7 @@ const report4 = async (req, res, next) => {
   }
 };
 
-const printReport4 = (req, res) => {
+const printReport4 = async (req, res) => {
   try {
     // Get data from Report 4
     const productArr = req.reportBody;
@@ -328,7 +332,7 @@ const printReport4 = (req, res) => {
     await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
 
     // Frontend accesses file using filename
-    return res.status(200).json({ filename: filename });
+    return res.status(200).json({ filename });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'Internal server error' });
@@ -336,7 +340,7 @@ const printReport4 = (req, res) => {
 };
 
 // Report 5.
-const report5 = async (req, res) => {
+const report5 = async (req, res, next) => {
   try {
     const transactions = req.transactions;
 
@@ -372,24 +376,20 @@ const report5 = async (req, res) => {
 
 // FOR ARTHUR TODO: FINISH THIS ONE
 const printReport5 = (req, res) => {
-  teacherData = req.reportBody;
-
-  const reportWorkbook = new ExcelJS.Workbook();
-  const sheet = reportWorkbook.addWorksheet('report5');
-
-  console.log(teacherData[0]);
-  // teacherData.forEach((teacher) => {
-
-  // });
+  // teacherData = req.reportBody;
+  // const reportWorkbook = new ExcelJS.Workbook();
+  // const sheet = reportWorkbook.addWorksheet('report5');
+  // console.log(teacherData[0]);
+  // // teacherData.forEach((teacher) => {
+  // // });
+  return res.status(500).json({ error: 'PrintReport5 not complete yet' });
 };
 
 const returnReport = (req, res) => {
   const reportBody = req.reportBody;
   const reportStats = req.reportStats ? req.reportStats : {};
 
-  return res
-    .status(200)
-    .json({ reportBody: reportBody, reportStats: reportStats });
+  return res.status(200).json({ reportBody, reportStats });
 };
 
 const deleteReportSheet = (req, res, next) => {
