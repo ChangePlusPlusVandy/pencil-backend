@@ -9,12 +9,21 @@ const schedulerRoutes = require('./routes/scheduler.routes.js');
 const masterInventoryRoutes = require('./routes/masterInventory.routes.js');
 const locationRoutes = require('./routes/location.routes.js');
 const reportRoutes = require('./routes/reports.routes.js');
+const schoolRoutes = require('./routes/school.routes.js');
 const locationController = require('./controllers/location.controller.js');
 
 const { sequelize } = require('./models');
 
 dotenv.config();
 const app = express();
+// admin.initializeApp({
+//   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+//   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+//   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+//   storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+//   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+//   appId: process.env.REACT_APP_FIREBASE_APP_ID,
+// });
 
 app.use(cors());
 
@@ -31,6 +40,7 @@ app.use('/api/location', locationRoutes);
 app.use('/api/schedule', schedulerRoutes);
 app.use('/api/:location/reports', reportRoutes);
 app.use('/api/masterInventory', masterInventoryRoutes);
+app.use('/api/school', schoolRoutes);
 
 const port = process.env.PORT || 8080;
 
