@@ -64,9 +64,6 @@ const updateMasterInventory = async (req, res, next) => {
     req.body.forEach(async (item) => {
       const [findItem, created] = await Item.findOrCreate({
         where: {
-          uuid: item.uuid,
-        },
-        defaults: {
           itemName: item.itemName,
           itemPrice: item.itemPrice,
         },
@@ -77,11 +74,7 @@ const updateMasterInventory = async (req, res, next) => {
         });
       }
     });
-    const itemList = await Item.findAll({
-      order: [['itemName', 'ASC']],
-      attributes: ['uuid', 'itemName', 'itemPrice', 'archived'],
-    });
-    return res.status(200).json(itemList);
+    return res.status(200).json(req.body);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'Internal server error' });
