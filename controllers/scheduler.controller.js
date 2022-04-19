@@ -56,8 +56,9 @@ const addAppointment = async (req, res) => {
         Authorization: `Bearer ${process.env.SCHEDULER_BEARER_AUTH_TOKEN}`,
       },
     };
-    const eventInfo = await fetch(req.body.payload.event, options);
-    const event = await eventInfo.json();
+    const event = await fetch(req.body.payload.event, options).then(
+      (response) => response.json()
+    );
     const location = await Location.findOne({
       name: event.resource.name,
     });
@@ -94,7 +95,7 @@ const addAppointment = async (req, res) => {
       _teacherId: findTeacher._id,
     });
 
-    return res.status(200).json({ message: 'Appointment added' });
+    return res.status(204);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ err: 'Error adding appointment' });
@@ -102,8 +103,13 @@ const addAppointment = async (req, res) => {
 };
 
 const cancelAppointment = async (req, res) => {
-  console.log(req.body);
-  return req;
+  console.log(req.body.payload);
+  try {
+    return res.status(204);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ err: 'Error canceling appointment' });
+  }
 };
 
 module.exports = {

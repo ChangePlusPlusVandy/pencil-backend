@@ -1,6 +1,7 @@
 const cors = require('cors');
 const dotenv = require('dotenv');
 const express = require('express');
+const admin = require('firebase-admin');
 const formRoutes = require('./routes/supplyForm.routes.js');
 const teacherRoutes = require('./routes/teacher.routes.js');
 const transactionRoutes = require('./routes/transaction.routes.js');
@@ -35,7 +36,7 @@ const port = process.env.PORT || 8080;
 
 app.listen(port, async () => {
   try {
-    console.log('listening on port 8080');
+    console.log(`listening on port ${port}`);
 
     await sequelize.authenticate();
     console.log('db connected');
