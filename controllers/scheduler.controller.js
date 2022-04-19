@@ -9,30 +9,21 @@ const {
   School,
 } = require('../models');
 
-/**
- * Get total schedule.
- *
- * @description   1. Retrieve location from request profile
- *                2. Perform a GET request on calendly's GET-CURRENT-USER endpoint
- *                3. Perform a GET request on calendly's LIST-EVENTS endpoint
- *                4. Find the event that contains the location param
- *                5. Perform a GET request on calendly's LIST-EVENT-INVITEES endpoint
- *                6. Filter each invitees to keep only the relevant parameters
- *                7. Perform a GET request on calendly's GET-EVENT to add start/end
- *                    time information to invitee object
- */
 const getSchedule = async (req, res) => {
   try {
-    const perPage = parseInt(req.query.perPage, 10) || 2;
-
-    const page = parseInt(req.query.page, 10) || 1;
+    const scheduleWhereStatement = {
+      _locationId: req.location._id,
+    };
+    if (req.query.startDate && req.query.endDate) {
+      scheduleWhereStatement.createdAt = {
+        [Op.between]: [req.query.startDate, req.query.endDate],
+      };
+    }
     const schedule = await Schedule.findAll({
       include: [
         {
           separate: true,
           model: ScheduleItem,
-          limit: perPage,
-          offset: perPage * (page - 1),
           include: [
             {
               model: Teacher,
@@ -45,11 +36,7 @@ const getSchedule = async (req, res) => {
           ],
         },
       ],
-      where: {
-        _locationId: req.location._id,
-      },
-      limit: perPage,
-      offset: perPage * (page - 1),
+      where: scheduleWhereStatement,
     });
     console.log(schedule);
 
@@ -115,7 +102,7 @@ const addAppointment = async (req, res) => {
 };
 
 const cancelAppointment = async (req, res) => {
-  console.log('test');
+  console.log(req.body);
   return req;
 };
 

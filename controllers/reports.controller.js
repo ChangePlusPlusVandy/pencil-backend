@@ -1,11 +1,12 @@
 /* eslint-disable no-param-reassign */
-const { Op, SequelizeScopeError } = require('sequelize');
+const { Op, SequelizeScopeError, fn, col } = require('sequelize');
 const {
   Teacher,
   Transaction,
   School,
   TransactionItem,
   Item,
+  ScheduleItem,
 } = require('../models');
 const ExcelJS = require('exceljs');
 const fs = require('fs');
@@ -15,6 +16,11 @@ const { json } = require('express/lib/response');
 // eslint-disable-next-line consistent-return
 const getTransaction = async (req, res, next) => {
   try {
+    // TODO: Integrate this logic
+    // const noShowList = scheduleArr.filter((schedule) => !schedule.showed);
+    // const noShowNum = noShowList.length;
+    // const totalNumAppointments = scheduleArr.length;
+
     const transactionWhereStatement = {
       // FIXME: UNCOMMENT
       //status: 1,
@@ -144,6 +150,52 @@ const printReport1 = async (req, res) => {
 
     // Frontend accesses file using filename
     return res.status(200).json({ filename: filename });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'internal server error' });
+  }
+};
+
+const report3 = async (req, res) => {
+  try {
+    // 1. Find all schedule items bewteen date range whose showed is false
+    const scheduleWhereStatement = { showed: 0 };
+    if (req.query.startDate && req.query.endDate) {
+      scheduleWhereStatement.createdAt = {
+        [Op.between]: [req.query.startDate, req.query.endDate],
+      };
+    }
+
+    // 2. Get teacher name and email and school name
+    const scheduleArr = await ScheduleItem.findAll({
+      attributes: [],
+      where: scheduleWhereStatement,
+      include: [
+        {
+          model: Teacher,
+          attributes: ['name', 'email'],
+          include: [
+            {
+              model: School,
+              attributes: ['name'],
+            },
+          ],
+        },
+      ],
+      raw: true,
+    });
+
+    // 3. Construct the object to return
+    const returnedData = {
+      noShowNum: scheduleArr.length,
+      noShowList: scheduleArr.map((schedule) => ({
+        name: schedule['Teacher.name'],
+        email: schedule['Teacher.email'],
+        school: schedule['Teacher.School.name'],
+      })),
+    };
+
+    return res.status(200).json(returnedData);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'internal server error' });
@@ -356,6 +408,7 @@ module.exports = {
   getTransaction,
   report1,
   printReport1,
+  report3,
   report4,
   printReport4,
   report5,

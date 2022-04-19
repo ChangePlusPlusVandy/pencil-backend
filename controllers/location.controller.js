@@ -63,6 +63,28 @@ const addLocation = async (req, res) => {
   }
 };
 
+/**
+ * Updates a location in the database.
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object.
+ * */
+const updateLocation = async (req, res) => {
+  try {
+    console.log('this is req body', req.body);
+    await Location.update(
+      {
+        name: req.body.name,
+        address: req.body.address,
+      },
+      { where: { uuid: req.body.uuid } }
+    );
+    return res.status(200).json('Location successfully updated');
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Could not update location' });
+  }
+};
+
 const getAllLocations = async (req, res) => {
   try {
     const locations = await Location.findAll();
@@ -79,5 +101,6 @@ const getAllLocations = async (req, res) => {
 module.exports = {
   locationByID,
   getAllLocations,
+  updateLocation,
   addLocation,
 };

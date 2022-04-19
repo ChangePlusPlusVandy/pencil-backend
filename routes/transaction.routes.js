@@ -24,6 +24,11 @@ router.route('/approved').get(transactionController.getAllApprovedTransactions);
 // get all rejected transactions from rejected table
 router.route('/denied').get(transactionController.getAllDeniedTransactions);
 
+// approve denied transaction and update amount of items taken
+router
+  .route('/approveDenied/:transuuid')
+  .post(transactionController.approveDeniedTransaction);
+
 // get one transaction from temp table
 router.route('/:transuuid').get(transactionController.getTransaction);
 

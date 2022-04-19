@@ -26,7 +26,7 @@ const submitTransaction = async (req, res) => {
     const scheduleItem = await ScheduleItem.findOne({
       where: { _teacherId: teacher._id, showed: false },
     });
-    scheduleItem.update({ showed: true });
+    if (scheduleItem) scheduleItem.update({ showed: true });
     const transaction = await Transaction.create({
       _teacherId: teacher._id,
       _schoolId: school._id,
@@ -97,6 +97,37 @@ const denyTransaction = async (req, res) => {
 };
 
 /**
+ * Approves a denied transaction and updates the amount of items taken in the transaction.
+ *
+ * @param {Object} req - Request Object with transuuid params and body with items
+ * @param {*} res - Response Object
+ */
+const approveDeniedTransaction = async (req, res) => {
+  try {
+    const transaction = await Transaction.findOne({
+      where: { uuid: req.params.transuuid },
+    });
+    req.body.items.forEach(async (item) => {
+      const findItem = await Item.findOne({
+        where: { uuid: item.Item.uuid },
+      });
+      await TransactionItem.update(
+        { amountTaken: item.amountTaken },
+        { where: { _transactionId: transaction._id, _itemId: findItem._id } }
+      );
+    });
+    await Transaction.update(
+      { status: 1 },
+      { where: { uuid: req.params.transuuid } }
+    );
+    return res.status(200).json({ status: 'Record approved' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+/**
  * Returns all pending transactions from temp transaction table.
  *
  * @param {Object} req - Request Object
@@ -111,7 +142,6 @@ const getAllPendingTransactions = async (req, res) => {
       limit: perPage,
       offset: previousItems,
       order: [['createdAt', 'DESC']],
-
       include: [
         {
           model: TransactionItem,
@@ -149,6 +179,7 @@ const getAllApprovedTransactions = async (req, res) => {
       where: { _locationId: req.location._id, status: 1 },
       limit: perPage,
       offset: previousItems,
+      order: [['createdAt', 'DESC']],
       include: [
         {
           model: TransactionItem,
@@ -183,6 +214,7 @@ const getAllDeniedTransactions = async (req, res) => {
       where: { _locationId: req.location._id, status: 2 },
       limit: perPage,
       offset: previousItems,
+      order: [['createdAt', 'DESC']],
       include: [
         {
           model: TransactionItem,
@@ -222,6 +254,7 @@ module.exports = {
   submitTransaction,
   approveTransaction,
   denyTransaction,
+  approveDeniedTransaction,
   getAllPendingTransactions,
   getAllApprovedTransactions,
   getAllDeniedTransactions,
