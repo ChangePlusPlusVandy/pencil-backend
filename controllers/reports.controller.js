@@ -100,9 +100,9 @@ const report1 = async (req, res, next) => {
   }
 };
 
-const printReport1 = async (req, res, next) => {
+const printReport1 = async (req, res) => {
   try {
-    // Get data from report4
+    // Get data from Report 1
     const pricedTransactions = req.reportBody;
 
     // Initialize excel spreadsheet
@@ -224,7 +224,7 @@ const report4 = async (req, res, next) => {
 
 const printReport4 = (req, res) => {
   try {
-    // Get data from report4
+    // Get data from Report 4
     const productArr = req.reportBody;
 
     // Initialize excel spreadsheet
