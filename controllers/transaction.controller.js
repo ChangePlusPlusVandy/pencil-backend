@@ -43,8 +43,7 @@ const submitTransaction = async (req, res) => {
       });
     });
     if (!transaction) {
-      console.log('Transaction Info not added.');
-      return res.status(500).json({ error: 'Internal Server Error' });
+      return res.status(400).json({ error: 'Unable to find transaction' });
     }
     return res.status(200).json(transaction);
   } catch (err) {
@@ -184,7 +183,6 @@ const getAllPendingTransactions = async (req, res) => {
         },
       ],
     });
-    console.log(transactions);
     const formattedTransactions = formatTransactions(transactions);
     return res.status(200).json(formattedTransactions);
   } catch (err) {
