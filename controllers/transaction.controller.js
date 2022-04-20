@@ -1,5 +1,4 @@
 /* eslint-disable no-underscore-dangle */
-const { v4 } = require('uuid');
 const {
   Transaction,
   Teacher,
