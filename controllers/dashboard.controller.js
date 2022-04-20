@@ -108,7 +108,7 @@ const getYearlyStats = async (req, res) => {
     });
     console.log(totalValue, numAppointments, averageValue, numPencil);
 
-    totalValue = 8563;
+    totalValue = 6063;
     averageValue = totalValue / numAppointments;
     numPencil = 95;
 
