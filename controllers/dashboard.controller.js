@@ -70,9 +70,9 @@ const getYearlyStats = async (req, res) => {
       where: {
         _locationId: location._id,
         status: 1,
-        createdAt: {
-          [Op.between]: [new Date(new Date().getFullYear(), 0, 1), new Date()],
-        },
+        // createdAt: {
+        //   [Op.between]: [new Date(new Date().getFullYear(), 0, 1), new Date()],
+        // },
       },
       include: [
         {
