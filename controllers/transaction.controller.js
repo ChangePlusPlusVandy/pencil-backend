@@ -154,6 +154,11 @@ const getAllPendingTransactions = async (req, res) => {
         },
         {
           model: Teacher,
+          include: [
+            {
+              model: School,
+            },
+          ],
         },
       ],
     });
@@ -191,6 +196,11 @@ const getAllApprovedTransactions = async (req, res) => {
         },
         {
           model: Teacher,
+          include: [
+            {
+              model: School,
+            },
+          ],
         },
       ],
     });
@@ -226,6 +236,11 @@ const getAllDeniedTransactions = async (req, res) => {
         },
         {
           model: Teacher,
+          include: [
+            {
+              model: School,
+            },
+          ],
         },
       ],
     });
