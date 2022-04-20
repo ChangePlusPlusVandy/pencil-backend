@@ -76,6 +76,7 @@ const approveTransaction = async (req, res) => {
           where: { _id: finalTransaction._teacherId },
         }
       );
+      finalTransaction._schoolId = newSchool._id;
     }
 
     return res.status(200).json({ status: 'Record approved' });
@@ -126,10 +127,7 @@ const approveDeniedTransaction = async (req, res) => {
         { where: { _transactionId: transaction._id, _itemId: findItem._id } }
       );
     });
-    await Transaction.update(
-      { status: 1 },
-      { where: { uuid: req.params.transuuid } }
-    );
+    await transaction.update({ status: 1 });
     if (req.query.newSchool) {
       const newSchool = await School.findOne({
         where: { name: req.body.schoolName },
@@ -140,6 +138,7 @@ const approveDeniedTransaction = async (req, res) => {
           where: { _id: transaction._teacherId },
         }
       );
+      transaction._schoolId = newSchool._id;
     }
     return res.status(200).json({ status: 'Record approved' });
   } catch (err) {

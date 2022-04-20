@@ -105,6 +105,7 @@ const getYearlyStats = async (req, res) => {
           numPencil += transactionItem.amountTaken;
       });
     });
+    console.log(totalValue, numAppointments, averageValue, numPencil);
 
     return res.status(200).json({
       totalValue,
