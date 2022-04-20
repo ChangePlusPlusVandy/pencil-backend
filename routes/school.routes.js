@@ -10,4 +10,6 @@ router.route('/create').post(schoolController.addSchool);
 
 router.route('/update').put(schoolController.updateSchool);
 
+router.route('/verified').get(schoolController.getVerifiedSchools);
+
 module.exports = router;

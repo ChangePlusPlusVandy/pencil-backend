@@ -66,8 +66,26 @@ const updateSchool = async (req, res) => {
   }
 };
 
+const getVerifiedSchools = async (req, res) => {
+  try {
+    const schools = await School.findAll({
+      where: {
+        verified: true,
+      },
+      attributes: ['uuid', 'name'],
+    });
+    return res.status(200).json(schools);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
+      error: 'Could not retrieve schools',
+    });
+  }
+};
+
 module.exports = {
   getSchools,
   addSchool,
   updateSchool,
+  getVerifiedSchools,
 };
