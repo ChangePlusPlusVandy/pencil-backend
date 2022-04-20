@@ -63,10 +63,22 @@ const submitTransaction = async (req, res) => {
  */
 const approveTransaction = async (req, res) => {
   try {
-    const finalTransaction = await Transaction.update(
-      { status: 1 },
-      { where: { uuid: req.params.transuuid } }
-    );
+    const finalTransaction = await Transaction.findOne({
+      where: { uuid: req.params.transuuid },
+    });
+    finalTransaction.status = 1;
+    await finalTransaction.save();
+    if (req.query.newSchool) {
+      const newSchool = await School.findOne({
+        where: { name: req.body.schoolName },
+      });
+      await Teacher.update(
+        { _schoolId: newSchool._id },
+        {
+          where: { _id: finalTransaction._teacherId },
+        }
+      );
+    }
 
     return res.status(200).json({ status: 'Record approved' });
   } catch (err) {
@@ -120,6 +132,17 @@ const approveDeniedTransaction = async (req, res) => {
       { status: 1 },
       { where: { uuid: req.params.transuuid } }
     );
+    if (req.query.newSchool) {
+      const newSchool = await School.findOne({
+        where: { name: req.body.schoolName },
+      });
+      await Teacher.update(
+        { _schoolId: newSchool._id },
+        {
+          where: { _id: transaction._teacherId },
+        }
+      );
+    }
     return res.status(200).json({ status: 'Record approved' });
   } catch (err) {
     console.log(err);
