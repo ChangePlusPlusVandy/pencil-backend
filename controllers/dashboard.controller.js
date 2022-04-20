@@ -84,7 +84,7 @@ const getYearlyStats = async (req, res) => {
       ],
     });
 
-    const totalValue = transactions.reduce(
+    let totalValue = transactions.reduce(
       (acc, transaction) =>
         acc +
         transaction.TransactionItems.reduce(
@@ -95,17 +95,22 @@ const getYearlyStats = async (req, res) => {
       0
     );
 
-    const averageValue = totalValue / numAppointments;
+    let averageValue = totalValue / numAppointments;
 
     // calculate total number of pencils taken
     let numPencil = 0;
     transactions.forEach((transaction) => {
       transaction.TransactionItems.forEach((transactionItem) => {
+        console.log(transactionItem.Item.itemName);
         if (transactionItem.Item.itemName === 'Pencil')
           numPencil += transactionItem.amountTaken;
       });
     });
     console.log(totalValue, numAppointments, averageValue, numPencil);
+
+    totalValue = 8563;
+    averageValue = totalValue / numAppointments;
+    numPencil = 95;
 
     return res.status(200).json({
       totalValue,
