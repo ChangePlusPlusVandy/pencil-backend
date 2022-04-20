@@ -10,6 +10,7 @@ const masterInventoryRoutes = require('./routes/masterInventory.routes.js');
 const locationRoutes = require('./routes/location.routes.js');
 const reportRoutes = require('./routes/reports.routes.js');
 const schoolRoutes = require('./routes/school.routes.js');
+const dashboardRoutes = require('./routes/dashboard.routes.js');
 const locationController = require('./controllers/location.controller.js');
 
 const { sequelize } = require('./models');
@@ -41,6 +42,7 @@ app.use('/api/schedule', schedulerRoutes);
 app.use('/api/:location/reports', reportRoutes);
 app.use('/api/masterInventory', masterInventoryRoutes);
 app.use('/api/school', schoolRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 const port = process.env.PORT || 8080;
 
