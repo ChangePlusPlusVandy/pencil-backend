@@ -42,7 +42,7 @@ app.use('/api/schedule', schedulerRoutes);
 app.use('/api/:location/reports', reportRoutes);
 app.use('/api/masterInventory', masterInventoryRoutes);
 app.use('/api/school', schoolRoutes);
-app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/:location/dashboard', dashboardRoutes);
 
 const port = process.env.PORT || 8080;
 
