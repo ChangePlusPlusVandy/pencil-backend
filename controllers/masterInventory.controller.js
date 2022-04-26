@@ -48,10 +48,7 @@ const getAllItems = async (req, res, next) => {
   try {
     const itemList = await Item.findAll({
       order: [['itemName', 'ASC']],
-      attributes: ['uuid', 'itemName', 'itemPrice'],
-      where: {
-        archived: false,
-      },
+      attributes: ['uuid', 'itemName', 'itemPrice', 'archived'],
     });
 
     return res.status(200).json(itemList);
@@ -63,34 +60,21 @@ const getAllItems = async (req, res, next) => {
 
 const updateMasterInventory = async (req, res, next) => {
   // FIXME: Consult about master inventory
-  const responseItem = [];
   try {
-    let allItems = await Item.findAll({});
-    console.log(allItems);
     req.body.forEach(async (item) => {
-      const [findSchedule, created] = await Item.findOrCreate({
+      const [findItem, created] = await Item.findOrCreate({
         where: {
-          uuid: item.uuid,
-        },
-        defaults: {
           itemName: item.itemName,
           itemPrice: item.itemPrice,
         },
       });
       if (!created) {
-        allItems = allItems.filter((i) => i.Item.dataValues.uuid !== item.uuid);
-        await findSchedule.update({
-          archived: false,
+        await findItem.update({
+          archived: item.archived,
         });
       }
-      responseItem.push(findSchedule);
     });
-    allItems.forEach(async (item) => {
-      await item.update({
-        archived: true,
-      });
-    });
-    return res.status(200).json(responseItem);
+    return res.status(200).json(req.body);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'Internal server error' });

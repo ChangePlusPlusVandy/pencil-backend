@@ -46,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: { message: 'Name cannot be empty' },
         },
       },
+      verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
     },
     {
       sequelize,

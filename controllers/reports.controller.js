@@ -26,9 +26,8 @@ const getTransaction = async (req, res, next) => {
     // const totalNumAppointments = scheduleArr.length;
 
     const transactionWhereStatement = {
-      // FIXME: UNCOMMENT
-      //status: 1,
-      //_locationId: req.location._id,
+      // status: 1,
+      // _locationId: req.location._id,
     };
     console.log(transactionWhereStatement);
     if (req.query.startDate && req.query.endDate) {

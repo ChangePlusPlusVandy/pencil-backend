@@ -1,5 +1,4 @@
 /* eslint-disable no-underscore-dangle */
-const { v4 } = require('uuid');
 const {
   Transaction,
   Teacher,
@@ -44,8 +43,7 @@ const submitTransaction = async (req, res) => {
       });
     });
     if (!transaction) {
-      console.log('Transaction Info not added.');
-      return res.status(500).json({ error: 'Internal Server Error' });
+      return res.status(400).json({ error: 'Unable to find transaction' });
     }
     return res.status(200).json(transaction);
   } catch (err) {
@@ -63,10 +61,23 @@ const submitTransaction = async (req, res) => {
  */
 const approveTransaction = async (req, res) => {
   try {
-    const finalTransaction = await Transaction.update(
-      { status: 1 },
-      { where: { uuid: req.params.transuuid } }
-    );
+    const finalTransaction = await Transaction.findOne({
+      where: { uuid: req.params.transuuid },
+    });
+    finalTransaction.status = 1;
+    await finalTransaction.save();
+    if (req.query.newSchool) {
+      const newSchool = await School.findOne({
+        where: { name: req.body.schoolName },
+      });
+      await Teacher.update(
+        { _schoolId: newSchool._id },
+        {
+          where: { _id: finalTransaction._teacherId },
+        }
+      );
+      finalTransaction._schoolId = newSchool._id;
+    }
 
     return res.status(200).json({ status: 'Record approved' });
   } catch (err) {
@@ -116,10 +127,19 @@ const approveDeniedTransaction = async (req, res) => {
         { where: { _transactionId: transaction._id, _itemId: findItem._id } }
       );
     });
-    await Transaction.update(
-      { status: 1 },
-      { where: { uuid: req.params.transuuid } }
-    );
+    await transaction.update({ status: 1 });
+    if (req.query.newSchool) {
+      const newSchool = await School.findOne({
+        where: { name: req.body.schoolName },
+      });
+      await Teacher.update(
+        { _schoolId: newSchool._id },
+        {
+          where: { _id: transaction._teacherId },
+        }
+      );
+      transaction._schoolId = newSchool._id;
+    }
     return res.status(200).json({ status: 'Record approved' });
   } catch (err) {
     console.log(err);
@@ -154,10 +174,14 @@ const getAllPendingTransactions = async (req, res) => {
         },
         {
           model: Teacher,
+          include: [
+            {
+              model: School,
+            },
+          ],
         },
       ],
     });
-    console.log(transactions);
     const formattedTransactions = formatTransactions(transactions);
     return res.status(200).json(formattedTransactions);
   } catch (err) {
@@ -191,6 +215,11 @@ const getAllApprovedTransactions = async (req, res) => {
         },
         {
           model: Teacher,
+          include: [
+            {
+              model: School,
+            },
+          ],
         },
       ],
     });
@@ -226,6 +255,11 @@ const getAllDeniedTransactions = async (req, res) => {
         },
         {
           model: Teacher,
+          include: [
+            {
+              model: School,
+            },
+          ],
         },
       ],
     });

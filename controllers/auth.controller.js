@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const firebaseAdmin = require('firebase-admin');
 
 const requireKey = async (req, res, next) => {
   const webhookSigningKey = process.env.WEBHOOK_SIGNING_KEY;
@@ -25,7 +26,6 @@ const requireKey = async (req, res, next) => {
   );
 
   if (!t || !signature) {
-    console.log('no t or signature');
     throw new Error('Invalid Signature');
   }
 
@@ -37,7 +37,6 @@ const requireKey = async (req, res, next) => {
     .digest('hex');
 
   if (expectedSignature !== signature) {
-    console.log('Invalid Signature');
     throw new Error('Invalid Signature');
   }
 
@@ -48,7 +47,6 @@ const requireKey = async (req, res, next) => {
   const timestampMilliseconds = Number(t) * 1000;
 
   if (timestampMilliseconds < Date.now() - tolerance) {
-    console.log('Timestamp is too old');
     throw new Error(
       "Invalid Signature. The signature's timestamp is outside of the tolerance zone."
     );
@@ -57,9 +55,27 @@ const requireKey = async (req, res, next) => {
   next();
 };
 
+const verifyAppCheckToken = async (appCheckToken) => {
+  if (!appCheckToken) {
+    return null;
+  }
+  try {
+    return firebaseAdmin.appCheck().verifyToken(appCheckToken);
+  } catch (err) {
+    return null;
+  }
+};
+
 const requireLogin = async (req, res, next) => {
-  console.log('logging in');
-  next();
+  console.log(req.header('X-Firebase-AppCheck'));
+  const appCheckClaims = await verifyAppCheckToken(
+    req.header('X-Firebase-AppCheck')
+  );
+  if (!appCheckClaims) {
+    res.status(401);
+    return res.status(403).json({ error: 'Unauthorized' });
+  }
+  return next();
 };
 
 module.exports = {
