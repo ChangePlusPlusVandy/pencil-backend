@@ -19,7 +19,13 @@ router
     reportController.printReport1
   );
 
-router.route('/report3').get(reportController.report3);
+router
+  .route('/report3')
+  .get(reportController.report3, reportController.returnReport);
+
+router
+  .route('/printReport3')
+  .get(reportController.report3, reportController.printReport3);
 
 router
   .route('/report4')

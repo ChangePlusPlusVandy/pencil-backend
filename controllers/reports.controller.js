@@ -16,6 +16,10 @@ const ExcelJS = require('exceljs');
 const fs = require('fs');
 const { NULL } = require('mysql/lib/protocol/constants/types');
 const { json } = require('express/lib/response');
+const { clearLine } = require('readline');
+
+// TODO (POUR RAFFA): Make function that gets all reports and compiles them in one
+// (In order to do this, change each report function so that they nest report info inside of report body (e.g., req.reportBody.report1))
 
 // eslint-disable-next-line consistent-return
 const getTransaction = async (req, res, next) => {
@@ -26,8 +30,8 @@ const getTransaction = async (req, res, next) => {
     // const totalNumAppointments = scheduleArr.length;
 
     const transactionWhereStatement = {
-      // status: 1,
-      // _locationId: req.location._id,
+      status: 1,
+      _locationId: req.location._id,
     };
     console.log(transactionWhereStatement);
     if (req.query.startDate && req.query.endDate) {
@@ -159,6 +163,7 @@ const printReport1 = async (req, res) => {
   }
 };
 
+// TODO: Document all reports
 const report3 = async (req, res) => {
   try {
     // 1. Find all schedule items bewteen date range whose showed is false
@@ -198,7 +203,57 @@ const report3 = async (req, res) => {
       })),
     };
 
-    return res.status(200).json(returnedData);
+    req.reportBody = returnedData;
+    next();
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'internal server error' });
+  }
+};
+
+const printReport3 = async (req, res) => {
+  try {
+    // Get data from Report 3
+    const returnedData = req.reportBody;
+
+    // Initialize excel spreadsheet
+    const reportWorkbook = new ExcelJS.Workbook();
+    const sheet = reportWorkbook.addWorksheet('No-Show report');
+
+    sheet.columns = [
+      { header: 'Teacher Name', key: 'teacherName', width: 20 },
+      { header: 'Teacher Email', key: 'teacherEmail', width: 20 },
+      { header: 'School Name', key: 'schoolName', width: 20 },
+      { header: 'No-Show Rate', key: 'noShowRate', width: 10 },
+    ];
+
+    returnedData.forEach((noShow) => {
+      sheet.addRow({
+        teacherName: noShow.noShowList.name,
+        teacherEmail: noShow.noShowList.email,
+        schoolName: noShow.noShowList.school,
+        noShowNum: null,
+      });
+    });
+
+    const noShowRateCell = sheet.getCell('D2');
+    noShowRateCell.value = returnedData.noShowNum;
+
+    // Append date to end of filename
+    let dateString;
+    if (req.query.startDate && req.query.endDate) {
+      dateString = `from-${req.query.startDate}-${req.query.endDate}`;
+    } else {
+      dateString = `all-dates-${Math.floor(Date.now() / 1000)}`;
+    }
+
+    const location = './downloads/';
+    const filename = `weekly-report-${dateString}`;
+
+    await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
+
+    // Frontend accesses file using filename
+    return res.status(200).json({ filename });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'internal server error' });
@@ -408,6 +463,7 @@ module.exports = {
   report1,
   printReport1,
   report3,
+  printReport3,
   report4,
   printReport4,
   report5,
