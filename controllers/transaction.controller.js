@@ -64,8 +64,7 @@ const approveTransaction = async (req, res) => {
     const finalTransaction = await Transaction.findOne({
       where: { uuid: req.params.transuuid },
     });
-    finalTransaction.status = 1;
-    await finalTransaction.save();
+    await finalTransaction.update({ status: 1 });
     if (req.query.newSchool) {
       const newSchool = await School.findOne({
         where: { name: req.body.schoolName },
