@@ -11,6 +11,7 @@ const reportRoutes = require('./routes/reports.routes.js');
 const schoolRoutes = require('./routes/school.routes.js');
 const dashboardRoutes = require('./routes/dashboard.routes.js');
 const locationController = require('./controllers/location.controller.js');
+const authController = require('./controllers/auth.controller.js');
 
 const { sequelize } = require('./models');
 
@@ -23,8 +24,9 @@ app.use(express.json());
 
 app.use('/static', express.static('public'));
 
-app.param('location', locationController.locationByID);
+app.use('/api', authController.requireLogin);
 
+app.param('location', locationController.locationByID);
 app.use('/api/:location/form', formRoutes);
 app.use('/api/teacher', teacherRoutes);
 app.use('/api/:location/transaction', transactionRoutes);

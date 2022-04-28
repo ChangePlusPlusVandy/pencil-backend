@@ -55,11 +55,11 @@ const requireKey = async (req, res, next) => {
 const requireLogin = async (req, res, next) => {
   const headerToken = req.headers.authorization;
   if (!headerToken) {
-    return res.send({ message: 'No token provided' }).status(401);
+    return res.send({ message: 'No token provided' }).status(403);
   }
 
   if (headerToken && headerToken.split(' ')[0] !== 'Bearer') {
-    return res.send({ message: 'Invalid token' }).status(401);
+    return res.status(403).send({ message: 'Invalid token' });
   }
 
   const token = headerToken.split(' ')[1];
@@ -67,7 +67,7 @@ const requireLogin = async (req, res, next) => {
     .auth()
     .verifyIdToken(token)
     .then(() => next())
-    .catch((err) => res.send({ message: err }).status(403));
+    .catch((err) => res.status(403).send({ message: err }));
 };
 
 module.exports = {

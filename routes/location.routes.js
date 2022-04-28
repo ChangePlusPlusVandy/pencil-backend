@@ -6,8 +6,6 @@ const router = express.Router();
 
 router.route('/create').post(locationController.addLocation); // add location to database
 router.route('/update/:uuid').put(locationController.updateLocation); // update location in database
-router
-  .route('/locations')
-  .get(authController.requireLogin, locationController.getAllLocations); // get all locations from database
+router.route('/locations').get(locationController.getAllLocations); // get all locations from database
 
 module.exports = router;
