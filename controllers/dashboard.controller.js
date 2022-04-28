@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 const { Op } = require('sequelize');
 const {
   Schedule,
@@ -7,25 +8,18 @@ const {
   Item,
 } = require('../models');
 
-const getDailyStats = async (req, res) => {
+const getDashboardSchedules = async (req, res, next) => {
   try {
     const location = req.location;
+    const startDate = req.body.startDate || new Date('2021-01-01 00:00:00');
+    const endDate = req.body.endDate || new Date();
 
     const schedules = await Schedule.findAll({
       where: {
         _locationId: location._id,
-        createdAt: {
-          [Op.between]: [
-            new Date(new Date().setHours(0, 0, 0, 0)),
-            new Date(new Date().setHours(23, 59, 59, 999)),
-          ],
-        },
+        createdAt: { [Op.between]: [startDate, endDate] },
       },
-      include: [
-        {
-          model: ScheduleItem,
-        },
-      ],
+      include: [{ model: ScheduleItem }],
     });
 
     const numAppointments = schedules.reduce(
@@ -33,53 +27,31 @@ const getDailyStats = async (req, res) => {
       0
     );
 
-    return res.status(200).json({
-      numAppointments,
-    });
+    req.schedules = schedules;
+    req.numAppointments = numAppointments;
+    next();
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: err });
   }
 };
 
-const getYearlyStats = async (req, res) => {
+const getDashboardTransactions = async (req, res, next) => {
   try {
     const location = req.location;
+    const startDate = req.query.startDate || new Date('2021-01-01 00:00:00');
+    const endDate = req.query.endDate || new Date();
 
-    const schedules = await Schedule.findAll({
-      where: {
-        _locationId: location._id,
-        createdAt: {
-          [Op.between]: [new Date(new Date().getFullYear(), 0, 1), new Date()],
-        },
-      },
-      include: [
-        {
-          model: ScheduleItem,
-        },
-      ],
-    });
-
-    const numAppointments = schedules.reduce(
-      (acc, schedule) => acc + schedule.ScheduleItems.length,
-      0
-    );
-
-    // calculate total value of product taken from all transactions
     const transactions = await Transaction.findAll({
       where: {
         _locationId: location._id,
         status: 1,
-        // createdAt: {
-        //   [Op.between]: [new Date(new Date().getFullYear(), 0, 1), new Date()],
-        // },
+        createdAt: { [Op.between]: [startDate, endDate] },
       },
       include: [
         {
           model: TransactionItem,
-          include: {
-            model: Item,
-          },
+          include: { model: Item },
         },
       ],
     });
@@ -95,13 +67,37 @@ const getYearlyStats = async (req, res) => {
       0
     );
 
+    req.transactions = transactions;
+    req.totalValue = totalValue;
+    next();
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err });
+  }
+};
+
+const getDailyMonthlyStats = async (req, res) => {
+  try {
+    return res.status(200).json({
+      numAppointments: req.numAppointments,
+      totalValue: req.totalValue,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err });
+  }
+};
+
+const getYearlyStats = async (req, res) => {
+  try {
+    const { transactions, numAppointments, totalValue } = req;
+
     const averageValue = totalValue / numAppointments;
 
     // calculate total number of pencils taken
     let numPencil = 0;
     transactions.forEach((transaction) => {
       transaction.TransactionItems.forEach((transactionItem) => {
-        console.log(transactionItem.Item.itemName);
         if (transactionItem.Item.itemName === 'Pencil')
           numPencil += transactionItem.amountTaken;
       });
@@ -120,6 +116,8 @@ const getYearlyStats = async (req, res) => {
 };
 
 module.exports = {
-  getDailyStats,
+  getDashboardSchedules,
+  getDashboardTransactions,
+  getDailyMonthlyStats,
   getYearlyStats,
 };

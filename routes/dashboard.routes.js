@@ -6,9 +6,26 @@ const router = express.Router();
 
 router
   .route('/dailystats')
-  .get(authController.requireLogin, dashboardController.getDailyStats);
+  .get(
+    dashboardController.getDashboardSchedules,
+    dashboardController.getDashboardTransactions,
+    dashboardController.getDailyMonthlyStats
+  );
+
+router
+  .route('/monthlystats')
+  .get(
+    dashboardController.getDashboardSchedules,
+    dashboardController.getDashboardTransactions,
+    dashboardController.getDailyMonthlyStats
+  );
+
 router
   .route('/yearlystats')
-  .get(authController.requireLogin, dashboardController.getYearlyStats);
+  .get(
+    dashboardController.getDashboardSchedules,
+    dashboardController.getDashboardTransactions,
+    dashboardController.getYearlyStats
+  );
 
 module.exports = router;
