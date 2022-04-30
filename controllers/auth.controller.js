@@ -1,6 +1,7 @@
 const crypto = require('crypto');
-const firebaseAdmin = require('firebase-admin');
+const firebase = require('../firebase.js');
 
+// eslint-disable-next-line consistent-return
 const requireKey = async (req, res, next) => {
   const webhookSigningKey = process.env.WEBHOOK_SIGNING_KEY;
 
@@ -26,7 +27,7 @@ const requireKey = async (req, res, next) => {
   );
 
   if (!t || !signature) {
-    throw new Error('Invalid Signature');
+    return res.status(403).json({ error: 'Invalid Signature' });
   }
 
   const data = `${t}.${JSON.stringify(req.body)}`;
@@ -37,45 +38,36 @@ const requireKey = async (req, res, next) => {
     .digest('hex');
 
   if (expectedSignature !== signature) {
-    throw new Error('Invalid Signature');
+    return res.status(403).json({ error: 'Invalid Signature' });
   }
 
-  // Prevent replay attacks.
-
-  const threeMinutes = 180000;
-  const tolerance = threeMinutes;
+  const tolerance = 180000;
   const timestampMilliseconds = Number(t) * 1000;
 
   if (timestampMilliseconds < Date.now() - tolerance) {
-    throw new Error(
-      "Invalid Signature. The signature's timestamp is outside of the tolerance zone."
-    );
+    return res.status(403).json({ error: 'Invalid Signature Time Stamp' });
   }
 
   next();
 };
 
-const verifyAppCheckToken = async (appCheckToken) => {
-  if (!appCheckToken) {
-    return null;
-  }
-  try {
-    return firebaseAdmin.appCheck().verifyToken(appCheckToken);
-  } catch (err) {
-    return null;
-  }
-};
-
+// eslint-disable-next-line consistent-return
 const requireLogin = async (req, res, next) => {
-  console.log(req.header('X-Firebase-AppCheck'));
-  const appCheckClaims = await verifyAppCheckToken(
-    req.header('X-Firebase-AppCheck')
-  );
-  if (!appCheckClaims) {
-    res.status(401);
-    return res.status(403).json({ error: 'Unauthorized' });
+  const headerToken = req.headers.authorization;
+  if (!headerToken) {
+    return res.send({ message: 'No token provided' }).status(403);
   }
-  return next();
+
+  if (headerToken && headerToken.split(' ')[0] !== 'Bearer') {
+    return res.status(403).send({ message: 'Invalid token' });
+  }
+
+  const token = headerToken.split(' ')[1];
+  firebase
+    .auth()
+    .verifyIdToken(token)
+    .then(() => next())
+    .catch((err) => res.status(403).send({ message: err }));
 };
 
 module.exports = {
