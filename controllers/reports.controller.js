@@ -151,7 +151,7 @@ const printReport1 = async (req, res) => {
     }
 
     const location = './downloads/';
-    const filename = `weekly-report-${dateString}`;
+    const filename = `weekly-report-${dateString}.xlsx`;
 
     await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
 
@@ -164,7 +164,7 @@ const printReport1 = async (req, res) => {
 };
 
 // TODO: Document all reports
-const report3 = async (req, res) => {
+const report3 = async (req, res, next) => {
   try {
     // 1. Find all schedule items bewteen date range whose showed is false
     const scheduleWhereStatement = { showed: 0 };
@@ -227,11 +227,11 @@ const printReport3 = async (req, res) => {
       { header: 'No-Show Rate', key: 'noShowRate', width: 10 },
     ];
 
-    returnedData.forEach((noShow) => {
+    returnedData.noShowList.forEach((noShow) => {
       sheet.addRow({
-        teacherName: noShow.noShowList.name,
-        teacherEmail: noShow.noShowList.email,
-        schoolName: noShow.noShowList.school,
+        teacherName: noShow.name,
+        teacherEmail: noShow.email,
+        schoolName: noShow.school,
         noShowNum: null,
       });
     });
@@ -248,7 +248,7 @@ const printReport3 = async (req, res) => {
     }
 
     const location = './downloads/';
-    const filename = `weekly-report-${dateString}`;
+    const filename = `no-show-report-${dateString}.xlsx`;
 
     await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
 
@@ -360,16 +360,16 @@ const printReport4 = async (req, res) => {
     ];
 
     // Iteratively add each row the the spreadsheet
-    productArr.forEach((transaction) => {
+    productArr.forEach((product) => {
       sheet.addRow({
-        itemName: productArr.itemName,
-        itemPrice: productArr.itemPrice,
-        numTaken: productArr.numTaken,
-        numShoppers: productArr.numShoppers,
-        numTakenAtMax: productArr.numTakenAtMax,
-        percentageOfShoppers: productArr.percentageOfShoppers,
-        percentageTakenAtMax: productArr.percentageTakenAtMax,
-        totalValTaken: productArr.totalValueTaken,
+        itemName: product.itemName,
+        itemPrice: product.itemPrice,
+        numTaken: product.numTaken,
+        numShoppers: product.numShoppers,
+        numTakenAtMax: product.numTakenAtMax,
+        percentageOfShoppers: product.percentageOfShoppers,
+        percentageTakenAtMax: product.percentageTakenAtMax,
+        totalValTaken: product.totalValueTaken,
       });
     });
 
@@ -382,7 +382,7 @@ const printReport4 = async (req, res) => {
     }
 
     const location = './downloads/';
-    const filename = `product-report-${dateString}`;
+    const filename = `product-report-${dateString}.xlsx`;
     await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
 
     // Frontend accesses file using filename
@@ -409,7 +409,7 @@ const report5 = async (req, res, next) => {
         // eslint-disable-next-line prefer-template
         teacherInfo.name + '-' + teacherInfo.email;
 
-      if (!(teacherID in teacherData)) {
+      if (!teacherData[teacherID]) {
         teacherData[teacherID] = {
           timesShopped: 1,
           schoolName: transaction.School.dataValues.name,
@@ -420,7 +420,12 @@ const report5 = async (req, res, next) => {
       }
     });
 
-    req.reportBody = teacherData;
+    const teacherArr = [];
+    for (const key in teacherData) {
+      teacherArr.push(teacherData[key]);
+    }
+
+    req.reportBody = teacherArr;
     next();
   } catch (err) {
     console.log(err);
@@ -428,15 +433,43 @@ const report5 = async (req, res, next) => {
   }
 };
 
-// FOR ARTHUR TODO: FINISH THIS ONE
-const printReport5 = (req, res) => {
-  // teacherData = req.reportBody;
-  // const reportWorkbook = new ExcelJS.Workbook();
-  // const sheet = reportWorkbook.addWorksheet('report5');
-  // console.log(teacherData[0]);
-  // // teacherData.forEach((teacher) => {
-  // // });
-  return res.status(500).json({ error: 'PrintReport5 not complete yet' });
+const printReport5 = async (req, res) => {
+  try {
+    teacherData = req.reportBody;
+
+    const reportWorkbook = new ExcelJS.Workbook();
+    const sheet = reportWorkbook.addWorksheet('report5');
+    sheet.columns = [
+      { header: 'Teacher Name', key: 'teacherName', width: 20 },
+      { header: 'School Name', key: 'schoolName', width: 20 },
+      { header: 'Times Shopped', key: 'timesShopped', width: 10 },
+    ];
+
+    teacherData.forEach((teacher) => {
+      sheet.addRow({
+        teacherName: teacher.name,
+        schoolName: teacher.schoolName,
+        timesShopped: teacher.timesShopped,
+      });
+    });
+
+    // Append date to end of filename
+    let dateString;
+    if (req.query.startDate && req.query.endDate) {
+      dateString = `from-${req.query.startDate}-${req.query.endDate}`;
+    } else {
+      dateString = `all-dates-${Math.floor(Date.now() / 1000)}`;
+    }
+
+    const location = './downloads/';
+    const filename = `teacher-visit-report-${dateString}.xlsx`;
+    await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
+
+    return res.status(200).json({ filename });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
 const returnReport = (req, res) => {
@@ -449,7 +482,7 @@ const returnReport = (req, res) => {
 const deleteReportSheet = (req, res, next) => {
   try {
     const filename = req.body.filename;
-    fs.unlinkSync(filename);
+    fs.unlinkSync(`./downloads/${filename}`);
 
     return res.status(200).json({ result: 'File deleted' });
   } catch (err) {
