@@ -25,7 +25,7 @@ const getTeacher = async (req, res) => {
 // eslint-disable-next-line consistent-return
 const teacherByID = async (req, res, next, pencilId) => {
   try {
-    const teacher = await Teacher.findOne({
+    await Teacher.findOne({
       where: { pencilId },
       include: [{ model: School }],
     })

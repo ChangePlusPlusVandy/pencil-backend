@@ -4,6 +4,8 @@ const authController = require('../controllers/auth.controller.js');
 
 const router = express.Router();
 
+router.use(authController.requireLogin);
+
 router.route('/').get(schoolController.getSchools);
 
 router.route('/create').post(schoolController.addSchool);

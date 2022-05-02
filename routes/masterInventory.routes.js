@@ -1,7 +1,10 @@
 const express = require('express');
 const inventoryController = require('../controllers/masterInventory.controller.js');
+const authController = require('../controllers/auth.controller.js');
 
 const router = express.Router();
+
+router.use(authController.requireLogin);
 
 // Add item to the master inventory
 router.route('/addItem').post(inventoryController.addItem);

@@ -24,8 +24,6 @@ app.use(express.json());
 
 app.use('/static', express.static('public'));
 
-app.use('/api', authController.requireLogin);
-
 app.param('location', locationController.locationByID);
 app.use('/api/:location/form', formRoutes);
 app.use('/api/teacher', teacherRoutes);
