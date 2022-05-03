@@ -57,42 +57,47 @@ const getTransaction = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: err });
+    return res.status(500).send(err.message);
   }
 };
 
 // Report 1 : Date shopped,Teacher name,Teacher email,Teacher school,Value of products.
 // Elements of list are individual shopping trips by teachers.
 const report1 = async (req, res) => {
-  const transactions = req.transactions;
-  const teacherIds = [];
-  // calculate the total value of all items in the transaction
-  const pricedTransactions = transactions.map((transaction) => {
-    // push teacher ID to array for summary
-    const teacherID = transaction.dataValues.Teacher.dataValues.pencilId;
-    teacherIds.push(teacherID);
+  try {
+    const transactions = req.transactions;
+    const teacherIds = [];
+    // calculate the total value of all items in the transaction
+    const pricedTransactions = transactions.map((transaction) => {
+      // push teacher ID to array for summary
+      const teacherID = transaction.dataValues.Teacher.dataValues.pencilId;
+      teacherIds.push(teacherID);
 
-    // generate total value of transaction
-    let cumulativeItemPrice = 0;
+      // generate total value of transaction
+      let cumulativeItemPrice = 0;
 
-    transaction.TransactionItems.forEach((transactionItem) => {
-      cumulativeItemPrice +=
-        transactionItem.dataValues.Item.dataValues.itemPrice *
-        transactionItem.dataValues.amountTaken;
+      transaction.TransactionItems.forEach((transactionItem) => {
+        cumulativeItemPrice +=
+          transactionItem.dataValues.Item.dataValues.itemPrice *
+          transactionItem.dataValues.amountTaken;
+      });
+
+      transaction.dataValues.totalItemPrice = cumulativeItemPrice;
+
+      return transaction;
     });
 
-    transaction.dataValues.totalItemPrice = cumulativeItemPrice;
+    // TODO: implement no show rate
+    const summary = {
+      totalSignups: teacherIds.length,
+      numUniqueTeachers: [...new Set(teacherIds)].length,
+    };
 
-    return transaction;
-  });
-
-  // TODO: implement no show rate
-  const summary = {
-    totalSignups: teacherIds.length,
-    numUniqueTeachers: [...new Set(teacherIds)].length,
-  };
-
-  return res.status(200).json({ transactions: pricedTransactions, summary });
+    return res.status(200).json({ transactions: pricedTransactions, summary });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send(err.message);
+  }
 };
 
 const report3 = async (req, res) => {
@@ -137,7 +142,8 @@ const report3 = async (req, res) => {
     return res.status(200).json(returnedData);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'internal server error' });
+
+    return res.status(500).send(err.message);
   }
 };
 
@@ -208,7 +214,7 @@ const report4 = async (req, res) => {
     return res.status(200).json(productArr);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'internal server error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -242,7 +248,8 @@ const report5 = async (req, res) => {
     return res.status(200).json(teacherData);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal server error' });
+
+    return res.status(500).send(err.message);
   }
 };
 
