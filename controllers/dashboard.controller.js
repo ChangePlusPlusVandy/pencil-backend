@@ -32,7 +32,7 @@ const getDashboardSchedules = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: err });
+    return res.status(500).send('Cannot retrieve scheduled appointments');
   }
 };
 
@@ -72,7 +72,7 @@ const getDashboardTransactions = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: err });
+    return res.status(500).send('Cannot retrieve dashboard transactions');
   }
 };
 
@@ -84,7 +84,7 @@ const getDailyMonthlyStats = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: err });
+    return res.status(500).send('Cannot retrieve daily/monthly stats');
   }
 };
 
@@ -111,7 +111,7 @@ const getYearlyStats = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: err });
+    return res.status(500).send('Cannot retrieve yearly stats');
   }
 };
 
