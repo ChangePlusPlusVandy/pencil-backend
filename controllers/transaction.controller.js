@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const {
   Transaction,
   Teacher,
@@ -7,7 +6,6 @@ const {
   School,
   ScheduleItem,
 } = require('../models');
-const { formatTransactions } = require('../helpers/transaction.helper.js');
 
 /**
  * Submits a User Transaction and adds data to the Temp Transaction Table.
@@ -19,36 +17,46 @@ const submitTransaction = async (req, res) => {
     const teacher = await Teacher.findOne({
       where: { pencilId: req.body.teacherId },
     });
+    if (!teacher) {
+      return res.status(400).send('Invalid Teacher ID');
+    }
     const school = await School.findOne({
       where: { uuid: req.body.schoolId },
     });
+    if (!school) {
+      return res.status(400).send('Invalid School ID');
+    }
     const scheduleItem = await ScheduleItem.findOne({
       where: { _teacherId: teacher._id, showed: false },
     });
-    if (scheduleItem) scheduleItem.update({ showed: true });
+    if (scheduleItem) await scheduleItem.update({ showed: true });
     const transaction = await Transaction.create({
       _teacherId: teacher._id,
       _schoolId: school._id,
       _locationId: req.location._id,
     });
-    req.body.items.forEach(async (item) => {
-      const findItem = await Item.findOne({
-        where: { uuid: item['Item.uuid'] },
-      }); // TODO: Null check
-      await TransactionItem.create({
-        _transactionId: transaction._id,
-        _itemId: findItem._id,
-        maxLimit: item.maxLimit,
-        amountTaken: item.itemCount,
-      });
-    });
-    if (!transaction) {
-      return res.status(400).json({ error: 'Unable to find transaction' });
-    }
+    await Promise.all(
+      req.body.items.map(async (item) => {
+        const findItem = await Item.findOne({
+          where: { uuid: item['Item.uuid'] },
+        });
+        const newLocal = 'Item not found';
+        if (!findItem) throw newLocal;
+
+        await TransactionItem.create({
+          _transactionId: transaction._id,
+          _itemId: findItem._id,
+          maxLimit: item.maxLimit,
+          amountTaken: item.itemCount,
+        });
+      })
+    );
     return res.status(200).json(transaction);
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ error: 'Submit Transaction - cant submit' });
+    return res
+      .status(500)
+      .send('Could not submit transaction. Please contact support.');
   }
 };
 
@@ -81,7 +89,7 @@ const approveTransaction = async (req, res) => {
     return res.status(200).json({ status: 'Record approved' });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -102,7 +110,7 @@ const denyTransaction = async (req, res) => {
     return res.status(200).json({ status: 'Record denied' });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -183,11 +191,10 @@ const getAllPendingTransactions = async (req, res) => {
         },
       ],
     });
-    const formattedTransactions = formatTransactions(transactions);
-    return res.status(200).json(formattedTransactions);
+    return res.status(200).json(transactions);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -227,7 +234,7 @@ const getAllApprovedTransactions = async (req, res) => {
     return res.status(200).json(transactions);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -267,7 +274,7 @@ const getAllDeniedTransactions = async (req, res) => {
     return res.status(200).json(transactions);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -281,7 +288,7 @@ const getTransaction = async (req, res) => {
     return res.json(req.transaction);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).send(err.message);
   }
 };
 

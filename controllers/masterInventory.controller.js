@@ -1,4 +1,3 @@
-const { v4 } = require('uuid');
 const { Item } = require('../models');
 
 /**
@@ -7,7 +6,7 @@ const { Item } = require('../models');
  * @param {Object} req - Request Object with structure { itemName: STRING, itemPrice: DOUBLE }
  * @param {Object} res - Response Object
  */
-const checkForItem = async (req, res, next) => {
+const checkForItem = async (req, res) => {
   try {
     const isInInventory = await Item.findOne({
       where: {

@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const { ShoppingFormItem, Item } = require('../models');
 
 /**

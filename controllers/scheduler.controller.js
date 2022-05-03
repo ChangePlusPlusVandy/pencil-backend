@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const fetch = require('cross-fetch');
 const { Op } = require('sequelize');
 const {
