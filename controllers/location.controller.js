@@ -1,7 +1,7 @@
 const { Location } = require('../models');
 
 /**
- * Populates profile field with location information.
+ * Populates location field with location information.
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * @param {function} next - Next middleware.
@@ -11,7 +11,7 @@ const { Location } = require('../models');
 // eslint-disable-next-line consistent-return
 const locationByID = async (req, res, next, name) => {
   try {
-    const location = await Location.findOne({ where: { name } })
+    await Location.findOne({ where: { name } })
       .then((data) => {
         if (!data) {
           return res.status(400).send('Invalid location ID');
@@ -78,7 +78,11 @@ const getAllLocations = async (req, res) => {
     return res.status(200).json(locations);
   } catch (err) {
     console.log(err);
-    return res.status(500).send('Could not get all locations');
+    return res
+      .status(500)
+      .send(
+        'Unable to retrieve locations. Please contact the development team.'
+      );
   }
 };
 
