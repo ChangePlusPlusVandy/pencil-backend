@@ -28,15 +28,13 @@ const teacherByID = async (req, res, next, pencilId) => {
     await Teacher.findOne({
       where: { pencilId },
       include: [{ model: School }],
-    })
-      .then((data) => {
-        if (!data) {
-          return res.status(400).send('Invalid teacher ID');
-        }
-        req.profile = data;
-        return next();
-      })
-      .catch(() => res.status(400).send('Teacher not found'));
+    }).then((data) => {
+      if (!data) {
+        return res.status(400).send('Invalid teacher ID');
+      }
+      req.profile = data;
+      return next();
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).send('Could not retrieve teacher');
