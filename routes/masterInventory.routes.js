@@ -7,12 +7,12 @@ const router = express.Router();
 router.use(authController.requireLogin);
 
 // Add item to the master inventory
-router.route('/addItem').post(inventoryController.addItem);
+// router.route('/addItem').post(inventoryController.addItem);
 
 // Check whether a given item is in the master inventory or not
-router
-  .route('/checkInInv/:itemName-:itemPrice')
-  .get(inventoryController.checkForItem);
+// router
+//   .route('/checkInInv/:itemName-:itemPrice')
+//   .get(inventoryController.checkForItem);
 
 router.route('/getAllItems').get(inventoryController.getAllItems);
 
