@@ -15,9 +15,9 @@ router
   .route('/cancelAppointment')
   .post(authController.requireKey, schedulerController.cancelAppointment);
 
-router
-  .route('/fakeAppointment')
-  .post(authController.requireLogin, schedulerController.fakeAppointment);
+// router
+//   .route('/fakeAppointment')
+//   .post(schedulerController.fakeAppointment);
 router.param('location', locationController.locationByID);
 
 module.exports = router;

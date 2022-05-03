@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const fetch = require('cross-fetch');
 const { Op } = require('sequelize');
 const {
@@ -38,12 +37,11 @@ const getSchedule = async (req, res) => {
       ],
       where: scheduleWhereStatement,
     });
-    console.log(schedule);
 
     return res.status(200).json(schedule);
   } catch (err) {
     console.log(err);
-    return { err: 'Error getting schedule' };
+    return res.status(500).send(err.message);
   }
 };
 
@@ -93,7 +91,7 @@ const addAppointment = async (req, res) => {
     findTeacher.update({
       pencilId: findTeacher._id,
     });
-    const newScheduleItem = await ScheduleItem.create({
+    await ScheduleItem.create({
       _scheduleId: findSchedule._id,
       _teacherId: findTeacher._id,
     });
@@ -101,20 +99,20 @@ const addAppointment = async (req, res) => {
     return res.status(204);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ err: 'Error adding appointment' });
+    return res.status(500).send('Could not process appointment');
   }
 };
 
 const cancelAppointment = async (req, res) => {
-  console.log(req.body.payload);
   try {
     return res.status(204);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ err: 'Error canceling appointment' });
+    return res.status(500).send('Could not cancel appointment');
   }
 };
 
+// TESTING ONLY
 const fakeAppointment = async (req, res) => {
   try {
     const location = await Location.findOne({
@@ -150,7 +148,7 @@ const fakeAppointment = async (req, res) => {
     findTeacher.update({
       pencilId: findTeacher._id,
     });
-    const newScheduleItem = await ScheduleItem.create({
+    await ScheduleItem.create({
       _scheduleId: findSchedule._id,
       _teacherId: findTeacher._id,
     });
@@ -160,7 +158,7 @@ const fakeAppointment = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ err: 'Error adding appointment' });
+    return res.status(500).send(err.message);
   }
 };
 

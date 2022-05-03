@@ -4,9 +4,7 @@ const authController = require('../controllers/auth.controller.js');
 
 const router = express.Router();
 
-router
-  .route('/addSupply')
-  .post(authController.requireLogin, formController.addSupply); // add Supply to shopping form
+// router.route('/addSupply').post(formController.addSupply); // add Supply to shopping form
 
 router.route('/getShopForm').get(formController.fetchSupplyForm); // fetch Supply Form
 
