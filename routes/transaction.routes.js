@@ -51,9 +51,9 @@ router
   );
 
 // get one transaction from temp table
-router
-  .route('/:transuuid')
-  .get(authController.requireLogin, transactionController.getTransaction);
+// router
+//   .route('/:transuuid')
+//   .get(transactionController.getTransaction);
 
 // param for _transactionId
 router.param('transuuid', transactionByID);

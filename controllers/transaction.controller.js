@@ -5,6 +5,7 @@ const {
   TransactionItem,
   Item,
   School,
+  ScheduleItem,
 } = require('../models');
 const { formatTransactions } = require('../helpers/transaction.helper.js');
 
@@ -13,44 +14,42 @@ const { formatTransactions } = require('../helpers/transaction.helper.js');
  * @param {Object} req - Request Object
  * @param {Object} res - Response Object
  */
-// eslint-disable-next-line arrow-body-style
 const submitTransaction = async (req, res) => {
-  return res.status(400).json({ error: 'Unable to find transaction' });
-  // try {
-  //   const teacher = await Teacher.findOne({
-  //     where: { pencilId: req.body.teacherId },
-  //   });
-  //   const school = await School.findOne({
-  //     where: { uuid: req.body.schoolId },
-  //   });
-  //   const scheduleItem = await ScheduleItem.findOne({
-  //     where: { _teacherId: teacher._id, showed: false },
-  //   });
-  //   if (scheduleItem) scheduleItem.update({ showed: true });
-  //   const transaction = await Transaction.create({
-  //     _teacherId: teacher._id,
-  //     _schoolId: school._id,
-  //     _locationId: req.location._id,
-  //   });
-  //   req.body.items.forEach(async (item) => {
-  //     const findItem = await Item.findOne({
-  //       where: { uuid: item['Item.uuid'] },
-  //     }); // TODO: Null check
-  //     const transactionItem = await TransactionItem.create({
-  //       _transactionId: transaction._id,
-  //       _itemId: findItem._id,
-  //       maxLimit: item.maxLimit,
-  //       amountTaken: item.itemCount,
-  //     });
-  //   });
-  //   if (!transaction) {
-  //     return res.status(400).json({ error: 'Unable to find transaction' });
-  //   }
-  //   return res.status(200).json(transaction);
-  // } catch (err) {
-  //   console.log(err);
-  //   return res.status(400).json({ error: 'Submit Transaction - cant submit' });
-  // }
+  try {
+    const teacher = await Teacher.findOne({
+      where: { pencilId: req.body.teacherId },
+    });
+    const school = await School.findOne({
+      where: { uuid: req.body.schoolId },
+    });
+    const scheduleItem = await ScheduleItem.findOne({
+      where: { _teacherId: teacher._id, showed: false },
+    });
+    if (scheduleItem) scheduleItem.update({ showed: true });
+    const transaction = await Transaction.create({
+      _teacherId: teacher._id,
+      _schoolId: school._id,
+      _locationId: req.location._id,
+    });
+    req.body.items.forEach(async (item) => {
+      const findItem = await Item.findOne({
+        where: { uuid: item['Item.uuid'] },
+      }); // TODO: Null check
+      await TransactionItem.create({
+        _transactionId: transaction._id,
+        _itemId: findItem._id,
+        maxLimit: item.maxLimit,
+        amountTaken: item.itemCount,
+      });
+    });
+    if (!transaction) {
+      return res.status(400).json({ error: 'Unable to find transaction' });
+    }
+    return res.status(200).json(transaction);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ error: 'Submit Transaction - cant submit' });
+  }
 };
 
 /**
@@ -118,15 +117,17 @@ const approveDeniedTransaction = async (req, res) => {
     const transaction = await Transaction.findOne({
       where: { uuid: req.params.transuuid },
     });
-    req.body.items.forEach(async (item) => {
-      const findItem = await Item.findOne({
-        where: { uuid: item.Item.uuid },
-      });
-      await TransactionItem.update(
-        { amountTaken: item.amountTaken },
-        { where: { _transactionId: transaction._id, _itemId: findItem._id } }
-      );
-    });
+    await Promise.all(
+      req.body.items.map(async (item) => {
+        const findItem = await Item.findOne({
+          where: { uuid: item.Item.uuid },
+        });
+        await TransactionItem.update(
+          { amountTaken: item.amountTaken },
+          { where: { _transactionId: transaction._id, _itemId: findItem._id } }
+        );
+      })
+    );
     await transaction.update({ status: 1 });
     if (req.query.newSchool) {
       const newSchool = await School.findOne({
@@ -143,7 +144,7 @@ const approveDeniedTransaction = async (req, res) => {
     return res.status(200).json({ status: 'Record approved' });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -271,13 +272,13 @@ const getAllDeniedTransactions = async (req, res) => {
 };
 
 /**
- * Gets a transaction profile.
+ * Gets a transaction (TESTING ONLY) .
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * */
 const getTransaction = async (req, res) => {
   try {
-    return res.json(req.profile);
+    return res.json(req.transaction);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'Internal Server Error' });
