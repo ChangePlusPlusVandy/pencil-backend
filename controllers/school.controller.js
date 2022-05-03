@@ -10,9 +10,7 @@ const getSchools = async (req, res) => {
     return res.status(200).json(schools);
   } catch (err) {
     console.log(err);
-    return res.status(400).json({
-      error: 'Could not retrieve schools',
-    });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -25,9 +23,7 @@ const addSchool = async (req, res) => {
     });
     if (!created) {
       if (school.verified) {
-        return res.status(400).json({
-          error: 'School already exists',
-        });
+        return res.status(400).send('School already exists');
       }
       await school.update({
         verified: true,
@@ -36,9 +32,7 @@ const addSchool = async (req, res) => {
     return res.status(200).json(school);
   } catch (err) {
     console.log(err);
-    return res.status(400).json({
-      error: 'Could not add school',
-    });
+    return res.status(500).json(err.message);
   }
 };
 
@@ -50,9 +44,7 @@ const updateSchool = async (req, res) => {
       },
     });
     if (!school) {
-      return res.status(400).json({
-        error: 'School not found',
-      });
+      return res.status(400).send('School does not exist');
     }
     await school.update({
       name: req.body.name,
@@ -60,9 +52,7 @@ const updateSchool = async (req, res) => {
     return res.status(200).json(school);
   } catch (err) {
     console.log(err);
-    return res.status(400).json({
-      error: 'Could not update school',
-    });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -77,9 +67,7 @@ const getVerifiedSchools = async (req, res) => {
     return res.status(200).json(schools);
   } catch (err) {
     console.log(err);
-    return res.status(400).json({
-      error: 'Could not retrieve schools',
-    });
+    return res.status(500).send(err.message);
   }
 };
 

@@ -58,13 +58,17 @@ const addLocation = async (req, res) => {
  * */
 const updateLocation = async (req, res) => {
   try {
-    await Location.update(
-      {
-        name: req.body.name,
-        address: req.body.address,
-      },
-      { where: { uuid: req.body.uuid } }
-    );
+    const location = await Location.findOne({
+      where: { uuid: req.body.uuid },
+    });
+    if (!location) {
+      return res.status(400).send('Location not found');
+    }
+
+    await location.update({
+      name: req.body.name,
+      address: req.body.address,
+    });
     return res.status(200).json('Location successfully updated');
   } catch (err) {
     console.log(err);
