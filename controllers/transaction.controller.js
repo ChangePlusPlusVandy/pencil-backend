@@ -5,7 +5,6 @@ const {
   TransactionItem,
   Item,
   School,
-  ScheduleItem,
 } = require('../models');
 const { formatTransactions } = require('../helpers/transaction.helper.js');
 
@@ -96,7 +95,7 @@ const approveTransaction = async (req, res) => {
  */
 const denyTransaction = async (req, res) => {
   try {
-    const finalTransaction = await Transaction.update(
+    await Transaction.update(
       { status: 2 },
       { where: { uuid: req.params.transuuid } }
     );

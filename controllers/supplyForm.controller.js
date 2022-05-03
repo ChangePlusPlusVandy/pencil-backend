@@ -38,7 +38,7 @@ const addSupply = async (req, res) => {
 const updateSupply = async (req, res) => {
   try {
     const responseItem = [];
-    const wipe = await ShoppingFormItem.destroy({
+    await ShoppingFormItem.destroy({
       where: { _locationId: req.location._id },
       truncate: true,
     });
