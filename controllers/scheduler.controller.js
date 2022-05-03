@@ -9,6 +9,17 @@ const {
   School,
 } = require('../models');
 
+/**
+ * Gets all appointments scheduled by teachers
+ *
+ * @param req - Express request object with the following params:
+ *                req.query.startDate - start date of the schedule
+ *                                      (i.e., the lower bound of scheduled appointments to fetch)
+ *                req.query.end_date - end date of the schedule (the upper bound)
+ * @param res - Express response object
+ * @returns response object with status code and schedule data if successful. Returned data contains
+ *          a list of scheduleItems, each of which contains all appointments for a given timeslot
+ */
 const getSchedule = async (req, res) => {
   try {
     const scheduleWhereStatement = {
@@ -47,6 +58,9 @@ const getSchedule = async (req, res) => {
   }
 };
 
+/**
+ * @param req --
+ */
 const addAppointment = async (req, res) => {
   try {
     const options = {
