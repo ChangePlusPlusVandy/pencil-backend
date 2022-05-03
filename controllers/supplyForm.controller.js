@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-const { ShoppingFormItem, Item, Location } = require('../models');
+const { ShoppingFormItem, Item } = require('../models');
 
 /**
  * Adds a supply to the form database.
