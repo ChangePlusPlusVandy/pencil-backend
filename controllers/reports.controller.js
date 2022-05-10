@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-param-reassign */
 const { Op, fn, col } = require('sequelize');
 const {
@@ -7,6 +8,7 @@ const {
   TransactionItem,
   Item,
   ScheduleItem,
+  Schedule,
 } = require('../models');
 
 // const ExcelJS = require('exceljs/dist/es5');
@@ -91,6 +93,10 @@ const report1 = async (req, res) => {
     const summary = {
       totalSignups: teacherIds.length,
       numUniqueTeachers: [...new Set(teacherIds)].length,
+      totalValue: pricedTransactions.reduce(
+        (acc, transaction) => acc + transaction.dataValues.totalItemPrice,
+        0
+      ),
     };
 
     return res.status(200).json({ transactions: pricedTransactions, summary });
@@ -102,47 +108,61 @@ const report1 = async (req, res) => {
 
 const report3 = async (req, res) => {
   try {
-    // 1. Find all schedule items bewteen date range whose showed is false
-    const scheduleWhereStatement = { showed: 0 };
+    const scheduleWhereStatement = {
+      _locationId: req.location._id,
+    };
     if (req.query.startDate && req.query.endDate) {
       scheduleWhereStatement.createdAt = {
         [Op.between]: [req.query.startDate, req.query.endDate],
       };
     }
-
-    // 2. Get teacher name and email and school name
-    const scheduleArr = await ScheduleItem.findAll({
-      attributes: [],
-      where: scheduleWhereStatement,
+    const schedule = await Schedule.findAll({
       include: [
         {
-          model: Teacher,
-          attributes: ['name', 'email'],
+          model: ScheduleItem,
           include: [
             {
-              model: School,
-              attributes: ['name'],
+              model: Teacher,
+              include: [
+                {
+                  model: School,
+                },
+              ],
             },
           ],
         },
       ],
+      where: scheduleWhereStatement,
       raw: true,
+      nest: true,
     });
-
-    // 3. Construct the object to return
-    const returnedData = {
-      noShowNum: scheduleArr.length,
-      noShowList: scheduleArr.map((schedule) => ({
-        name: schedule['Teacher.name'],
-        email: schedule['Teacher.email'],
-        school: schedule['Teacher.School.name'],
-      })),
-    };
-
-    return res.status(200).json(returnedData);
+    console.log(schedule);
+    let totalAppointments = 0;
+    let noShowNum = 0;
+    const noShowList = [];
+    schedule.forEach(({ start_date, ScheduleItems: scheduleItem }) => {
+      console.log(scheduleItem);
+      if (scheduleItem._id) {
+        if (!scheduleItem.showed) {
+          noShowNum += 1;
+          noShowList.push({
+            date: start_date,
+            name: scheduleItem.Teacher.name,
+            email: scheduleItem.Teacher.email,
+            school: scheduleItem.Teacher.School.name,
+          });
+        }
+        totalAppointments += 1;
+      }
+    });
+    console.log(noShowNum, totalAppointments);
+    const noShowRate = (noShowNum / totalAppointments) * 100;
+    return res.status(200).json({
+      noShowRate: noShowRate.toFixed(2),
+      noShowList,
+    });
   } catch (err) {
     console.log(err);
-
     return res.status(500).send(err.message);
   }
 };

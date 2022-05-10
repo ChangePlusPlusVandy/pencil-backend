@@ -4,7 +4,7 @@ const authController = require('../controllers/auth.controller.js');
 
 const router = express.Router();
 
-router.use(authController.requireLogin);
+// router.use(authController.requireLogin);
 
 router
   .route('/report1')
