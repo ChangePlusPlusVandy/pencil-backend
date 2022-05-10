@@ -54,10 +54,6 @@ module.exports = (sequelize, DataTypes) => {
           isEmail: { message: 'Email must be valid' },
         },
       },
-      phone: {
-        type: DataTypes.STRING,
-        defaultValue: '',
-      },
     },
     {
       sequelize,

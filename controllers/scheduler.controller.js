@@ -84,7 +84,6 @@ const addAppointment = async (req, res) => {
       },
       defaults: {
         name: req.body.payload.name,
-        phone: req.body.payload.questions_and_answers[1].answer, // FIX BASED ON ACTUAL FORM
         _schoolId: findSchool._id,
       },
     });
@@ -141,7 +140,6 @@ const fakeAppointment = async (req, res) => {
       },
       defaults: {
         name: req.body.teacher.name,
-        phone: req.body.teacher.phone, // FIX BASED ON ACTUAL FORM
         _schoolId: findSchool._id,
       },
     });
