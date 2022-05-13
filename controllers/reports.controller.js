@@ -11,24 +11,18 @@ const {
   TransactionItem,
   Item,
   ScheduleItem,
+  Schedule,
 } = require('../models');
 const ExcelJS = require('exceljs');
 const fs = require('fs');
 const { NULL } = require('mysql/lib/protocol/constants/types');
 const { json } = require('express/lib/response');
 const { clearLine } = require('readline');
-
-// TODO (POUR RAFFA): Make function that gets all reports and compiles them in one
-// (In order to do this, change each report function so that they nest report info inside of report body (e.g., req.reportBody.report1))
+const schedule = require('../models/schedule');
 
 // eslint-disable-next-line consistent-return
 const getTransaction = async (req, res, next) => {
   try {
-    // TODO: Integrate this logic
-    // const noShowList = scheduleArr.filter((schedule) => !schedule.showed);
-    // const noShowNum = noShowList.length;
-    // const totalNumAppointments = scheduleArr.length;
-
     const transactionWhereStatement = {
       status: 1,
       _locationId: req.location._id,
@@ -68,7 +62,7 @@ const getTransaction = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: err });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -109,11 +103,12 @@ const report1 = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).send(err.message);
   }
 };
 
 const printReport1 = async (req, res) => {
+  console.log(req);
   try {
     // Get data from Report 1
     const pricedTransactions = req.reportBody;
@@ -142,10 +137,18 @@ const printReport1 = async (req, res) => {
       });
     });
 
-    // Append date to end of filename
+    // Create string for date range
+    const startDate =
+      req.query.startDate &&
+      req.query.startDate.slice(0, req.query.startDate.indexOf('T'));
+    const endDate =
+      req.query.endDate &&
+      req.query.endDate.slice(0, req.query.endDate.indexOf('T'));
+
+    // Append date range string to end of filename
     let dateString;
-    if (req.query.startDate && req.query.endDate) {
-      dateString = `from-${req.query.startDate}-${req.query.endDate}`;
+    if (startDate && endDate) {
+      dateString = `FROM-${startDate}-TO-${endDate}`;
     } else {
       dateString = `all-dates-${Math.floor(Date.now() / 1000)}`;
     }
@@ -156,10 +159,10 @@ const printReport1 = async (req, res) => {
     await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
 
     // Frontend accesses file using filename
-    return res.status(200).json({ filename });
+    return res.status(200).json({ file: filename });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'internal server error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -179,6 +182,10 @@ const report3 = async (req, res, next) => {
       attributes: [],
       where: scheduleWhereStatement,
       include: [
+        {
+          model: Schedule,
+          attributes: ['start_date'],
+        },
         {
           model: Teacher,
           attributes: ['name', 'email'],
@@ -200,6 +207,7 @@ const report3 = async (req, res, next) => {
         name: schedule['Teacher.name'],
         email: schedule['Teacher.email'],
         school: schedule['Teacher.School.name'],
+        date: schedule['Schedule.start_date'],
       })),
     };
 
@@ -207,7 +215,7 @@ const report3 = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'internal server error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -239,10 +247,18 @@ const printReport3 = async (req, res) => {
     const noShowRateCell = sheet.getCell('D2');
     noShowRateCell.value = returnedData.noShowNum;
 
-    // Append date to end of filename
+    // Create string for date range
+    const startDate =
+      req.query.startDate &&
+      req.query.startDate.slice(0, req.query.startDate.indexOf('T'));
+    const endDate =
+      req.query.endDate &&
+      req.query.endDate.slice(0, req.query.endDate.indexOf('T'));
+
+    // Append date range string to end of filename
     let dateString;
-    if (req.query.startDate && req.query.endDate) {
-      dateString = `from-${req.query.startDate}-${req.query.endDate}`;
+    if (startDate && endDate) {
+      dateString = `FROM-${startDate}-TO-${endDate}`;
     } else {
       dateString = `all-dates-${Math.floor(Date.now() / 1000)}`;
     }
@@ -256,7 +272,8 @@ const printReport3 = async (req, res) => {
     return res.status(200).json({ filename });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'internal server error' });
+
+    return res.status(500).send(err.message);
   }
 };
 
@@ -328,7 +345,7 @@ const report4 = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'internal server error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -373,10 +390,18 @@ const printReport4 = async (req, res) => {
       });
     });
 
-    // Append date to end of filename
+    // Create string for date range
+    const startDate =
+      req.query.startDate &&
+      req.query.startDate.slice(0, req.query.startDate.indexOf('T'));
+    const endDate =
+      req.query.endDate &&
+      req.query.endDate.slice(0, req.query.endDate.indexOf('T'));
+
+    // Append date range string to end of filename
     let dateString;
-    if (req.query.startDate && req.query.endDate) {
-      dateString = `from-${req.query.startDate}-${req.query.endDate}`;
+    if (startDate && endDate) {
+      dateString = `FROM-${startDate}-TO-${endDate}`;
     } else {
       dateString = `all-dates-${Math.floor(Date.now() / 1000)}`;
     }
@@ -389,7 +414,7 @@ const printReport4 = async (req, res) => {
     return res.status(200).json({ filename });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -429,7 +454,7 @@ const report5 = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -453,10 +478,18 @@ const printReport5 = async (req, res) => {
       });
     });
 
-    // Append date to end of filename
+    // Create string for date range
+    const startDate =
+      req.query.startDate &&
+      req.query.startDate.slice(0, req.query.startDate.indexOf('T'));
+    const endDate =
+      req.query.endDate &&
+      req.query.endDate.slice(0, req.query.endDate.indexOf('T'));
+
+    // Append date range string to end of filename
     let dateString;
-    if (req.query.startDate && req.query.endDate) {
-      dateString = `from-${req.query.startDate}-${req.query.endDate}`;
+    if (startDate && endDate) {
+      dateString = `FROM-${startDate}-TO-${endDate}`;
     } else {
       dateString = `all-dates-${Math.floor(Date.now() / 1000)}`;
     }
@@ -468,7 +501,8 @@ const printReport5 = async (req, res) => {
     return res.status(200).json({ filename });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal server error' });
+
+    return res.status(500).send(err.message);
   }
 };
 
@@ -487,7 +521,7 @@ const deleteReportSheet = (req, res, next) => {
     return res.status(200).json({ result: 'File deleted' });
   } catch (err) {
     console.log(err);
-    return res.status(200).json({ error: 'internal server error' });
+    return res.status(200).send(err.message);
   }
 };
 

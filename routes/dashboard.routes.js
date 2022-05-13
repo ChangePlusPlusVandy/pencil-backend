@@ -4,6 +4,8 @@ const authController = require('../controllers/auth.controller.js');
 
 const router = express.Router();
 
+router.use(authController.requireLogin);
+
 router
   .route('/dailystats')
   .get(

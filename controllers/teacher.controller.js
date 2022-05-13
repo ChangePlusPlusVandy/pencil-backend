@@ -1,7 +1,7 @@
 const { Teacher, School } = require('../models');
 
 /**
- * Gets a teacher's profile.
+ * Retrieves a teacher's profile.
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * */
@@ -10,7 +10,7 @@ const getTeacher = async (req, res) => {
     return res.json(req.profile);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).send('Could not retrieve teacher');
   }
 };
 
@@ -25,51 +25,36 @@ const getTeacher = async (req, res) => {
 // eslint-disable-next-line consistent-return
 const teacherByID = async (req, res, next, pencilId) => {
   try {
-    const teacher = await Teacher.findOne({
+    await Teacher.findOne({
       where: { pencilId },
       include: [{ model: School }],
-    })
-      .then((data) => {
-        if (!data) {
-          return res.status(400).json({
-            error: 'Invalid teacher ID',
-          });
-        }
-        req.profile = data;
-        return next();
-      })
-      .catch((err) =>
-        res.status(400).json({
-          error: 'Teacher not found',
-        })
-      );
+    }).then((data) => {
+      if (!data) {
+        return res.status(400).send('Invalid teacher ID');
+      }
+      req.profile = data;
+      return next();
+    });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({
-      error: 'Could not retrieve teacher',
-    });
+    return res.status(500).send('Could not retrieve teacher');
   }
 };
 
 /**
- * Adds a teacher to the database.
+ * Adds a teacher to the database (TESTING ONLY).
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * */
 const addTeacher = async (req, res) => {
   try {
-    console.log('addTeacher:', req);
-
     // check if teacher already in database
     const data = await Teacher.findOne({
       where: { email: req.body.email },
     });
 
     if (data) {
-      return res.status(400).json({
-        teacher: data,
-        error: 'Teacher already exists',
-      });
+      return res.status(400).send('Teacher already exists');
     }
 
     const teacher = await Teacher.create({
@@ -83,9 +68,7 @@ const addTeacher = async (req, res) => {
     return res.status(200).json({ teacher });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({
-      error: 'Could not create teacher',
-    });
+    return res.status(400).send(err.message);
   }
 };
 

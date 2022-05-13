@@ -12,33 +12,21 @@ const { Transaction } = require('../models');
 // eslint-disable-next-line consistent-return
 const transactionByID = async (req, res, next, id) => {
   try {
-    const transaction = await Transaction.findOne({
+    await Transaction.findOne({
       where: {
         uuid: id,
       },
-    })
-      .then((data) => {
-        if (!data) {
-          return res.status(403).json({
-            error: 'Invalid transaction ID',
-          });
-        }
-        req.transaction = data;
-        return next();
-      })
-      .catch((err) =>
-        res.status(400).json({ error: 'Could not retrieve transaction' })
-      );
+    }).then((data) => {
+      if (!data) {
+        return res.status(403).send('Invalid transaction ID');
+      }
+      req.transaction = data;
+      return next();
+    });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ error: 'Could not retrieve transaction' });
+    return res.status(500).send(err.message);
   }
 };
 
-const formatTransactions = (transactions) => {
-  const formattedData = [];
-  console.log(transactions);
-  return transactions;
-};
-
-module.exports = { transactionByID, formatTransactions };
+module.exports = { transactionByID };

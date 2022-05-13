@@ -1,7 +1,10 @@
 const express = require('express');
 const reportController = require('../controllers/reports.controller.js');
+const authController = require('../controllers/auth.controller.js');
 
 const router = express.Router();
+
+router.use(authController.requireLogin);
 
 router
   .route('/report1')
