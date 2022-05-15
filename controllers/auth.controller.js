@@ -7,11 +7,10 @@ const firebase = require('../firebase.js');
 /**
  * Middleware function for adding key information on Calendly.
  * Returns a 403 response status if there is an error in signature or signature timestamp.
- * @param {Request Object} req
- * @param {Response Object} res
- * @param {Next} next
- * @returns This function should not return anything unless there is an error
- * in signature or signature timestamp.
+ * @param {Object} req - Request Object.
+ * @param {Object} res - Response Object.
+ * @param {function} next - Next middleware.
+ * @returns {function} - Call to next controller.
  */
 const requireKey = async (req, res, next) => {
   const webhookSigningKey = process.env.WEBHOOK_SIGNING_KEY;
@@ -64,11 +63,10 @@ const requireKey = async (req, res, next) => {
 /**
  * Middleware function for adding login token information on firebase authentication.
  * Returns a 403 response status if no login token is provided or an invalid token is provided.
- * @param {Request Object} req
- * @param {Response Object} res
- * @param {Next} next
- * @returns This function should not return anything unless no login token is provided or
- * an invalid token is provided.
+ * @param {Object} req - Request Object.
+ * @param {Object} res - Response Object.
+ * @param {function} next - Next middleware.
+ * @returns {function} - Call to next controller.
  */
 const requireLogin = async (req, res, next) => {
   const headerToken = req.headers.authorization;

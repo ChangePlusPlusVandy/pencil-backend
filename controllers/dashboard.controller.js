@@ -11,13 +11,13 @@ const {
 } = require('../models');
 
 /**
- * Middleware function for retrieving scheduled appointments based on the location, start date,
- * & end date passed through the request object. Queryed schedules and appointments are attatched to the request
- * object. Returns a 500 response status if there is an error.
- * @param {Request Object} req
- * @param {Response Object} res
- * @param {Next} next
- * @returns This function should not return anything unless there is an error.
+ * Middleware function for retrieving scheduled appointments in the 'Schedule' databse based on location,
+ * start date & end date passed through the request object. Queryed schedules and appointments are attatched
+ * to the request object. Returns a 500 response status if there is an error.
+ * @param {Object} req - Request Object.
+ * @param {Object} res - Response Object.
+ * @param {function} next - Next middleware.
+ * @returns {function} - Call to next controller.
  */
 const getDashboardSchedules = async (req, res, next) => {
   try {
@@ -48,13 +48,13 @@ const getDashboardSchedules = async (req, res, next) => {
 };
 
 /**
- * Middleware function for retrieving scheduled appointments based on the location, start date,
- * & end date passed through the request object. Queryed transactions and the total value of that transcation
- * are attatched to the request object. Returns a 500 response status if there is an error.
- * @param {Request Object} req
- * @param {Response Object} res
- * @param {Next} next
- * @returns This function should not return anything unless there is an error.
+ * Middleware function for retrieving scheduled appointments in the 'Transaction' databse based on location,
+ * start date & end date passed through the request object. Queryed transactions and the total value of that
+ * transcation are attatched to the request object. Returns a 500 response status if there is an error.
+ * @param {Object} req - Request Object.
+ * @param {Object} res - Response Object.
+ * @param {function} next - Next middleware.
+ * @returns {function} - Call to next controller.
  */
 const getDashboardTransactions = async (req, res, next) => {
   try {
@@ -99,8 +99,8 @@ const getDashboardTransactions = async (req, res, next) => {
 /**
  * Function that returns monthly statistics. Number of appointments & total value of transactions
  * are returned through the response object.
- * @param {Request Object} req
- * @param {Response Object} res
+ * @param {Object} req - Request Object.
+ * @param {Object} res - Response Object.
  * @returns Response object that holds monthly statistics.
  */
 const getDailyMonthlyStats = async (req, res) => {
@@ -118,8 +118,8 @@ const getDailyMonthlyStats = async (req, res) => {
 /**
  * Function that returns yearly statistics. Number of appointments, total value of transactions, average value
  * of each appointment & total number of pencils taken are returned through the response object.
- * @param {Request Object} req
- * @param {Response Object} res
+ * @param {Object} req - Request Object.
+ * @param {Object} res - Response Object.
  * @returns Response object that holds yearly statistics.
  */
 const getYearlyStats = async (req, res) => {

@@ -1,10 +1,9 @@
 const { Item } = require('../models');
 
 /**
- * Check whether a given item is in the master inventory table (TESTING PURPOSES ONLY).
- *
- * @param {Object} req - Request Object with structure { itemName: STRING, itemPrice: DOUBLE }
- * @param {Object} res - Response Object
+ * Function that checks whether a given item is in the master inventory table (TESTING PURPOSES ONLY).
+ * @param {Object} req - Request Object with structure { itemName: STRING, itemPrice: DOUBLE }.
+ * @param {Object} res - Response Object.
  */
 const checkForItem = async (req, res) => {
   try {
@@ -22,10 +21,9 @@ const checkForItem = async (req, res) => {
 };
 
 /**
- * Add an item to the master inventory (TESTING PURPOSES ONLY)
- *
- * @param {Object} req - Request Object with structure { itemName: STRING, itemPrice: DOUBLE }
- * @param {Object} res - Response Object
+ * Function that adds an item to the master inventory (TESTING PURPOSES ONLY).
+ * @param {Object} req - Request Object with structure { itemName: STRING, itemPrice: DOUBLE }.
+ * @param {Object} res - Response Object.
  */
 const addItem = async (req, res) => {
   try {
@@ -47,6 +45,11 @@ const addItem = async (req, res) => {
   }
 };
 
+/**
+ * Function that retrieves all items in the 'Item'(Master Inventory) database.
+ * @param {Object} req - Request Object.
+ * @param {Object} res - Response Object.
+ */
 const getAllItems = async (req, res) => {
   try {
     const itemList = await Item.findAll({
@@ -61,6 +64,12 @@ const getAllItems = async (req, res) => {
   }
 };
 
+/**
+ * Function that updates the 'Item'(Master Inventory) database based on items passed through
+ * the request object body.
+ * @param {Object} req - Request Object.
+ * @param {Object} res - Reponse Object.
+ */
 const updateMasterInventory = async (req, res) => {
   try {
     await Promise.all(

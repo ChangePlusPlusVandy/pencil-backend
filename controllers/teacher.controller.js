@@ -1,7 +1,10 @@
+// We will put all ES lint disables in the beginning for later cleanup.
+/* eslint-disable consistent-return */
+
 const { Teacher, School } = require('../models');
 
 /**
- * Retrieves a teacher's profile.
+ * Function that retrieves a teacher's profile.
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * */
@@ -15,14 +18,14 @@ const getTeacher = async (req, res) => {
 };
 
 /**
- * Populates profile field with teacher information.
+ * Middleware function that populates profile field with teacher information. Teacher information is found
+ * by querying the 'Teacher' database using the pencilId parameter.
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * @param {function} next - Next middleware.
  * @param {id} pencilId - Teacher id.
  * @returns {function} - Call to next controller.
- * */
-// eslint-disable-next-line consistent-return
+ */
 const teacherByID = async (req, res, next, pencilId) => {
   try {
     await Teacher.findOne({
@@ -42,7 +45,7 @@ const teacherByID = async (req, res, next, pencilId) => {
 };
 
 /**
- * Adds a teacher to the database (TESTING ONLY).
+ * Function that adds a teacher to the 'Teacher' database (TESTING ONLY).
  * @param {Object} req - Request object.
  * @param {Object} res - Response object.
  * */
