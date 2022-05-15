@@ -1,4 +1,6 @@
+// We will put all ES lint disables in the beginning for later cleanup.
 /* eslint-disable consistent-return */
+
 const { Op } = require('sequelize');
 const {
   Schedule,
@@ -8,6 +10,15 @@ const {
   Item,
 } = require('../models');
 
+/**
+ * Middleware function for retrieving scheduled appointments based on the location, start date,
+ * & end date passed through the request object. Queryed schedules and appointments are attatched to the request
+ * object. Returns a 500 response status if there is an error.
+ * @param {Request Object} req
+ * @param {Response Object} res
+ * @param {Next} next
+ * @returns This function should not return anything unless there is an error.
+ */
 const getDashboardSchedules = async (req, res, next) => {
   try {
     const location = req.location;
@@ -36,6 +47,15 @@ const getDashboardSchedules = async (req, res, next) => {
   }
 };
 
+/**
+ * Middleware function for retrieving scheduled appointments based on the location, start date,
+ * & end date passed through the request object. Queryed transactions and the total value of that transcation
+ * are attatched to the request object. Returns a 500 response status if there is an error.
+ * @param {Request Object} req
+ * @param {Response Object} res
+ * @param {Next} next
+ * @returns This function should not return anything unless there is an error.
+ */
 const getDashboardTransactions = async (req, res, next) => {
   try {
     const location = req.location;
@@ -76,6 +96,13 @@ const getDashboardTransactions = async (req, res, next) => {
   }
 };
 
+/**
+ * Function that returns monthly statistics. Number of appointments & total value of transactions
+ * are returned through the response object.
+ * @param {Request Object} req
+ * @param {Response Object} res
+ * @returns Response object that holds monthly statistics.
+ */
 const getDailyMonthlyStats = async (req, res) => {
   try {
     return res.status(200).json({
@@ -88,6 +115,13 @@ const getDailyMonthlyStats = async (req, res) => {
   }
 };
 
+/**
+ * Function that returns yearly statistics. Number of appointments, total value of transactions, average value
+ * of each appointment & total number of pencils taken are returned through the response object.
+ * @param {Request Object} req
+ * @param {Response Object} res
+ * @returns Response object that holds yearly statistics.
+ */
 const getYearlyStats = async (req, res) => {
   try {
     const { transactions, numAppointments, totalValue } = req;
