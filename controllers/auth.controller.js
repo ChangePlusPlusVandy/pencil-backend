@@ -1,7 +1,18 @@
+// We will put all ES lint disables in the beginning for later cleanup.
+/* eslint-disable consistent-return */
+
 const crypto = require('crypto');
 const firebase = require('../firebase.js');
 
-// eslint-disable-next-line consistent-return
+/**
+ * Middleware function for adding key information on Calendly.
+ * Returns a 403 response status if there is an error in signature or signature timestamp.
+ * @param {Request Object} req
+ * @param {Response Object} res
+ * @param {Next} next
+ * @returns This function should not return anything unless there is an error
+ * in signature or signature timestamp.
+ */
 const requireKey = async (req, res, next) => {
   const webhookSigningKey = process.env.WEBHOOK_SIGNING_KEY;
 
@@ -50,7 +61,15 @@ const requireKey = async (req, res, next) => {
   next();
 };
 
-// eslint-disable-next-line consistent-return
+/**
+ * Middleware function for adding login token information on firebase authentication.
+ * Returns a 403 response status if no login token is provided or an invalid token is provided.
+ * @param {Request Object} req
+ * @param {Response Object} res
+ * @param {Next} next
+ * @returns This function should not return anything unless no login token is provided or
+ * an invalid token is provided.
+ */
 const requireLogin = async (req, res, next) => {
   const headerToken = req.headers.authorization;
   if (!headerToken) {
