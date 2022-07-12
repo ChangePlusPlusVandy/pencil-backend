@@ -1,5 +1,4 @@
-/* eslint-disable no-underscore-dangle */
-const { ShoppingFormItem, Item, Location } = require('../models');
+const { ShoppingFormItem, Item } = require('../models');
 
 /**
  * Adds a supply to the form database.
@@ -38,33 +37,34 @@ const addSupply = async (req, res) => {
 const updateSupply = async (req, res) => {
   try {
     const responseItem = [];
-    const wipe = await ShoppingFormItem.destroy({
+    await ShoppingFormItem.destroy({
       where: { _locationId: req.location._id },
       truncate: true,
     });
-    req.body.forEach(async (item) => {
-      let newItem = await Item.findOne({
-        where: { itemName: item['Item.itemName'] },
-      });
-      if (!newItem) {
-        newItem = await Item.create({
-          itemName: item['Item.itemName'],
-          itemPrice: 0,
+    await Promise.all(
+      req.body.map(async (item) => {
+        let newItem = await Item.findOne({
+          where: { itemName: item['Item.itemName'] },
         });
-      }
-      const supply = await ShoppingFormItem.create({
-        _itemId: newItem._id,
-        _locationId: req.location._id,
-        maxLimit: item.maxLimit,
-        itemOrder: item.itemOrder,
-      });
-      responseItem.push(supply);
-    });
+        if (!newItem) {
+          newItem = await Item.create({
+            itemName: item['Item.itemName'],
+            itemPrice: 0,
+          });
+        }
+        const supply = await ShoppingFormItem.create({
+          _itemId: newItem._id,
+          _locationId: req.location._id,
+          maxLimit: item.maxLimit,
+          itemOrder: item.itemOrder,
+        });
+        responseItem.push(supply);
+      })
+    );
 
     return res.status(200).json({ message: 'Supply Form Updated' });
   } catch (err) {
-    console.log("addSupply : can't connect");
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -83,14 +83,13 @@ const fetchSupplyForm = async (req, res) => {
     });
 
     if (!supplies) {
-      console.log('fetchForm - supplies not found..');
-      return res.status(400).json({ error: 'No items found' });
+      return res.status(400).send('No supplies were found');
     }
     supplies.sort((a, b) => a.itemOrder - b.itemOrder);
     return res.status(200).json(supplies);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).send(err.message);
   }
 };
 

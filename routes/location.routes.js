@@ -8,7 +8,7 @@ router
   .route('/create')
   .post(authController.requireLogin, locationController.addLocation); // add location to database
 router
-  .route('/update/:uuid')
+  .route('/update')
   .put(authController.requireLogin, locationController.updateLocation); // update location in database
 router.route('/locations').get(locationController.getAllLocations); // get all locations from database
 

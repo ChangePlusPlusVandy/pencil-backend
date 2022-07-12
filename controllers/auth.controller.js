@@ -27,7 +27,7 @@ const requireKey = async (req, res, next) => {
   );
 
   if (!t || !signature) {
-    return res.status(403).json({ error: 'Invalid Signature' });
+    return res.status(403).send('Invalid signature');
   }
 
   const data = `${t}.${JSON.stringify(req.body)}`;
@@ -38,16 +38,15 @@ const requireKey = async (req, res, next) => {
     .digest('hex');
 
   if (expectedSignature !== signature) {
-    return res.status(403).json({ error: 'Invalid Signature' });
+    return res.status(403).send('Invalid Signature');
   }
 
   const tolerance = 180000;
   const timestampMilliseconds = Number(t) * 1000;
 
   if (timestampMilliseconds < Date.now() - tolerance) {
-    return res.status(403).json({ error: 'Invalid Signature Time Stamp' });
+    return res.status(403).send('Invalid Signature Time Stamp');
   }
-
   next();
 };
 
@@ -55,11 +54,11 @@ const requireKey = async (req, res, next) => {
 const requireLogin = async (req, res, next) => {
   const headerToken = req.headers.authorization;
   if (!headerToken) {
-    return res.send({ message: 'No token provided' }).status(403);
+    return res.status(403).send('No token provided');
   }
 
   if (headerToken && headerToken.split(' ')[0] !== 'Bearer') {
-    return res.status(403).send({ message: 'Invalid token' });
+    return res.status(403).send('Invalid token');
   }
 
   const token = headerToken.split(' ')[1];
@@ -67,7 +66,7 @@ const requireLogin = async (req, res, next) => {
     .auth()
     .verifyIdToken(token)
     .then(() => next())
-    .catch((err) => res.status(403).send({ message: err }));
+    .catch((err) => res.status(403).send(err.message));
 };
 
 module.exports = {

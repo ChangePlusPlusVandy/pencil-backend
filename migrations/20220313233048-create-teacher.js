@@ -23,10 +23,6 @@ module.exports = {
           isEmail: { message: 'Email must be valid' },
         },
       },
-      phone: {
-        type: DataTypes.STRING,
-        defaultValue: '',
-      },
       _schoolId: {
         type: DataTypes.INTEGER,
       },
