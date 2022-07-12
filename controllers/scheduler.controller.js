@@ -86,7 +86,6 @@ const addAppointment = async (req, res) => {
       },
       defaults: {
         name: req.body.payload.name,
-        phone: req.body.payload.questions_and_answers[1].answer, // FIX BASED ON ACTUAL FORM
         _schoolId: findSchool._id,
       },
     });
@@ -107,7 +106,39 @@ const addAppointment = async (req, res) => {
 
 const cancelAppointment = async (req, res) => {
   console.log(req.body.payload);
+  const options = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.SCHEDULER_BEARER_AUTH_TOKEN}`,
+    },
+  };
+  const event = await fetch(req.body.payload.event, options).then((response) =>
+    response.json()
+  );
   try {
+    const findSchedule = await Schedule.findOne({
+      where: {
+        start_date: event.resource.start_time,
+        end_date: event.resource.end_time,
+      },
+      include: [{ model: ScheduleItem }],
+    });
+    console.log(findSchedule);
+    const findTeacher = await Teacher.findOne({
+      where: {
+        email: req.body.payload.email,
+      },
+    });
+    await ScheduleItem.destroy({
+      where: {
+        _scheduleId: findSchedule._id,
+        _teacherId: findTeacher._id,
+      },
+    });
+    if (findSchedule.ScheduleItems.length > 1) {
+      await findSchedule.destroy();
+    }
     return res.status(204);
   } catch (err) {
     console.log(err);
