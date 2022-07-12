@@ -134,7 +134,7 @@ const cancelAppointment = async (req, res) => {
         _teacherId: findTeacher._id,
       },
     });
-    if (findSchedule.ScheduleItems.length <= 1) {
+    if (findSchedule && findSchedule.ScheduleItems.length <= 1) {
       await findSchedule.destroy();
     }
     return res.status(204);
