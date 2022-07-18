@@ -147,13 +147,19 @@ const printReport1 = async (req, res) => {
       dateString = `all-dates-${Math.floor(Date.now() / 1000)}`;
     }
 
-    const location = './downloads/';
     const filename = `weekly-report-${dateString}`;
 
-    await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
-
-    // Frontend accesses file using filename
-    return res.status(200).json({ filename });
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=${filename}.xlsx`
+    );
+    return reportWorkbook.xlsx.write(res).then(() => {
+      res.status(200).end();
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: 'internal server error' });
@@ -388,6 +394,7 @@ const printReport5 = (req, res) => {
 const returnReport = (req, res) => {
   const reportBody = req.reportBody;
   const reportStats = req.reportStats ? req.reportStats : {};
+  console.log({ reportBody, reportStats });
 
   return res.status(200).json({ reportBody, reportStats });
 };

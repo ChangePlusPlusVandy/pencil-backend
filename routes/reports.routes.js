@@ -23,7 +23,11 @@ router.route('/report3').get(reportController.report3);
 
 router
   .route('/report4')
-  .get(reportController.getTransaction, reportController.report4); // report 4
+  .get(
+    reportController.getTransaction,
+    reportController.report4,
+    reportController.returnReport
+  ); // report 4
 
 router
   .route('/printReport4')
@@ -35,6 +39,10 @@ router
 
 router
   .route('/report5')
-  .get(reportController.getTransaction, reportController.report5); // report 5
+  .get(
+    reportController.getTransaction,
+    reportController.report5,
+    reportController.returnReport
+  ); // report 5
 
 module.exports = router;

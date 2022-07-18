@@ -20,7 +20,6 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/static', express.static('public'));
-app.use('/report-downloads', express.static('downloads'));
 
 app.param('location', locationController.locationByID);
 
