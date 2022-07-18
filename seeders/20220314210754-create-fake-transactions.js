@@ -9,7 +9,7 @@ module.exports = {
           _teacherId: 2,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-06T21:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -18,7 +18,7 @@ module.exports = {
           _teacherId: 3,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-06T22:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -27,7 +27,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-06T23:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -36,7 +36,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T00:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -54,7 +54,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T02:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -63,7 +63,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T04:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -72,7 +72,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T06:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -81,7 +81,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T08:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -90,7 +90,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T10:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -99,7 +99,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T12:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -108,7 +108,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T14:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -117,7 +117,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T16:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -126,7 +126,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T18:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -135,7 +135,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T20:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -144,7 +144,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T22:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -153,7 +153,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-08T00:00:00'),
           updatedAt: new Date(),
         },
         {
@@ -162,7 +162,7 @@ module.exports = {
           _teacherId: 4,
           _schoolId: 2,
           _locationId: 1,
-          createdAt: new Date(),
+          createdAt: new Date('2022-04-07T02:00:00'),
           updatedAt: new Date(),
         },
       ],

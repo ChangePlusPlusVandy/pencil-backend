@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const fetch = require('cross-fetch');
 const { Op } = require('sequelize');
 const {
@@ -8,6 +9,17 @@ const {
   School,
 } = require('../models');
 
+/**
+ * Gets all appointments scheduled by teachers
+ *
+ * @param req - Express request object with the following params:
+ *                req.query.startDate - start date of the schedule
+ *                                      (i.e., the lower bound of scheduled appointments to fetch)
+ *                req.query.end_date - end date of the schedule (the upper bound)
+ * @param res - Express response object
+ * @returns response object with status code and schedule data if successful. Returned data contains
+ *          a list of scheduleItems, each of which contains all appointments for a given timeslot
+ */
 const getSchedule = async (req, res) => {
   try {
     const scheduleWhereStatement = {
@@ -37,14 +49,18 @@ const getSchedule = async (req, res) => {
       ],
       where: scheduleWhereStatement,
     });
+    console.log(schedule);
 
     return res.status(200).json(schedule);
   } catch (err) {
     console.log(err);
-    return res.status(500).send(err.message);
+    return { err: 'Error getting schedule' };
   }
 };
 
+/**
+ * @param req --
+ */
 const addAppointment = async (req, res) => {
   try {
     const options = {
@@ -90,7 +106,7 @@ const addAppointment = async (req, res) => {
     findTeacher.update({
       pencilId: findTeacher._id,
     });
-    await ScheduleItem.create({
+    const newScheduleItem = await ScheduleItem.create({
       _scheduleId: findSchedule._id,
       _teacherId: findTeacher._id,
     });
@@ -98,7 +114,7 @@ const addAppointment = async (req, res) => {
     return res.status(204);
   } catch (err) {
     console.log(err);
-    return res.status(500).send('Could not process appointment');
+    return res.status(500).json({ err: 'Error adding appointment' });
   }
 };
 
@@ -140,11 +156,10 @@ const cancelAppointment = async (req, res) => {
     return res.status(204);
   } catch (err) {
     console.log(err);
-    return res.status(500).send('Could not cancel appointment');
+    return res.status(500).json({ err: 'Error canceling appointment' });
   }
 };
 
-// TESTING ONLY
 const fakeAppointment = async (req, res) => {
   try {
     const location = await Location.findOne({
@@ -179,7 +194,7 @@ const fakeAppointment = async (req, res) => {
     findTeacher.update({
       pencilId: findTeacher._id,
     });
-    await ScheduleItem.create({
+    const newScheduleItem = await ScheduleItem.create({
       _scheduleId: findSchedule._id,
       _teacherId: findTeacher._id,
     });
@@ -189,7 +204,7 @@ const fakeAppointment = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    return res.status(500).send(err.message);
+    return res.status(500).json({ err: 'Error adding appointment' });
   }
 };
 
