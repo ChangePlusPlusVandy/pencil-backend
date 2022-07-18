@@ -148,7 +148,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
-          uuid: '7fbcee32-acd0-4595-94c9-c83a3f5978ee',
+          uuid: '7fbcee32-acd0-4595-94c9-c83a3f59780e',
           status: 0,
           _teacherId: 4,
           _schoolId: 2,

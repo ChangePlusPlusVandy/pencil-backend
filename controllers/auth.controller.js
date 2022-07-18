@@ -1,5 +1,7 @@
 const crypto = require('crypto');
+const firebase = require('../firebase.js');
 
+// eslint-disable-next-line consistent-return
 const requireKey = async (req, res, next) => {
   const webhookSigningKey = process.env.WEBHOOK_SIGNING_KEY;
 
@@ -25,8 +27,7 @@ const requireKey = async (req, res, next) => {
   );
 
   if (!t || !signature) {
-    console.log('no t or signature');
-    throw new Error('Invalid Signature');
+    return res.status(403).send('Invalid signature');
   }
 
   const data = `${t}.${JSON.stringify(req.body)}`;
@@ -37,29 +38,35 @@ const requireKey = async (req, res, next) => {
     .digest('hex');
 
   if (expectedSignature !== signature) {
-    console.log('Invalid Signature');
-    throw new Error('Invalid Signature');
+    return res.status(403).send('Invalid Signature');
   }
 
-  // Prevent replay attacks.
-
-  const threeMinutes = 180000;
-  const tolerance = threeMinutes;
+  const tolerance = 180000;
   const timestampMilliseconds = Number(t) * 1000;
 
   if (timestampMilliseconds < Date.now() - tolerance) {
-    console.log('Timestamp is too old');
-    throw new Error(
-      "Invalid Signature. The signature's timestamp is outside of the tolerance zone."
-    );
+    return res.status(403).send('Invalid Signature Time Stamp');
   }
-
   next();
 };
 
+// eslint-disable-next-line consistent-return
 const requireLogin = async (req, res, next) => {
-  console.log('logging in');
-  next();
+  const headerToken = req.headers.authorization;
+  if (!headerToken) {
+    return res.status(403).send('No token provided');
+  }
+
+  if (headerToken && headerToken.split(' ')[0] !== 'Bearer') {
+    return res.status(403).send('Invalid token');
+  }
+
+  const token = headerToken.split(' ')[1];
+  firebase
+    .auth()
+    .verifyIdToken(token)
+    .then(() => next())
+    .catch((err) => res.status(403).send(err.message));
 };
 
 module.exports = {

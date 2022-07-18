@@ -5,13 +5,19 @@ const authController = require('../controllers/auth.controller.js');
 
 const router = express.Router();
 
-router.route('/:location/getSchedule').get(schedulerController.getSchedule);
+router
+  .route('/:location/getSchedule')
+  .get(authController.requireLogin, schedulerController.getSchedule);
 router
   .route('/addAppointment')
   .post(authController.requireKey, schedulerController.addAppointment);
 router
   .route('/cancelAppointment')
   .post(authController.requireKey, schedulerController.cancelAppointment);
+
+// router
+//   .route('/fakeAppointment')
+//   .post(schedulerController.fakeAppointment);
 router.param('location', locationController.locationByID);
 
 module.exports = router;

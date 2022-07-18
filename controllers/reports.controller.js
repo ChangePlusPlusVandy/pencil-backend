@@ -11,24 +11,21 @@ const {
   TransactionItem,
   Item,
   ScheduleItem,
+  Schedule,
 } = require('../models');
 const ExcelJS = require('exceljs');
 const fs = require('fs');
 const { NULL } = require('mysql/lib/protocol/constants/types');
 const { json } = require('express/lib/response');
+const { clearLine } = require('readline');
+const schedule = require('../models/schedule');
 
 // eslint-disable-next-line consistent-return
 const getTransaction = async (req, res, next) => {
   try {
-    // TODO: Integrate this logic
-    // const noShowList = scheduleArr.filter((schedule) => !schedule.showed);
-    // const noShowNum = noShowList.length;
-    // const totalNumAppointments = scheduleArr.length;
-
     const transactionWhereStatement = {
-      // FIXME: UNCOMMENT
-      //status: 1,
-      //_locationId: req.location._id,
+      status: 1,
+      _locationId: req.location._id,
     };
     console.log(transactionWhereStatement);
     if (req.query.startDate && req.query.endDate) {
@@ -65,7 +62,7 @@ const getTransaction = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: err });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -106,11 +103,12 @@ const report1 = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).send(err.message);
   }
 };
 
 const printReport1 = async (req, res) => {
+  console.log(req);
   try {
     // Get data from Report 1
     const pricedTransactions = req.reportBody;
@@ -139,10 +137,18 @@ const printReport1 = async (req, res) => {
       });
     });
 
-    // Append date to end of filename
+    // Create string for date range
+    const startDate =
+      req.query.startDate &&
+      req.query.startDate.slice(0, req.query.startDate.indexOf('T'));
+    const endDate =
+      req.query.endDate &&
+      req.query.endDate.slice(0, req.query.endDate.indexOf('T'));
+
+    // Append date range string to end of filename
     let dateString;
-    if (req.query.startDate && req.query.endDate) {
-      dateString = `from-${req.query.startDate}-${req.query.endDate}`;
+    if (startDate && endDate) {
+      dateString = `FROM-${startDate}-TO-${endDate}`;
     } else {
       dateString = `all-dates-${Math.floor(Date.now() / 1000)}`;
     }
@@ -162,11 +168,12 @@ const printReport1 = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'internal server error' });
+    return res.status(500).send(err.message);
   }
 };
 
-const report3 = async (req, res) => {
+// TODO: Document all reports
+const report3 = async (req, res, next) => {
   try {
     // 1. Find all schedule items bewteen date range whose showed is false
     const scheduleWhereStatement = { showed: 0 };
@@ -181,6 +188,10 @@ const report3 = async (req, res) => {
       attributes: [],
       where: scheduleWhereStatement,
       include: [
+        {
+          model: Schedule,
+          attributes: ['start_date'],
+        },
         {
           model: Teacher,
           attributes: ['name', 'email'],
@@ -202,13 +213,73 @@ const report3 = async (req, res) => {
         name: schedule['Teacher.name'],
         email: schedule['Teacher.email'],
         school: schedule['Teacher.School.name'],
+        date: schedule['Schedule.start_date'],
       })),
     };
 
-    return res.status(200).json(returnedData);
+    req.reportBody = returnedData;
+    next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'internal server error' });
+    return res.status(500).send(err.message);
+  }
+};
+
+const printReport3 = async (req, res) => {
+  try {
+    // Get data from Report 3
+    const returnedData = req.reportBody;
+
+    // Initialize excel spreadsheet
+    const reportWorkbook = new ExcelJS.Workbook();
+    const sheet = reportWorkbook.addWorksheet('No-Show report');
+
+    sheet.columns = [
+      { header: 'Teacher Name', key: 'teacherName', width: 20 },
+      { header: 'Teacher Email', key: 'teacherEmail', width: 20 },
+      { header: 'School Name', key: 'schoolName', width: 20 },
+      { header: 'No-Show Rate', key: 'noShowRate', width: 10 },
+    ];
+
+    returnedData.noShowList.forEach((noShow) => {
+      sheet.addRow({
+        teacherName: noShow.name,
+        teacherEmail: noShow.email,
+        schoolName: noShow.school,
+        noShowNum: null,
+      });
+    });
+
+    const noShowRateCell = sheet.getCell('D2');
+    noShowRateCell.value = returnedData.noShowNum;
+
+    // Create string for date range
+    const startDate =
+      req.query.startDate &&
+      req.query.startDate.slice(0, req.query.startDate.indexOf('T'));
+    const endDate =
+      req.query.endDate &&
+      req.query.endDate.slice(0, req.query.endDate.indexOf('T'));
+
+    // Append date range string to end of filename
+    let dateString;
+    if (startDate && endDate) {
+      dateString = `FROM-${startDate}-TO-${endDate}`;
+    } else {
+      dateString = `all-dates-${Math.floor(Date.now() / 1000)}`;
+    }
+
+    const location = './downloads/';
+    const filename = `no-show-report-${dateString}.xlsx`;
+
+    await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
+
+    // Frontend accesses file using filename
+    return res.status(200).json({ filename });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).send(err.message);
   }
 };
 
@@ -280,7 +351,7 @@ const report4 = async (req, res, next) => {
     next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'internal server error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -312,36 +383,44 @@ const printReport4 = async (req, res) => {
     ];
 
     // Iteratively add each row the the spreadsheet
-    productArr.forEach((transaction) => {
+    productArr.forEach((product) => {
       sheet.addRow({
-        itemName: productArr.itemName,
-        itemPrice: productArr.itemPrice,
-        numTaken: productArr.numTaken,
-        numShoppers: productArr.numShoppers,
-        numTakenAtMax: productArr.numTakenAtMax,
-        percentageOfShoppers: productArr.percentageOfShoppers,
-        percentageTakenAtMax: productArr.percentageTakenAtMax,
-        totalValTaken: productArr.totalValueTaken,
+        itemName: product.itemName,
+        itemPrice: product.itemPrice,
+        numTaken: product.numTaken,
+        numShoppers: product.numShoppers,
+        numTakenAtMax: product.numTakenAtMax,
+        percentageOfShoppers: product.percentageOfShoppers,
+        percentageTakenAtMax: product.percentageTakenAtMax,
+        totalValTaken: product.totalValueTaken,
       });
     });
 
-    // Append date to end of filename
+    // Create string for date range
+    const startDate =
+      req.query.startDate &&
+      req.query.startDate.slice(0, req.query.startDate.indexOf('T'));
+    const endDate =
+      req.query.endDate &&
+      req.query.endDate.slice(0, req.query.endDate.indexOf('T'));
+
+    // Append date range string to end of filename
     let dateString;
-    if (req.query.startDate && req.query.endDate) {
-      dateString = `from-${req.query.startDate}-${req.query.endDate}`;
+    if (startDate && endDate) {
+      dateString = `FROM-${startDate}-TO-${endDate}`;
     } else {
       dateString = `all-dates-${Math.floor(Date.now() / 1000)}`;
     }
 
     const location = './downloads/';
-    const filename = `product-report-${dateString}`;
+    const filename = `product-report-${dateString}.xlsx`;
     await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
 
     // Frontend accesses file using filename
     return res.status(200).json({ filename });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).send(err.message);
   }
 };
 
@@ -361,7 +440,7 @@ const report5 = async (req, res, next) => {
         // eslint-disable-next-line prefer-template
         teacherInfo.name + '-' + teacherInfo.email;
 
-      if (!(teacherID in teacherData)) {
+      if (!teacherData[teacherID]) {
         teacherData[teacherID] = {
           timesShopped: 1,
           schoolName: transaction.School.dataValues.name,
@@ -372,23 +451,65 @@ const report5 = async (req, res, next) => {
       }
     });
 
-    req.reportBody = teacherData;
+    const teacherArr = [];
+    Object.keys(teacherData).forEach((key) =>
+      teacherArr.push(teacherData[key])
+    );
+
+    req.reportBody = teacherArr;
     next();
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).send(err.message);
   }
 };
 
-// FOR ARTHUR TODO: FINISH THIS ONE
-const printReport5 = (req, res) => {
-  // teacherData = req.reportBody;
-  // const reportWorkbook = new ExcelJS.Workbook();
-  // const sheet = reportWorkbook.addWorksheet('report5');
-  // console.log(teacherData[0]);
-  // // teacherData.forEach((teacher) => {
-  // // });
-  return res.status(500).json({ error: 'PrintReport5 not complete yet' });
+const printReport5 = async (req, res) => {
+  try {
+    teacherData = req.reportBody;
+
+    const reportWorkbook = new ExcelJS.Workbook();
+    const sheet = reportWorkbook.addWorksheet('report5');
+    sheet.columns = [
+      { header: 'Teacher Name', key: 'teacherName', width: 20 },
+      { header: 'School Name', key: 'schoolName', width: 20 },
+      { header: 'Times Shopped', key: 'timesShopped', width: 10 },
+    ];
+
+    teacherData.forEach((teacher) => {
+      sheet.addRow({
+        teacherName: teacher.name,
+        schoolName: teacher.schoolName,
+        timesShopped: teacher.timesShopped,
+      });
+    });
+
+    // Create string for date range
+    const startDate =
+      req.query.startDate &&
+      req.query.startDate.slice(0, req.query.startDate.indexOf('T'));
+    const endDate =
+      req.query.endDate &&
+      req.query.endDate.slice(0, req.query.endDate.indexOf('T'));
+
+    // Append date range string to end of filename
+    let dateString;
+    if (startDate && endDate) {
+      dateString = `FROM-${startDate}-TO-${endDate}`;
+    } else {
+      dateString = `all-dates-${Math.floor(Date.now() / 1000)}`;
+    }
+
+    const location = './downloads/';
+    const filename = `teacher-visit-report-${dateString}.xlsx`;
+    await reportWorkbook.xlsx.writeFile(`${location}${filename}`);
+
+    return res.status(200).json({ filename });
+  } catch (err) {
+    console.log(err);
+
+    return res.status(500).send(err.message);
+  }
 };
 
 const returnReport = (req, res) => {
@@ -399,27 +520,15 @@ const returnReport = (req, res) => {
   return res.status(200).json({ reportBody, reportStats });
 };
 
-const deleteReportSheet = (req, res, next) => {
-  try {
-    const filename = req.body.filename;
-    fs.unlinkSync(filename);
-
-    return res.status(200).json({ result: 'File deleted' });
-  } catch (err) {
-    console.log(err);
-    return res.status(200).json({ error: 'internal server error' });
-  }
-};
-
 module.exports = {
   getTransaction,
   report1,
   printReport1,
   report3,
+  printReport3,
   report4,
   printReport4,
   report5,
   printReport5,
   returnReport,
-  deleteReportSheet,
 };
