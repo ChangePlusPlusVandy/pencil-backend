@@ -164,7 +164,7 @@ const approveDeniedTransaction = async (req, res) => {
  */
 const getAllPendingTransactions = async (req, res) => {
   try {
-    const perPage = parseInt(req.query.perPage, 10) || 10;
+    const perPage = parseInt(req.query.perPage, 10) || 50;
     const previousItems = parseInt(req.query.previous, 10) || 0;
     const transactions = await Transaction.findAll({
       where: { _locationId: req.location._id, status: 0 },
@@ -205,7 +205,7 @@ const getAllPendingTransactions = async (req, res) => {
  */
 const getAllApprovedTransactions = async (req, res) => {
   try {
-    const perPage = parseInt(req.query.perPage, 10) || 10;
+    const perPage = parseInt(req.query.perPage, 10) || 50;
     const previousItems = parseInt(req.query.previous, 10) || 0;
     const transactions = await Transaction.findAll({
       where: { _locationId: req.location._id, status: 1 },
@@ -245,7 +245,7 @@ const getAllApprovedTransactions = async (req, res) => {
  */
 const getAllDeniedTransactions = async (req, res) => {
   try {
-    const perPage = parseInt(req.query.perPage, 10) || 10;
+    const perPage = parseInt(req.query.perPage, 10) || 50;
     const previousItems = parseInt(req.query.previous, 10) || 0;
     const transactions = await Transaction.findAll({
       where: { _locationId: req.location._id, status: 2 },

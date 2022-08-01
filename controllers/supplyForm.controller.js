@@ -18,7 +18,6 @@ const addSupply = async (req, res) => {
       itemOrder: req.body.itemOrder,
     });
     if (!supply) {
-      console.log('addSupply : Sup empty.');
       return res.status(500).json({ error: 'Could not create supply' });
     }
 

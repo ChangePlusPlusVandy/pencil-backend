@@ -23,6 +23,14 @@ router
   );
 
 router
+  .route('/report2')
+  .get(reportController.report2, reportController.returnReport);
+
+router
+  .route('/printReport2')
+  .get(reportController.report2, reportController.printReport2);
+
+router
   .route('/report3')
   .get(reportController.report3, reportController.returnReport);
 
@@ -53,5 +61,13 @@ router
     reportController.report5,
     reportController.returnReport
   ); // report 5
+
+router
+  .route('/printReport5')
+  .get(
+    reportController.getTransaction,
+    reportController.report5,
+    reportController.printReport5
+  );
 
 module.exports = router;

@@ -49,7 +49,6 @@ const getSchedule = async (req, res) => {
       ],
       where: scheduleWhereStatement,
     });
-    console.log(schedule);
 
     return res.status(200).json(schedule);
   } catch (err) {
@@ -119,7 +118,6 @@ const addAppointment = async (req, res) => {
 };
 
 const cancelAppointment = async (req, res) => {
-  console.log(req.body.payload);
   const options = {
     method: 'GET',
     headers: {
@@ -138,7 +136,6 @@ const cancelAppointment = async (req, res) => {
       },
       include: [{ model: ScheduleItem }],
     });
-    console.log(findSchedule);
     const findTeacher = await Teacher.findOne({
       where: {
         email: req.body.payload.email,
